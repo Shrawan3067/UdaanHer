@@ -52,7 +52,7 @@ export const AdminReportsPage: React.FC = () => {
           <select
             value={financialYear}
             onChange={(e) => setFinancialYear(e.target.value)}
-            className="px-3.5 py-2 text-sm bg-surface-container-low border border-[#E8EAE5] rounded-xl font-label-md font-semibold text-on-surface cursor-pointer focus:outline-hidden"
+            className="px-3.5 py-2 text-sm bg-surface-container-low border border-[#E5E7EB] rounded-xl font-label-md font-semibold text-on-surface cursor-pointer focus:outline-hidden"
           >
             <option value="2026-27">FY 2026-27 (Current)</option>
             <option value="2025-26">FY 2025-26</option>
@@ -70,7 +70,7 @@ export const AdminReportsPage: React.FC = () => {
       </div>
 
       {/* Summary Banner */}
-      <div className="bg-surface-container-lowest rounded-2xl border border-[#E8EAE5] p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-surface-container-lowest rounded-2xl border border-[#E5E7EB] p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-primary-fixed flex items-center justify-center text-primary font-bold">
             <span className="material-symbols-outlined text-[24px]">verified_user</span>
@@ -102,8 +102,8 @@ export const AdminReportsPage: React.FC = () => {
       </div>
 
       {/* Form 10BD Table */}
-      <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-[#E8EAE5] overflow-hidden">
-        <div className="p-6 border-b border-[#E8EAE5] flex items-center justify-between">
+      <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-[#E5E7EB] overflow-hidden">
+        <div className="p-6 border-b border-[#E5E7EB] flex items-center justify-between">
           <h3 className="font-title-md text-title-md text-primary font-bold">
             Schedule of Donors (Form 10BD Electronic Specification)
           </h3>
@@ -124,7 +124,7 @@ export const AdminReportsPage: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider border-b border-[#E8EAE5]">
+                <tr className="bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider border-b border-[#E5E7EB]">
                   <th className="py-3 px-6 font-semibold">Sl. No.</th>
                   <th className="py-3 px-6 font-semibold">Unique ID (PAN)</th>
                   <th className="py-3 px-6 font-semibold">Donor Name</th>
@@ -134,7 +134,7 @@ export const AdminReportsPage: React.FC = () => {
                   <th className="py-3 px-6 font-semibold">Receipt Number</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E8EAE5]">
+              <tbody className="divide-y divide-[#E5E7EB]">
                 {form10bdRecords.map((r, idx) => (
                   <tr key={idx} className="hover:bg-surface-container-low/40 transition-colors">
                     <td className="py-3 px-6 font-mono text-xs text-on-surface-variant">{idx + 1}</td>

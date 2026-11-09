@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { Role, Language } from '@prisma/client';
+import { Role, Language } from '../../types/models.js';
 import { prisma } from '../../config/database.js';
 import { env } from '../../config/env.js';
 import { AppError } from '../../utils/app-error.js';

@@ -66,17 +66,17 @@ export const AdminLayout: React.FC = () => {
   return (
     <div className="min-h-screen bg-surface text-on-surface">
       {/* Sidebar Desktop */}
-      <aside className="hidden lg:flex fixed left-0 top-0 h-full w-72 bg-surface-container-lowest z-50 flex-col justify-between border-r border-[#E8EAE5] shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+      <aside className="hidden lg:flex fixed left-0 top-0 h-full w-72 glass-card z-50 flex-col justify-between border-r border-[#E5E7EB] shadow-[0_1px_12px_rgba(0,53,39,0.05)]">
         <div className="flex flex-col">
           {/* Brand */}
-          <div className="h-20 px-6 flex items-center justify-between border-b border-[#E8EAE5]">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-on-primary">
+          <div className="h-20 px-6 flex items-center justify-between border-b border-[#E5E7EB]">
+            <Link to="/" className="flex items-center gap-3 group">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-container flex items-center justify-center text-on-primary shadow-xs ring-1 ring-primary/20 group-hover:scale-105 transition-transform">
                 <span className="material-symbols-outlined text-[22px]">diversity_1</span>
               </div>
               <div className="flex flex-col">
-                <span className="font-title-md text-title-md text-primary tracking-tight font-bold">SakhiSetu</span>
-                <span className="font-label-caps text-label-caps text-on-surface-variant uppercase font-semibold">
+                <span className="font-title-md text-title-md text-primary tracking-tight font-bold group-hover:text-primary-container transition-colors">UdaanHer</span>
+                <span className="font-label-caps text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">
                   Admin Portal
                 </span>
               </div>
@@ -85,32 +85,32 @@ export const AdminLayout: React.FC = () => {
 
           {/* Environment Status */}
           <div className="px-4 py-3">
-            <div className="px-3 py-1.5 rounded-xl bg-surface-container-low flex items-center justify-between border border-[#E8EAE5]">
-              <span className="font-label-sm text-label-sm text-on-surface-variant font-medium">Environment</span>
-              <span className="font-label-caps text-label-caps text-on-primary-fixed-variant bg-primary-fixed px-2 py-0.5 rounded font-semibold">
+            <div className="px-3.5 py-2 rounded-xl bg-surface-container-low flex items-center justify-between border border-[#E5E7EB] shadow-xs">
+              <span className="font-label-sm text-xs text-on-surface-variant font-medium">Environment</span>
+              <span className="font-label-caps text-[10px] text-on-primary-fixed-variant bg-primary-fixed px-2 py-0.5 rounded font-bold">
                 Govt Sync Live
               </span>
             </div>
           </div>
 
           <div className="px-6 pt-3 pb-2">
-            <span className="font-label-caps text-label-caps text-on-surface-variant uppercase font-semibold tracking-wider">
+            <span className="font-label-caps text-[11px] text-on-surface-variant uppercase font-bold tracking-wider">
               Operations Management
             </span>
           </div>
 
           {/* Navigation */}
-          <nav className="px-4 flex flex-col gap-1">
+          <nav className="px-4 flex flex-col gap-1.5">
             {menuItems.map((item) => {
               const active = isActive(item);
               return (
                 <Link
                   key={item.href}
                   to={item.href}
-                  className={`flex items-center justify-between px-4 py-2.5 rounded-xl font-label-md text-label-md transition-colors ${
+                  className={`flex items-center justify-between px-4 py-2.5 rounded-xl font-label-md text-label-md transition-all duration-150 ${
                     active
-                      ? 'bg-primary-container text-on-primary font-semibold shadow-xs'
-                      : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
+                      ? 'btn-primary-gradient text-on-primary font-bold shadow-xs'
+                      : 'text-on-surface-variant hover:bg-primary/5 hover:text-primary'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -118,7 +118,7 @@ export const AdminLayout: React.FC = () => {
                     <span>{item.label}</span>
                   </div>
                   {item.badge && (
-                    <span className="px-2 py-0.5 rounded-full bg-secondary text-on-secondary font-label-caps text-[10px] uppercase font-bold">
+                    <span className="px-2 py-0.5 rounded-full bg-secondary text-on-secondary font-label-caps text-[10px] uppercase font-bold shadow-xs">
                       {item.badge}
                     </span>
                   )}
@@ -129,8 +129,8 @@ export const AdminLayout: React.FC = () => {
         </div>
 
         {/* Portal Health & Logout */}
-        <div className="p-4 border-t border-[#E8EAE5] space-y-3">
-          <div className="p-3.5 rounded-xl bg-surface-container-low flex flex-col gap-1 border border-[#E8EAE5]">
+        <div className="p-4 border-t border-[#E5E7EB] space-y-3">
+          <div className="p-3.5 rounded-xl bg-surface-container-low flex flex-col gap-1 border border-[#E5E7EB]">
             <div className="flex items-center justify-between">
               <span className="font-label-caps text-label-caps text-on-surface-variant uppercase font-semibold">
                 Portal Health
@@ -145,7 +145,7 @@ export const AdminLayout: React.FC = () => {
 
           <button
             onClick={logout}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-on-surface-variant hover:text-error hover:bg-surface-container-low font-label-sm text-label-sm transition-colors"
+            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-on-surface-variant hover:text-error hover:bg-error/10 font-label-sm text-label-sm transition-colors cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
             <span>Sign Out</span>
@@ -155,15 +155,15 @@ export const AdminLayout: React.FC = () => {
 
       {/* Top Header Bar for Desktop */}
       <div className="lg:pl-72">
-        <header className="fixed top-0 left-0 lg:left-72 right-0 h-20 bg-surface/90 backdrop-blur-xl border-b border-[#E8EAE5] z-40 px-6 lg:px-8 flex items-center justify-between">
+        <header className="fixed top-0 left-0 lg:left-72 right-0 h-20 glass-header border-b border-[#E5E7EB] z-40 px-6 lg:px-8 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-              className="lg:hidden p-2 text-on-surface rounded-xl hover:bg-surface-container"
+              className="lg:hidden p-2 text-on-surface rounded-xl hover:bg-surface-container cursor-pointer"
             >
               <Menu className="w-6 h-6" />
             </button>
-            <span className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider bg-surface-container-high px-3 py-1 rounded-full font-semibold">
+            <span className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider glass-pill px-3 py-1 rounded-full font-bold shadow-xs">
               Govt &amp; Field Operations Portal
             </span>
             <div className="hidden sm:flex items-center gap-1.5 text-on-surface-variant font-body-sm text-xs">
@@ -203,8 +203,8 @@ export const AdminLayout: React.FC = () => {
           <div className="fixed inset-0 bg-black/40" onClick={() => setMobileSidebarOpen(false)}></div>
           <div className="relative w-72 bg-surface-container-lowest h-full shadow-2xl flex flex-col justify-between p-4 z-10">
             <div>
-              <div className="flex items-center justify-between pb-4 border-b border-[#E8EAE5]">
-                <span className="font-title-md text-primary font-bold">SakhiSetu Admin</span>
+              <div className="flex items-center justify-between pb-4 border-b border-[#E5E7EB]">
+                <span className="font-title-md text-primary font-bold">UdaanHer Admin</span>
                 <button onClick={() => setMobileSidebarOpen(false)}>
                   <X className="w-6 h-6 text-on-surface" />
                 </button>

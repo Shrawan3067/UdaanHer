@@ -1,4 +1,4 @@
-import { Prisma, SchemeStatus } from '@prisma/client';
+import { SchemeStatus } from '../../types/models.js';
 import { prisma } from '../../config/database.js';
 import { AppError } from '../../utils/app-error.js';
 
@@ -17,7 +17,7 @@ export class SchemeService {
     const { search, category, district, need, status, page, limit } = params;
     const skip = (page - 1) * limit;
 
-    const where: Prisma.SchemeWhereInput = {};
+    const where: any = {};
 
     // Public users only see PUBLISHED schemes
     if (!isAdmin) {
@@ -43,10 +43,10 @@ export class SchemeService {
       ];
     }
 
-    // Filter by district in JSON field
+    // Filter by district in array field
     if (district) {
       where.applicableDistricts = {
-        array_contains: district,
+        has: district,
       };
     }
 
@@ -92,7 +92,7 @@ export class SchemeService {
   }
 
   async getSchemeBySlug(slug: string, isAdmin = false) {
-    const where: Prisma.SchemeWhereUniqueInput = { slug };
+    const where: any = { slug };
 
     const scheme = await prisma.scheme.findUnique({
       where,

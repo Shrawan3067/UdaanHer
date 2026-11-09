@@ -154,7 +154,7 @@ export const AdminSchemesPage: React.FC = () => {
       )}
 
       {/* Header Bar */}
-      <div className="p-6 rounded-2xl bg-surface-container-lowest shadow-sm border border-[#E8EAE5] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-6 rounded-2xl bg-surface-container-lowest shadow-sm border border-[#E5E7EB] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="font-label-caps text-label-caps uppercase text-secondary font-bold tracking-wider">
             Content Management
@@ -178,7 +178,7 @@ export const AdminSchemesPage: React.FC = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-surface-container-lowest p-4 rounded-2xl shadow-sm border border-[#E8EAE5] flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="bg-surface-container-lowest p-4 rounded-2xl shadow-sm border border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="relative flex-1 w-full sm:w-auto">
           <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">
             search
@@ -187,7 +187,7 @@ export const AdminSchemesPage: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by code, scheme title, or Hindi name..."
-            className="w-full pl-10 pr-4 py-2 bg-surface-container-low rounded-xl font-body-sm text-body-sm text-on-surface border border-[#E8EAE5] focus:outline-hidden"
+            className="w-full pl-10 pr-4 py-2 bg-surface-container-low rounded-xl font-body-sm text-body-sm text-on-surface border border-[#E5E7EB] focus:outline-hidden"
           />
         </div>
 
@@ -210,7 +210,7 @@ export const AdminSchemesPage: React.FC = () => {
       </div>
 
       {/* Schemes Table */}
-      <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-[#E8EAE5] overflow-hidden">
+      <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-[#E5E7EB] overflow-hidden">
         {isLoading ? (
           <div className="p-12 text-center text-on-surface-variant">Loading scheme registry...</div>
         ) : filteredSchemes.length === 0 ? (
@@ -223,7 +223,7 @@ export const AdminSchemesPage: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider border-b border-[#E8EAE5]">
+                <tr className="bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider border-b border-[#E5E7EB]">
                   <th className="py-3 px-6 font-semibold">Code &amp; Title</th>
                   <th className="py-3 px-6 font-semibold">Category</th>
                   <th className="py-3 px-6 font-semibold">Benefit Entitlement</th>
@@ -232,7 +232,7 @@ export const AdminSchemesPage: React.FC = () => {
                   <th className="py-3 px-6 font-semibold text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E8EAE5]">
+              <tbody className="divide-y divide-[#E5E7EB]">
                 {filteredSchemes.map((s) => (
                   <tr key={s.id} className="hover:bg-surface-container-low/40 transition-colors">
                     <td className="py-4 px-6">
@@ -320,8 +320,8 @@ export const AdminSchemesPage: React.FC = () => {
       {/* CREATE / EDIT SCHEME MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-surface-container-lowest max-w-2xl w-full rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6 border border-[#E8EAE5] max-h-[90vh] overflow-y-auto animate-fadeIn">
-            <div className="flex items-center justify-between border-b border-[#E8EAE5] pb-4">
+          <div className="bg-surface-container-lowest max-w-2xl w-full rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6 border border-[#E5E7EB] max-h-[90vh] overflow-y-auto animate-fadeIn">
+            <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-4">
               <h3 className="font-title-md text-title-md text-primary font-bold">
                 {editingScheme ? `Edit Scheme: ${editingScheme.schemeCode}` : 'Create New Welfare Scheme'}
               </h3>
@@ -345,7 +345,7 @@ export const AdminSchemesPage: React.FC = () => {
                     required
                     value={modalForm.schemeCode}
                     onChange={(e) => setModalForm({ ...modalForm, schemeCode: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-surface-container-low font-mono text-sm border border-[#E8EAE5] focus:outline-hidden"
+                    className="w-full px-3 py-2 rounded-xl bg-surface-container-low font-mono text-sm border border-[#E5E7EB] focus:outline-hidden"
                   />
                 </div>
                 <div className="space-y-1">
@@ -353,7 +353,7 @@ export const AdminSchemesPage: React.FC = () => {
                   <select
                     value={modalForm.status}
                     onChange={(e) => setModalForm({ ...modalForm, status: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E8EAE5] focus:outline-hidden"
+                    className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E5E7EB] focus:outline-hidden"
                   >
                     <option value="PUBLISHED">PUBLISHED (Live)</option>
                     <option value="DRAFT">DRAFT</option>
@@ -370,7 +370,7 @@ export const AdminSchemesPage: React.FC = () => {
                   value={modalForm.name}
                   onChange={(e) => setModalForm({ ...modalForm, name: e.target.value })}
                   placeholder="e.g. State Kalyani Pension Scheme"
-                  className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E8EAE5] focus:outline-hidden"
+                  className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E5E7EB] focus:outline-hidden"
                 />
               </div>
 
@@ -381,7 +381,7 @@ export const AdminSchemesPage: React.FC = () => {
                   value={modalForm.nameHi}
                   onChange={(e) => setModalForm({ ...modalForm, nameHi: e.target.value })}
                   placeholder="उदा. मध्यप्रदेश कल्याणी सहायता योजना"
-                  className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm font-hindi border border-[#E8EAE5] focus:outline-hidden"
+                  className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm font-hindi border border-[#E5E7EB] focus:outline-hidden"
                 />
               </div>
 
@@ -392,7 +392,7 @@ export const AdminSchemesPage: React.FC = () => {
                     type="text"
                     value={modalForm.category}
                     onChange={(e) => setModalForm({ ...modalForm, category: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E8EAE5] focus:outline-hidden"
+                    className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E5E7EB] focus:outline-hidden"
                   />
                 </div>
                 <div className="space-y-1">
@@ -401,7 +401,7 @@ export const AdminSchemesPage: React.FC = () => {
                     type="text"
                     value={modalForm.need}
                     onChange={(e) => setModalForm({ ...modalForm, need: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E8EAE5] focus:outline-hidden"
+                    className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E5E7EB] focus:outline-hidden"
                   />
                 </div>
               </div>
@@ -414,7 +414,7 @@ export const AdminSchemesPage: React.FC = () => {
                   value={modalForm.benefit}
                   onChange={(e) => setModalForm({ ...modalForm, benefit: e.target.value })}
                   placeholder="e.g. ₹600 / month direct transfer"
-                  className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E8EAE5] focus:outline-hidden"
+                  className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E5E7EB] focus:outline-hidden"
                 />
               </div>
 
@@ -425,7 +425,7 @@ export const AdminSchemesPage: React.FC = () => {
                   required
                   value={modalForm.description}
                   onChange={(e) => setModalForm({ ...modalForm, description: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E8EAE5] focus:outline-hidden"
+                  className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E5E7EB] focus:outline-hidden"
                 />
               </div>
 
@@ -435,11 +435,11 @@ export const AdminSchemesPage: React.FC = () => {
                   type="url"
                   value={modalForm.officialSourceUrl}
                   onChange={(e) => setModalForm({ ...modalForm, officialSourceUrl: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E8EAE5] focus:outline-hidden"
+                  className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E5E7EB] focus:outline-hidden"
                 />
               </div>
 
-              <div className="pt-4 flex items-center justify-end gap-3 border-t border-[#E8EAE5]">
+              <div className="pt-4 flex items-center justify-end gap-3 border-t border-[#E5E7EB]">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}

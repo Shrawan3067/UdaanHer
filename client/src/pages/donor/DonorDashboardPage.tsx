@@ -36,7 +36,7 @@ export const DonorDashboardPage: React.FC = () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `SakhiSetu_80G_${receiptNumber.replace(/\//g, '_')}.pdf`;
+      a.download = `UdaanHer_80G_${receiptNumber.replace(/\//g, '_')}.pdf`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -65,17 +65,6 @@ export const DonorDashboardPage: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8 space-y-10 w-full animate-fadeIn">
       {/* Top Navigation & Dashboard Meta Header */}
       <div className="flex flex-col gap-6">
-        {/* Breadcrumb */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm">
-          <Link to="/" className="hover:text-primary transition-colors">
-            Home
-          </Link>
-          <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-          <span className="hover:text-primary transition-colors">Donor Portal</span>
-          <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-          <span className="text-primary font-semibold">My Dashboard</span>
-        </nav>
-
         {/* Welcome Banner & Quick Action Buttons */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-2">
           <div className="space-y-2 max-w-3xl">
@@ -94,7 +83,7 @@ export const DonorDashboardPage: React.FC = () => {
           <div className="flex flex-wrap items-center gap-3">
             <Link
               to="/donate"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container shadow-sm transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl btn-primary-gradient text-on-primary font-label-md text-label-md font-bold hover-lift shadow-xs transition-all cursor-pointer"
             >
               <span className="material-symbols-outlined text-[18px]">add_circle</span>
               <span>Make a New Contribution</span>
@@ -106,55 +95,55 @@ export const DonorDashboardPage: React.FC = () => {
       {/* Key Impact & Financial Summary Cards (Bento Grid of 4) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* Stat 1: Total Donated */}
-        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-sm flex flex-col justify-between border border-[#E8EAE5]">
+        <div className="glass-card rounded-2xl p-6 shadow-xs flex flex-col justify-between border border-[#E5E7EB] hover-lift">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
-              <span className="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider font-semibold">
+              <span className="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider font-bold">
                 Total Donated
               </span>
-              <div className="font-headline-md text-headline-md text-primary pt-1 font-bold">
+              <div className="font-headline-md text-headline-md text-primary pt-1 font-extrabold">
                 ₹{totalDonated.toLocaleString('en-IN')}
               </div>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-surface-container-low flex items-center justify-center text-primary">
+            <div className="w-10 h-10 rounded-xl bg-primary-fixed/50 flex items-center justify-center text-primary shadow-xs">
               <span className="material-symbols-outlined text-[22px]">payments</span>
             </div>
           </div>
-          <div className="pt-4 mt-2 flex items-center justify-between border-t border-[#E8EAE5]">
-            <span className="font-body-sm text-body-sm text-on-surface-variant">
+          <div className="pt-4 mt-2 flex items-center justify-between border-t border-[#E5E7EB]">
+            <span className="font-body-sm text-xs text-on-surface-variant font-medium">
               Across {successfulDonations.length} contributions
             </span>
-            <span className="px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-[11px] font-semibold">
+            <span className="px-2.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-[11px] font-bold">
               Live
             </span>
           </div>
         </div>
 
         {/* Stat 2: Section 80G Deductions */}
-        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-sm flex flex-col justify-between border border-[#E8EAE5]">
+        <div className="glass-card rounded-2xl p-6 shadow-xs flex flex-col justify-between border border-[#E5E7EB] hover-lift">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
-              <span className="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider font-semibold">
+              <span className="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider font-bold">
                 80G Tax Deductions
               </span>
-              <div className="font-headline-md text-headline-md text-secondary pt-1 font-bold">
+              <div className="font-headline-md text-headline-md text-secondary pt-1 font-extrabold">
                 ₹{taxDeductionsTotal.toLocaleString('en-IN')}
               </div>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed">
+            <div className="w-10 h-10 rounded-xl bg-secondary-fixed/50 flex items-center justify-center text-secondary shadow-xs">
               <span className="material-symbols-outlined text-[22px]">verified_user</span>
             </div>
           </div>
-          <div className="pt-4 mt-2 flex items-center justify-between border-t border-[#E8EAE5]">
-            <span className="font-body-sm text-body-sm text-on-surface-variant">50% IT Deduction</span>
-            <span className="px-2 py-0.5 rounded-full bg-surface-container-high text-primary font-label-sm text-[11px] font-semibold">
+          <div className="pt-4 mt-2 flex items-center justify-between border-t border-[#E5E7EB]">
+            <span className="font-body-sm text-xs text-on-surface-variant font-medium">50% IT Deduction</span>
+            <span className="px-2.5 py-0.5 rounded-full bg-surface-container-high text-primary font-label-sm text-[11px] font-bold">
               Form 10BE Ready
             </span>
           </div>
         </div>
 
         {/* Stat 3: Supported Causes */}
-        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-sm flex flex-col justify-between border border-[#E8EAE5]">
+        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-sm flex flex-col justify-between border border-[#E5E7EB]">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
               <span className="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider font-semibold">
@@ -168,7 +157,7 @@ export const DonorDashboardPage: React.FC = () => {
               <span className="material-symbols-outlined text-[22px]">diversity_3</span>
             </div>
           </div>
-          <div className="pt-4 mt-2 border-t border-[#E8EAE5]">
+          <div className="pt-4 mt-2 border-t border-[#E5E7EB]">
             <span className="font-body-sm text-body-sm text-on-surface-variant truncate block">
               Handlooms, Health Vans, Digital Pods
             </span>
@@ -176,7 +165,7 @@ export const DonorDashboardPage: React.FC = () => {
         </div>
 
         {/* Stat 4: Fund Utilization */}
-        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-sm flex flex-col justify-between border border-[#E8EAE5]">
+        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-sm flex flex-col justify-between border border-[#E5E7EB]">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
               <span className="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider font-semibold">
@@ -188,7 +177,7 @@ export const DonorDashboardPage: React.FC = () => {
               <span className="material-symbols-outlined text-[22px]">account_balance</span>
             </div>
           </div>
-          <div className="pt-4 mt-2 flex items-center justify-between border-t border-[#E8EAE5]">
+          <div className="pt-4 mt-2 flex items-center justify-between border-t border-[#E5E7EB]">
             <span className="font-body-sm text-body-sm text-on-surface-variant">Zero platform deductions</span>
             <span className="font-label-sm text-label-sm text-secondary font-semibold">Audited</span>
           </div>
@@ -196,7 +185,7 @@ export const DonorDashboardPage: React.FC = () => {
       </div>
 
       {/* Interactive Navigation Tabs */}
-      <div className="bg-surface-container-lowest p-2 rounded-2xl shadow-sm border border-[#E8EAE5]">
+      <div className="bg-surface-container-lowest p-2 rounded-2xl shadow-sm border border-[#E5E7EB]">
         <div className="flex flex-wrap items-center gap-1 sm:gap-2">
           <button
             onClick={() => setActiveTab('receipts')}
@@ -246,7 +235,7 @@ export const DonorDashboardPage: React.FC = () => {
       {activeTab === 'receipts' && (
         <div className="flex flex-col gap-6">
           {/* Search, Filter Toolbar */}
-          <div className="bg-surface-container-lowest rounded-2xl p-4 sm:p-5 shadow-sm space-y-4 border border-[#E8EAE5]">
+          <div className="bg-surface-container-lowest rounded-2xl p-4 sm:p-5 shadow-sm space-y-4 border border-[#E5E7EB]">
             <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
               <div className="relative flex-1">
                 <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">
@@ -256,14 +245,14 @@ export const DonorDashboardPage: React.FC = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search by receipt number, campaign, or transaction ID..."
-                  className="w-full pl-11 pr-4 py-2.5 bg-surface-container-low rounded-xl font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/70 border border-[#E8EAE5] focus:outline-hidden"
+                  className="w-full pl-11 pr-4 py-2.5 bg-surface-container-low rounded-xl font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/70 border border-[#E5E7EB] focus:outline-hidden"
                 />
               </div>
             </div>
           </div>
 
           {/* Receipts Table */}
-          <div className="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden border border-[#E8EAE5]">
+          <div className="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden border border-[#E5E7EB]">
             {isLoading ? (
               <div className="p-12 text-center text-on-surface-variant">Loading contribution history...</div>
             ) : filteredDonations.length === 0 ? (
@@ -284,7 +273,7 @@ export const DonorDashboardPage: React.FC = () => {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider border-b border-[#E8EAE5]">
+                    <tr className="bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider border-b border-[#E5E7EB]">
                       <th className="py-4 px-6 font-semibold">Receipt &amp; Date</th>
                       <th className="py-4 px-6 font-semibold">Cause / Campaign</th>
                       <th className="py-4 px-6 font-semibold">Contribution</th>
@@ -292,7 +281,7 @@ export const DonorDashboardPage: React.FC = () => {
                       <th className="py-4 px-6 font-semibold text-right">80G Certificate</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#E8EAE5]">
+                  <tbody className="divide-y divide-[#E5E7EB]">
                     {filteredDonations.map((d) => (
                       <tr key={d.id} className="hover:bg-surface-container-low/40 transition-colors">
                         <td className="py-4 px-6">
@@ -367,7 +356,7 @@ export const DonorDashboardPage: React.FC = () => {
       {/* TAB 2: Live Field Impact & Photos */}
       {activeTab === 'updates' && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fadeIn">
-          <div className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm border border-[#E8EAE5]">
+          <div className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm border border-[#E5E7EB]">
             <img
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0yZrBNsf5tCCWRpEqyvrgn7PynsUcqw1WFExML40GciCuOiN06sO1rfju4R2iL7i1q_tCDL9ugpZq8w4mgTC9_MhNQBEC53p2guBzH5WgPF1xZ1xESy-19KpghEa-BLI_BkFvmEgoN2V_VmEL-36v0cx_ctdYRlIk81O_UOcVEZ1KQ4-Z-tO9312ChFihJTFw88k-9ZshDLic-DZtouos9GVoCsQwlUPe5lRLf9sH"
               alt="Health van in Sehore"
@@ -382,7 +371,7 @@ export const DonorDashboardPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm border border-[#E8EAE5]">
+          <div className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm border border-[#E5E7EB]">
             <img
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuAujDufzPHzuINJT1kSBH6Ld-ks3XFpe5_7aESEsQ2woEtmBNM6GD8Mw5701Uh2bFuaOR2Ltv2rpJjj70tvYKIMg1uXykFfnv6Pt-ve50-P67c8GkvhO77qZAHESQFvoJmG2y1tSJi6WXOiVuPeELTid2ViRamIr57FmbwCOZr6gMqePYzCSpIRFH2ixXjYWe8dI6VhtKuQjVsiKGcxqeiZjQ0UFgp9QfghczzYS5pp"
               alt="Artisan loom training"
@@ -397,7 +386,7 @@ export const DonorDashboardPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm border border-[#E8EAE5]">
+          <div className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm border border-[#E5E7EB]">
             <img
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnGMmSC1b7YlbL4MlJGkMysFCz8FOLz-IMsIEHfGU3XPMaCx8Z_V73HN1KaXXORkuRh7Jl1kQ3iydvAcTVE6PLAlcrlWj7oals0LYKjAQJgz1z-CVGxEw-Z7fqxUOJWVZoXTI3BC9aNyfyudSgU0Ep9p2LfUMBufdCvULP0MmgWxbNTv10SkqGWS6wkUFcmroqK_lpHpxJCOcKtA217Aq6VS1Whrk8BgvQPsTS-WYM"
               alt="Digital literacy pods"
@@ -416,7 +405,7 @@ export const DonorDashboardPage: React.FC = () => {
 
       {/* TAB 3: Recurring Pledges */}
       {activeTab === 'pledges' && (
-        <div className="bg-surface-container-lowest rounded-2xl p-8 text-center space-y-4 border border-[#E8EAE5] animate-fadeIn">
+        <div className="bg-surface-container-lowest rounded-2xl p-8 text-center space-y-4 border border-[#E5E7EB] animate-fadeIn">
           <span className="material-symbols-outlined text-4xl text-primary">event_repeat</span>
           <h3 className="font-headline-sm text-primary font-bold">Monthly Guardian Program</h3>
           <p className="font-body-md text-on-surface-variant max-w-lg mx-auto">

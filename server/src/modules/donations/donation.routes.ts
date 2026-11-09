@@ -4,7 +4,7 @@ import { validate } from '../../middleware/validate.middleware.js';
 import { createDonationSchema } from './donation.validator.js';
 import { authenticate, optionalAuthenticate } from '../../middleware/auth.middleware.js';
 import { requireRole } from '../../middleware/role.middleware.js';
-import { Role } from '@prisma/client';
+import { Role } from '../../types/models.js';
 
 export const donationRouter = Router();
 export const adminDonationRouter = Router();

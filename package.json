@@ -1,8 +1,8 @@
 {
-  "name": "sakhisetu-root",
+  "name": "udaanher-root",
   "version": "1.0.0",
   "private": true,
-  "description": "SakhiSetu — Complete Full-Stack Web Application for Women's Welfare and NGO Empowerment",
+  "description": "UdaanHer: Giving women wings to fly — Complete Full-Stack Web Application for Women's Welfare and NGO Empowerment",
   "workspaces": [
     "server",
     "client"
@@ -17,18 +17,18 @@
     "test:server": "npm --prefix server run test",
     "test:client": "npm --prefix client run test",
     "test": "npm --prefix server run test && npm --prefix client run test",
-    "prisma:generate": "npm --prefix server run prisma:generate",
-    "prisma:migrate": "npm --prefix server run prisma:migrate",
-    "prisma:seed": "npm --prefix server run prisma:seed"
+    "db:seed": "npm --prefix server run db:seed",
+    "seed": "npm --prefix server run db:seed"
   },
   "keywords": [
-    "sakhisetu",
+    "udaanher",
+    "giving-women-wings-to-fly",
     "women-empowerment",
     "welfare-schemes",
     "donations",
-    "80g-receipts"
+    "80g-receipts",
+    "mongodb-atlas"
   ],
   "author": "Isocode Labs Take-Home Candidate",
   "license": "ISC"
 }
-

@@ -1,32 +1,37 @@
-import { Prisma, PrismaClient } from '@prisma/client';
-import { getFinancialYear } from '../../utils/financial-year.js';
+import { getFinancialYear } from "../../utils/financial-year.js";
 
 export class ReceiptSequenceService {
   /**
    * Concurrency-safe atomic allocation of the next receipt number for the given financial year.
-   * Uses PostgreSQL UPDATE ... RETURNING inside a database transaction to prevent race conditions.
+   * Uses native MongoDB atomic upsert & $inc inside a database transaction to prevent race conditions.
    */
   async allocateNextReceiptNumber(
-    tx: Prisma.TransactionClient,
-    targetDate: Date = new Date()
-  ): Promise<{ receiptNumber: string; financialYear: string; sequenceNumber: number }> {
+    tx: any,
+    targetDate: Date = new Date(),
+  ): Promise<{
+    receiptNumber: string;
+    financialYear: string;
+    sequenceNumber: number;
+  }> {
     const financialYear = getFinancialYear(targetDate);
 
-    // Atomic increment using raw query or upsert with optimistic/pessimistic lock.
-    // In PostgreSQL: UPDATE "ReceiptSequence" SET "nextNumber" = "nextNumber" + 1 WHERE "financialYear" = $1 RETURNING "nextNumber"
-    // First, ensure the row exists for this financial year:
-    const seqRow = await tx.$queryRaw<Array<{ id: string; financialYear: string; nextNumber: number }>>`
-      INSERT INTO "ReceiptSequence" ("id", "financialYear", "nextNumber", "updatedAt")
-      VALUES (gen_random_uuid()::text, ${financialYear}, 1, NOW())
-      ON CONFLICT ("financialYear") DO UPDATE
-      SET "nextNumber" = "ReceiptSequence"."nextNumber" + 1, "updatedAt" = NOW()
-      RETURNING "id", "financialYear", "nextNumber"
-    `;
+    // Atomic increment using Prisma upsert:
+    // If the sequence for this FY exists, atomically increment nextNumber by 1.
+    // If it does not exist, initialize nextNumber to 1.
+    const seq = await tx.receiptSequence.upsert({
+      where: { financialYear },
+      update: {
+        nextNumber: { increment: 1 },
+      },
+      create: {
+        financialYear,
+        nextNumber: 1,
+      },
+    });
 
-    const allocated = seqRow[0];
-    const sequenceNumber = allocated.nextNumber;
-    const padded = String(sequenceNumber).padStart(6, '0');
-    const receiptNumber = `SAKHI/80G/${financialYear}/${padded}`;
+    const sequenceNumber = seq.nextNumber;
+    const padded = String(sequenceNumber).padStart(6, "0");
+    const receiptNumber = `UDAAN/80G/${financialYear}/${padded}`;
 
     return {
       receiptNumber,
@@ -37,4 +42,3 @@ export class ReceiptSequenceService {
 }
 
 export const receiptSequenceService = new ReceiptSequenceService();
-

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { useLanguage } from '../../context/LanguageContext';
+import React, { useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { useLanguage } from "../../context/LanguageContext";
 
 export const LoginPage: React.FC = () => {
   const { login } = useAuth();
@@ -9,12 +9,12 @@ export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const from = (location.state as any)?.from?.pathname || '/';
+  const from = (location.state as any)?.from?.pathname || "/";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,117 +23,132 @@ export const LoginPage: React.FC = () => {
 
     try {
       await login({ email, password });
-      if (email.includes('admin')) {
-        navigate('/admin');
+      if (email.includes("admin")) {
+        navigate("/admin");
       } else {
-        navigate(from === '/' ? '/donor/dashboard' : from);
+        navigate(from === "/" ? "/donor/dashboard" : from);
       }
     } catch (err: any) {
-      setError(err.message || 'Invalid email or password');
+      setError(err.message || "Invalid email or password");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const fillAdminDemo = () => {
-    setEmail('admin@sakhisetu.org');
-    setPassword('Admin@123456');
+    setEmail("admin@udaanher.org");
+    setPassword("Admin@123456");
     setError(null);
   };
 
   const fillDonorDemo = () => {
-    setEmail('priya.sharma@example.com');
-    setPassword('Donor@123456');
+    setEmail("priya.sharma@example.com");
+    setPassword("Donor@123456");
     setError(null);
   };
 
   return (
-    <div className="min-h-[75vh] flex items-center justify-center px-4 py-12 bg-surface">
-      <div className="w-full max-w-md bg-surface-container-lowest rounded-2xl border border-[#E8EAE5] shadow-sm p-8 space-y-6">
+    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 bg-white text-[#1A1A1A]">
+      <div className="w-full max-w-md bg-white rounded-xl border border-gray-200 shadow-xl p-8 space-y-6">
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-xl bg-primary text-on-primary flex items-center justify-center mx-auto font-bold text-xl font-hindi shadow-xs">
-            स
+          {/* Red Cross Emblem */}
+          <div className="w-12 h-12 rounded-lg bg-[#EA3C36] text-white flex items-center justify-center mx-auto shadow-sm">
+            <svg className="w-7 h-7 fill-current" viewBox="0 0 24 24">
+              <path d="M19 10.5h-5.5V5c0-.55-.45-1-1-1h-1c-.55 0-1 .45-1 1v5.5H5c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h5.5V19c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-5.5H19c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1z" />
+            </svg>
           </div>
-          <h1 className="font-headline-sm text-headline-sm text-primary font-bold">
-            {language === 'HI' ? 'सखीसेतु पोर्टल लॉगिन' : 'Log In to SakhiSetu'}
+          <h1 className="text-2xl font-bold text-[#1A1A1A]">
+            {language === "HI" ? "उड़ानहर पोर्टल लॉगिन" : "Log In to UdaanHer"}
           </h1>
-          <p className="font-body-sm text-xs text-on-surface-variant">
+          <p className="text-xs text-gray-500">
             Access your donor 80G receipts or trust administration desk.
           </p>
         </div>
 
         {/* Quick-fill demo credentials bar */}
-        <div className="p-3 bg-surface-container-low rounded-xl border border-[#E8EAE5] space-y-2">
-          <span className="font-label-caps text-[10px] font-bold text-on-surface-variant uppercase tracking-wider block text-center">
-            Development Quick-Fill Credentials
+        <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 space-y-2">
+          <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block text-center">
+            Quick-Fill Demo Credentials
           </span>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={fillAdminDemo}
-              className="py-1.5 px-2 bg-surface-container-lowest border border-[#E8EAE5] rounded-lg text-xs font-semibold text-primary hover:border-primary flex items-center justify-center gap-1 transition-colors"
+              className="py-1.5 px-2 bg-white border border-gray-200 rounded-md text-xs font-semibold text-gray-800 hover:border-[#EA3C36] hover:text-[#EA3C36] flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
             >
-              <span className="material-symbols-outlined text-[15px]">shield</span>
+              <span className="material-symbols-outlined text-[15px] text-[#EA3C36]">
+                shield
+              </span>
               <span>Admin Demo</span>
             </button>
             <button
               type="button"
               onClick={fillDonorDemo}
-              className="py-1.5 px-2 bg-surface-container-lowest border border-[#E8EAE5] rounded-lg text-xs font-semibold text-on-surface hover:border-primary flex items-center justify-center gap-1 transition-colors"
+              className="py-1.5 px-2 bg-white border border-gray-200 rounded-md text-xs font-semibold text-gray-800 hover:border-[#EA3C36] hover:text-[#EA3C36] flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
             >
-              <span className="material-symbols-outlined text-[15px]">person</span>
+              <span className="material-symbols-outlined text-[15px] text-[#EA3C36]">
+                person
+              </span>
               <span>Donor Demo</span>
             </button>
           </div>
         </div>
 
         {error && (
-          <div className="p-3 bg-error-container text-on-error-container rounded-xl text-xs flex items-center gap-2">
-            <span className="material-symbols-outlined text-[16px] text-error">error</span>
+          <div className="p-3 bg-red-50 text-red-700 rounded-lg text-xs flex items-center gap-2 border border-red-200">
+            <span className="material-symbols-outlined text-[16px] text-red-600">
+              error
+            </span>
             <span>{error}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
-            <label className="font-label-sm text-xs font-semibold text-on-surface">Email Address</label>
+            <label className="text-xs font-bold text-gray-700">
+              Email Address
+            </label>
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g. admin@sakhisetu.org"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low text-on-surface text-sm border border-[#E8EAE5] focus:outline-hidden"
+              placeholder="name@example.com"
+              className="w-full px-3.5 py-2.5 bg-white rounded-lg text-sm text-[#1A1A1A] border border-gray-300 focus:border-[#EA3C36] focus:outline-hidden"
             />
           </div>
 
           <div className="space-y-1">
-            <label className="font-label-sm text-xs font-semibold text-on-surface">Password</label>
+            <label className="text-xs font-bold text-gray-700">Password</label>
             <input
               type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low text-on-surface text-sm border border-[#E8EAE5] focus:outline-hidden"
+              className="w-full px-3.5 py-2.5 bg-white rounded-lg text-sm text-[#1A1A1A] border border-gray-300 focus:border-[#EA3C36] focus:outline-hidden"
             />
           </div>
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-sm font-semibold transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full py-2.5 bg-[#EA3C36] hover:bg-[#D32F2F] text-white font-bold text-sm rounded-lg shadow-sm transition-all cursor-pointer disabled:opacity-50"
           >
-            <span>{isSubmitting ? 'Authenticating...' : 'Sign In'}</span>
-            <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+            {isSubmitting ? "Authenticating..." : "Sign In"}
           </button>
         </form>
 
-        <div className="pt-2 text-center text-xs text-on-surface-variant">
-          Don't have an account yet?{' '}
-          <Link to="/register" className="font-semibold text-secondary hover:underline">
-            Register as a Donor
-          </Link>
+        <div className="text-center pt-2 border-t border-gray-100">
+          <p className="text-xs text-gray-500">
+            Don't have an account yet?{" "}
+            <Link
+              to="/register"
+              className="text-[#EA3C36] font-bold hover:underline"
+            >
+              Create an Account
+            </Link>
+          </p>
         </div>
       </div>
     </div>

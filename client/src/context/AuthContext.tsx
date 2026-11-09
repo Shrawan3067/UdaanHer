@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, Role } from '../types';
-import { api } from '../services/api';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { User, Role } from "../types";
+import { api } from "../services/api";
 
 interface AuthContextType {
   user: User | null;
@@ -9,20 +9,33 @@ interface AuthContextType {
   isAdmin: boolean;
   isDonor: boolean;
   login: (credentials: { email: string; password: string }) => Promise<void>;
-  register: (data: { fullName: string; email: string; password: string; phone?: string }) => Promise<void>;
+  register: (data: {
+    fullName: string;
+    email: string;
+    password: string;
+    phone?: string;
+  }) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('sakhisetu_token'));
+  const [token, setToken] = useState<string | null>(
+    () =>
+      localStorage.getItem("udaanher_token") ||
+      localStorage.getItem("sakhisetu_token"),
+  );
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchUser = async () => {
-      const storedToken = localStorage.getItem('sakhisetu_token');
+      const storedToken =
+        localStorage.getItem("udaanher_token") ||
+        localStorage.getItem("sakhisetu_token");
       if (!storedToken) {
         setIsLoading(false);
         return;
@@ -32,7 +45,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const currentUser = await api.getMe();
         setUser(currentUser);
       } catch {
-        localStorage.removeItem('sakhisetu_token');
+        localStorage.removeItem("udaanher_token");
+        localStorage.removeItem("sakhisetu_token");
         setToken(null);
         setUser(null);
       } finally {
@@ -47,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     try {
       const result = await api.login(credentials);
-      localStorage.setItem('sakhisetu_token', result.token);
+      localStorage.setItem("udaanher_token", result.token);
       setToken(result.token);
       setUser(result.user);
     } finally {
@@ -55,11 +69,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (data: { fullName: string; email: string; password: string; phone?: string }) => {
+  const register = async (data: {
+    fullName: string;
+    email: string;
+    password: string;
+    phone?: string;
+  }) => {
     setIsLoading(true);
     try {
       const result = await api.register(data);
-      localStorage.setItem('sakhisetu_token', result.token);
+      localStorage.setItem("udaanher_token", result.token);
       setToken(result.token);
       setUser(result.user);
     } finally {
@@ -68,13 +87,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
-    localStorage.removeItem('sakhisetu_token');
+    localStorage.removeItem("udaanher_token");
+    localStorage.removeItem("sakhisetu_token");
     setToken(null);
     setUser(null);
   };
 
-  const isAdmin = user?.role === 'ADMIN';
-  const isDonor = user?.role === 'DONOR';
+  const isAdmin = user?.role === "ADMIN";
+  const isDonor = user?.role === "DONOR";
 
   return (
     <AuthContext.Provider
@@ -97,8 +117,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
-

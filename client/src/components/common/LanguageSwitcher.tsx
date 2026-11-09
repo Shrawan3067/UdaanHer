@@ -5,28 +5,30 @@ export const LanguageSwitcher: React.FC<{ className?: string }> = ({ className =
   const { language, setLanguage } = useLanguage();
 
   return (
-    <div className={`flex items-center bg-surface-container-high rounded-full p-1 border border-outline-variant/40 ${className}`}>
+    <div
+      className={`inline-flex items-center bg-gray-100 p-0.5 rounded-full border border-gray-200/80 shadow-2xs ${className}`}
+    >
       <button
         type="button"
         onClick={() => setLanguage('EN')}
-        className={`px-2.5 py-1 rounded-full font-label-sm text-label-sm transition-all ${
+        className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all duration-150 cursor-pointer ${
           language === 'EN'
-            ? 'bg-primary text-on-primary font-semibold shadow-xs'
-            : 'text-on-surface-variant hover:text-on-surface'
+            ? 'bg-[#EA3C36] text-white shadow-xs'
+            : 'text-gray-600 hover:text-[#EA3C36]'
         }`}
       >
-        English
+        EN
       </button>
       <button
         type="button"
         onClick={() => setLanguage('HI')}
-        className={`px-2.5 py-1 rounded-full font-label-sm text-label-sm transition-all ${
+        className={`px-2.5 py-0.5 rounded-full text-[11px] font-hindi font-bold transition-all duration-150 cursor-pointer ${
           language === 'HI'
-            ? 'bg-primary text-on-primary font-semibold shadow-xs'
-            : 'text-on-surface-variant hover:text-on-surface'
+            ? 'bg-[#EA3C36] text-white shadow-xs'
+            : 'text-gray-600 hover:text-[#EA3C36]'
         }`}
       >
-        हिंदी
+        हिं
       </button>
     </div>
   );

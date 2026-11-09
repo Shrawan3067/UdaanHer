@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { Role } from '@prisma/client';
+import { Role } from '../types/models.js';
 import { AppError } from '../utils/app-error.js';
 
 export const requireRole = (...roles: Role[]) => {

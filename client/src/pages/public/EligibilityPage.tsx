@@ -4,6 +4,25 @@ import { useLanguage } from '../../context/LanguageContext';
 import { api } from '../../services/api';
 import { EligibilityResult } from '../../types';
 import { CallbackModal } from '../../components/common/CallbackModal';
+import {
+  CheckCircle2,
+  Circle,
+  HelpCircle,
+  ArrowRight,
+  ArrowLeft,
+  RotateCcw,
+  Printer,
+  ShieldCheck,
+  Zap,
+  Users,
+  CreditCard,
+  Building,
+  HeartHandshake,
+  Headphones,
+  FileText,
+  Clock,
+  Sparkles,
+} from 'lucide-react';
 
 const MP_DISTRICTS = [
   'Bhopal',
@@ -18,17 +37,17 @@ const MP_DISTRICTS = [
 ];
 
 const AGE_RANGES = [
-  { id: '18-25', min: 18, max: 25, label: '18–25 Years', labelHi: '18–25 वर्ष (युवा)' },
-  { id: '26-40', min: 26, max: 40, label: '26–40 Years', labelHi: '26–40 वर्ष' },
-  { id: '41-59', min: 41, max: 59, label: '41–59 Years', labelHi: '41–59 वर्ष' },
-  { id: '60+', min: 60, max: 80, label: '60+ Years', labelHi: '60+ वर्ष (वरिष्ठ)' },
+  { id: '18-25', min: 18, max: 25, label: '18–25 Years', labelHi: '18–25 वर्ष (युवा)', desc: 'Higher education & skill programs' },
+  { id: '26-40', min: 26, max: 40, label: '26–40 Years', labelHi: '26–40 वर्ष', desc: 'Maternal health & enterprise credit' },
+  { id: '41-59', min: 41, max: 59, label: '41–59 Years', labelHi: '41–59 वर्ष', desc: 'SHG loans & micro-enterprise funds' },
+  { id: '60+', min: 60, max: 80, label: '60+ Years', labelHi: '60+ वर्ष (वरिष्ठ)', desc: 'Senior citizen social security pension' },
 ];
 
 const WORK_CATEGORIES = [
-  { id: 'Homemaker', label: 'Homemaker', labelHi: 'गृहिणी', desc: 'Focusing on family and household livelihood' },
-  { id: 'Agriculture', label: 'Farmer / Farming', labelHi: 'कृषि / किसान', desc: 'Cultivator or agricultural laborer' },
-  { id: 'Daily Wage Labourer', label: 'Daily Wage Labourer', labelHi: 'दैनिक मजदूर', desc: 'Engaged in seasonal or manual unorganized labor' },
-  { id: 'Small Artisan/Self-Employed', label: 'Artisan / Self-Employed', labelHi: 'कारीगर / उद्यमी', desc: 'Weaving, handicrafts, retail, or micro-enterprise' },
+  { id: 'Homemaker', label: 'Homemaker', labelHi: 'गृहिणी', desc: 'Focusing on family, caregiving, and household welfare' },
+  { id: 'Agriculture', label: 'Farmer / Farming', labelHi: 'कृषि / किसान', desc: 'Cultivator, smallholder, or agricultural worker' },
+  { id: 'Daily Wage Labourer', label: 'Daily Wage Labourer', labelHi: 'दैनिक मजदूर', desc: 'Engaged in seasonal manual or unorganized labor' },
+  { id: 'Small Artisan/Self-Employed', label: 'Artisan / Self-Employed', labelHi: 'कारीगर / उद्यमी', desc: 'Handicrafts, weaving, retail shop, or micro-enterprise' },
 ];
 
 export const EligibilityPage: React.FC = () => {
@@ -137,181 +156,162 @@ export const EligibilityPage: React.FC = () => {
     {
       num: '04',
       title: 'Status',
-      val: maritalStatus === 'widowed' ? 'Widowed / कल्याणी' : maritalStatus,
+      val: maritalStatus === 'widowed' ? 'Widowed (कल्याणी)' : maritalStatus,
     },
-    { num: '05', title: 'SHG', val: isSHGMember ? 'Yes (Gram SHG)' : 'No' },
-    { num: '06', title: 'Ration', val: hasBPLCard ? 'BPL / Antyodaya' : 'General' },
+    { num: '05', title: 'SHG', val: isSHGMember ? 'Yes (SHG)' : 'No' },
+    { num: '06', title: 'Ration', val: hasBPLCard ? 'BPL Card' : 'General' },
   ];
 
   return (
-    <div className="relative w-full overflow-hidden bg-surface">
-      {/* Top Subtle Texture Glow */}
-      <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[350px] bg-gradient-to-b from-primary-fixed/30 via-surface-container-low to-transparent rounded-full blur-3xl pointer-events-none"></div>
-
-      {/* Main Container */}
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-12 py-8 space-y-10">
-        {/* Breadcrumbs & Trust Indicator Bar */}
-        <section className="space-y-4">
+    <div className="relative w-full overflow-hidden bg-white text-[#1A1A1A]">
+      {/* Header Banner */}
+      <section className="w-full bg-[#F8F9FA] py-10 px-6 lg:px-12 border-b border-gray-200">
+        <div className="max-w-7xl mx-auto space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <nav aria-label="Breadcrumb" className="flex items-center gap-2">
-              <Link
-                to="/"
-                className="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1"
-              >
-                <span className="material-symbols-outlined text-[16px]">home</span>
-                <span>Home</span>
-              </Link>
-              <span className="text-outline-variant font-label-sm">/</span>
-              <span className="font-label-sm text-label-sm text-primary font-semibold">
-                Find My Scheme (Eligibility Screener)
-              </span>
-            </nav>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-low text-primary">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-              <span className="font-label-caps text-label-caps uppercase tracking-wider text-primary font-semibold">
-                MP &amp; Central Schemes • Updated 2024–25
-              </span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-[#EA3C36] text-xs font-bold uppercase tracking-wider">
+              <span className="w-2 h-2 rounded-full bg-[#EA3C36] animate-pulse"></span>
+              <span>Updated 2024–25 Government Rules</span>
             </div>
           </div>
 
-          {/* Privacy Shield Pill */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm">
-            <span className="material-symbols-outlined text-[18px] text-secondary">verified_user</span>
+          {/* Privacy Notice Pill */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white text-gray-700 text-xs font-semibold border border-gray-200 shadow-xs">
+            <ShieldCheck className="w-4 h-4 text-[#EA3C36]" />
             <span>
-              <strong>100% Free &amp; Anonymous</strong> • No Aadhaar, phone number, or OTP required to check eligibility
+              <strong>100% Free &amp; Anonymous</strong> • No Aadhaar, phone number, or OTP required
             </span>
           </div>
 
-          {/* Editorial Headline & Bilingual Intro */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-baseline pt-2">
+          {/* Main Title & Bilingual Intro */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-8 space-y-3">
-              <h1 className="font-headline-lg text-headline-lg text-primary tracking-tight">
-                Find Government Schemes You Are Eligible For in 2 Minutes
+              <span className="text-xs uppercase tracking-wider text-[#EA3C36] font-bold">
+                2-MINUTE CONFIDENTIAL SCREENER
+              </span>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1A1A1A] tracking-tight leading-tight">
+                Find Welfare Programs You Are Eligible For
               </h1>
-              <p className="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
-                सरल ६ सवालों के जवाब दें और अपनी पात्रता अनुसार सरकारी योजनाएं खोजें। We match your household profile against active Central and Madhya Pradesh welfare programs in real-time.
+              <p className="text-gray-600 text-base leading-relaxed max-w-2xl">
+                सरल ६ सवालों के जवाब दें और अपनी पात्रता अनुसार सरकारी योजनाएं खोजें। We match your household situation against verified Central and Madhya Pradesh welfare programs with clear documentation steps.
               </p>
             </div>
 
-            {/* Quick Trust Badges Tray */}
-            <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-2.5 bg-surface-container-low p-4 rounded-xl border border-[#E8EAE5]">
+            {/* Quick Benefits Tray */}
+            <div className="lg:col-span-4 bg-white p-5 rounded-xl border border-gray-200 shadow-xs space-y-3">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                  <span className="material-symbols-outlined text-[18px]">timer</span>
+                <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-[#EA3C36] shrink-0">
+                  <Clock className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="font-label-sm text-label-sm font-semibold text-primary">Takes ~2 Minutes</p>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">6 intuitive questions</p>
+                  <p className="text-xs font-bold text-gray-900">Takes ~2 Minutes</p>
+                  <p className="text-[11px] text-gray-500">6 simple anonymous questions</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-secondary/15 flex items-center justify-center text-secondary">
-                  <span className="material-symbols-outlined text-[18px]">lock_reset</span>
+              <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
+                <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-[#00A3C4] shrink-0">
+                  <ShieldCheck className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="font-label-sm text-label-sm font-semibold text-primary">Zero Identity Risk</p>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">Anonymous profile screening</p>
+                  <p className="text-xs font-bold text-gray-900">Zero Identity Risk</p>
+                  <p className="text-[11px] text-gray-500">No personal data logged</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-tertiary-fixed flex items-center justify-center text-tertiary">
-                  <span className="material-symbols-outlined text-[18px]">offline_bolt</span>
+              <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
+                <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-[#EA3C36] shrink-0">
+                  <Zap className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="font-label-sm text-label-sm font-semibold text-primary">Instant Sanction Preview</p>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">Document checklist generated</p>
+                  <p className="text-xs font-bold text-gray-900">Instant Sanction Checklist</p>
+                  <p className="text-[11px] text-gray-500">Immediate document checklist</p>
                 </div>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
+      {/* Main Questionnaire Container */}
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 py-10 space-y-10">
         {/* Evaluating State */}
         {isEvaluating && (
-          <div className="bg-surface-container-lowest rounded-2xl border border-[#E8EAE5] shadow-sm p-12 text-center space-y-4">
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto text-primary">
-              <span className="material-symbols-outlined text-[28px] animate-spin">refresh</span>
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center space-y-4 animate-fadeIn">
+            <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mx-auto text-[#EA3C36]">
+              <span className="material-symbols-outlined text-3xl animate-spin">refresh</span>
             </div>
-            <h2 className="font-headline-sm text-headline-sm text-primary">
-              Evaluating Rules Against Madhya Pradesh Welfare Databases...
+            <h2 className="text-xl font-bold text-[#1A1A1A]">
+              Evaluating Rules Against Welfare Databases...
             </h2>
-            <p className="font-body-md text-body-md text-on-surface-variant max-w-lg mx-auto">
-              Comparing your inputs with verified eligibility rules for Sehore, Bhopal, Raisen, and other districts.
+            <p className="text-xs text-gray-500 max-w-md mx-auto">
+              Matching your inputs with verified eligibility rules for Sehore, Bhopal, Raisen, and other districts.
             </p>
           </div>
         )}
 
-        {/* QUESTIONNAIRE CONTAINER */}
+        {/* QUESTIONNAIRE INTERFACE */}
         {!isEvaluating && !result && (
-          <section className="bg-surface-container-lowest rounded-2xl border border-[#E8EAE5] shadow-sm p-6 lg:p-8 space-y-8">
-            {/* Step Indicator Header */}
+          <section className="bg-white rounded-xl border border-gray-200 shadow-xs p-6 sm:p-8 lg:p-10 space-y-8">
+            {/* Stepper Header */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center justify-between flex-wrap gap-2 border-b border-gray-100 pb-4">
                 <div>
-                  <span className="font-label-caps text-label-caps uppercase text-secondary font-semibold">
-                    Live Screener Progress
+                  <span className="text-xs uppercase tracking-wider text-[#EA3C36] font-bold">
+                    QUESTION {step} OF 6
                   </span>
-                  <p className="font-title-md text-title-md text-primary font-semibold">
-                    Step {step} of 6:{' '}
+                  <h2 className="text-xl font-bold text-[#1A1A1A] mt-0.5">
                     {step === 1 && 'District of Residence (निवास ज़िला)'}
                     {step === 2 && 'Applicant Age Bracket (आयु सीमा)'}
                     {step === 3 && 'Livelihood & Occupation (व्यवसाय / आजीविका)'}
                     {step === 4 && 'Marital & Family Status (वैवाहिक स्थिति)'}
                     {step === 5 && 'Self-Help Group Affiliation (स्वयं सहायता समूह)'}
                     {step === 6 && 'Household Ration Card Status (राशन कार्ड)'}
-                  </p>
+                  </h2>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-label-sm text-label-sm text-on-surface-variant">
+                  <span className="text-xs font-semibold text-gray-500">
                     {Math.round((step / 6) * 100)}% Completed
                   </span>
-                  <span className="px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-caps text-label-caps">
-                    In Progress
+                  <span className="px-2.5 py-0.5 rounded-full bg-red-50 text-[#EA3C36] text-[11px] font-bold">
+                    Step {step}
                   </span>
                 </div>
               </div>
 
-              {/* Stepper Progress Rail */}
-              <div className="w-full bg-surface-container rounded-full h-2 overflow-hidden flex">
+              {/* Red Cross Progress Rail */}
+              <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
                 <div
-                  className="bg-primary h-full transition-all duration-500"
+                  className="bg-[#EA3C36] h-full transition-all duration-300"
                   style={{ width: `${(step / 6) * 100}%` }}
                 ></div>
               </div>
 
-              {/* Step Indicators Pill Row */}
-              <div className="grid grid-cols-2 md:grid-cols-6 gap-2 pt-2">
+              {/* Step Summary Pills */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 pt-2">
                 {stepLabels.map((sl, idx) => {
                   const isDone = idx + 1 < step;
                   const isCurrent = idx + 1 === step;
                   return (
                     <div
                       key={sl.num}
-                      className={`px-3 py-2 rounded-lg flex items-center gap-2 ${
+                      className={`px-3 py-2 rounded-lg border text-xs transition-all flex items-center gap-2 ${
                         isDone
-                          ? 'bg-surface-container-low'
+                          ? 'bg-gray-50 border-gray-200 text-gray-700'
                           : isCurrent
-                          ? 'bg-surface-container border border-primary/30'
-                          : 'bg-surface-container-low/60 opacity-70'
+                          ? 'bg-red-50/60 border-[#EA3C36] text-[#EA3C36]'
+                          : 'bg-white border-gray-200 text-gray-400 opacity-60'
                       }`}
                     >
-                      <span
-                        className={`material-symbols-outlined text-[16px] ${
-                          isDone
-                            ? 'text-primary'
-                            : isCurrent
-                            ? 'text-secondary'
-                            : 'text-outline'
-                        }`}
-                        style={isDone ? { fontVariationSettings: "'FILL' 1" } : undefined}
-                      >
-                        {isDone ? 'check_circle' : isCurrent ? 'radio_button_checked' : 'radio_button_unchecked'}
-                      </span>
+                      {isDone ? (
+                        <CheckCircle2 className="w-4 h-4 text-[#EA3C36] shrink-0" />
+                      ) : isCurrent ? (
+                        <div className="w-2 h-2 rounded-full bg-[#EA3C36] shrink-0 animate-pulse" />
+                      ) : (
+                        <Circle className="w-3.5 h-3.5 text-gray-300 shrink-0" />
+                      )}
                       <div className="min-w-0">
-                        <p className="font-label-caps text-label-caps uppercase text-on-surface-variant truncate">
-                          {sl.num}. {sl.title}
+                        <p className="text-[10px] uppercase font-bold tracking-wider truncate">
+                          {sl.title}
                         </p>
-                        <p className="font-label-sm text-label-sm font-semibold text-primary truncate">
+                        <p className="font-bold text-xs truncate">
                           {sl.val}
                         </p>
                       </div>
@@ -321,327 +321,225 @@ export const EligibilityPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Question Body Area */}
-            <div className="space-y-4">
+            {/* Question Options Body */}
+            <div className="space-y-6 pt-2">
               {/* Step 1: District */}
               {step === 1 && (
                 <div className="space-y-4">
-                  <div className="space-y-1">
-                    <h2 className="font-headline-sm text-headline-sm text-primary">
-                      Please select your current district of residence
-                    </h2>
-                    <p className="font-body-md text-body-md text-on-surface-variant">
-                      मध्य प्रदेश का अपना निवास ज़िला चुनें। Schemes are matched based on applicable administrative jurisdictions.
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
-                    {MP_DISTRICTS.map((d) => (
-                      <button
-                        key={d}
-                        type="button"
-                        onClick={() => setDistrict(d)}
-                        className={`p-4 rounded-xl text-left transition-all flex items-center justify-between ${
-                          district === d
-                            ? 'bg-surface-container border-2 border-primary shadow-xs'
-                            : 'bg-surface-container-low hover:bg-surface-container border border-transparent'
-                        }`}
-                      >
-                        <span className="font-title-md text-title-md text-primary font-semibold">{d}</span>
-                        <span
-                          className={`material-symbols-outlined text-[20px] ${
-                            district === d ? 'text-primary' : 'text-outline'
+                  <p className="text-sm text-gray-600">
+                    मध्य प्रदेश का अपना निवास ज़िला चुनें। Schemes are matched based on applicable administrative jurisdictions.
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {MP_DISTRICTS.map((d) => {
+                      const isSelected = district === d;
+                      return (
+                        <button
+                          key={d}
+                          type="button"
+                          onClick={() => setDistrict(d)}
+                          className={`p-4 rounded-xl text-left transition-all border flex items-center justify-between cursor-pointer ${
+                            isSelected
+                              ? 'border-[#EA3C36] bg-red-50 text-[#EA3C36] shadow-xs'
+                              : 'border-gray-200 hover:border-gray-300 bg-white text-gray-800'
                           }`}
                         >
-                          {district === d ? 'check_circle' : 'radio_button_unchecked'}
-                        </span>
-                      </button>
-                    ))}
+                          <span className="font-bold text-sm">{d}</span>
+                          {isSelected ? (
+                            <CheckCircle2 className="w-5 h-5 text-[#EA3C36]" />
+                          ) : (
+                            <Circle className="w-5 h-5 text-gray-300" />
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
 
-              {/* Step 2: Age */}
+              {/* Step 2: Age Bracket */}
               {step === 2 && (
                 <div className="space-y-4">
-                  <div className="space-y-1">
-                    <h2 className="font-headline-sm text-headline-sm text-primary">
-                      What is the applicant's current age?
-                    </h2>
-                    <p className="font-body-md text-body-md text-on-surface-variant">
-                      आवेदक की आयु सीमा चुनें। Age is a statutory prerequisite for youth grants, maternity support, and old-age social security.
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-                    {AGE_RANGES.map((ar) => (
-                      <button
-                        key={ar.id}
-                        type="button"
-                        onClick={() => {
-                          setAgeRange(ar.id);
-                          setAge(Math.round((ar.min + ar.max) / 2));
-                        }}
-                        className={`p-5 rounded-xl text-left transition-all flex flex-col justify-between space-y-3 ${
-                          ageRange === ar.id
-                            ? 'bg-surface-container border-2 border-primary shadow-sm'
-                            : 'bg-surface-container-low hover:bg-surface-container'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span
-                            className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                              ageRange === ar.id
-                                ? 'bg-primary text-on-primary'
-                                : 'bg-surface-container-high text-outline'
-                            }`}
-                          >
-                            <span className="material-symbols-outlined text-[18px]">
-                              {ageRange === ar.id ? 'check' : 'radio_button_unchecked'}
+                  <p className="text-sm text-gray-600">
+                    आवेदक की आयु सीमा चुनें। Age is a statutory prerequisite for youth skilling, maternal cash grants, and old-age social security.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {AGE_RANGES.map((ar) => {
+                      const isSelected = ageRange === ar.id;
+                      return (
+                        <button
+                          key={ar.id}
+                          type="button"
+                          onClick={() => {
+                            setAgeRange(ar.id);
+                            setAge(Math.round((ar.min + ar.max) / 2));
+                          }}
+                          className={`p-5 rounded-xl text-left transition-all border flex flex-col justify-between space-y-3 cursor-pointer ${
+                            isSelected
+                              ? 'border-[#EA3C36] bg-red-50 text-[#EA3C36] shadow-xs'
+                              : 'border-gray-200 hover:border-gray-300 bg-white text-gray-800'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-white/80 border border-gray-100">
+                              {ar.labelHi}
                             </span>
-                          </span>
-                          {ageRange === ar.id && (
-                            <span className="px-2 py-0.5 rounded-full bg-surface-container-high text-primary font-label-caps text-label-caps font-semibold">
-                              Active
-                            </span>
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-title-md text-title-md text-primary font-bold">{ar.label}</p>
-                          <p className="font-label-md text-label-md text-secondary font-medium">{ar.labelHi}</p>
-                        </div>
-                      </button>
-                    ))}
+                            {isSelected ? (
+                              <CheckCircle2 className="w-5 h-5 text-[#EA3C36]" />
+                            ) : (
+                              <Circle className="w-5 h-5 text-gray-300" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-extrabold text-base">{ar.label}</p>
+                            <p className="text-xs text-gray-500 mt-1">{ar.desc}</p>
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
 
-              {/* Step 3: Work */}
+              {/* Step 3: Occupation */}
               {step === 3 && (
                 <div className="space-y-4">
-                  <div className="space-y-1">
-                    <h2 className="font-headline-sm text-headline-sm text-primary">
-                      Primary source of livelihood or occupation
-                    </h2>
-                    <p className="font-body-md text-body-md text-on-surface-variant">
-                      आवेदक की वर्तमान आजीविका या कार्यक्षेत्र चुनें। Matches enterprise subsidies, artisan toolkits, and NRLM credit.
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                    {WORK_CATEGORIES.map((wc) => (
-                      <button
-                        key={wc.id}
-                        type="button"
-                        onClick={() => setOccupation(wc.id)}
-                        className={`p-5 rounded-xl text-left transition-all flex flex-col justify-between space-y-2 ${
-                          occupation === wc.id
-                            ? 'bg-surface-container border-2 border-primary shadow-sm'
-                            : 'bg-surface-container-low hover:bg-surface-container'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <p className="font-title-md text-title-md text-primary font-bold">{wc.label}</p>
-                          <span className="font-label-md text-label-md text-secondary font-medium">{wc.labelHi}</span>
-                        </div>
-                        <p className="font-body-sm text-body-sm text-on-surface-variant">{wc.desc}</p>
-                      </button>
-                    ))}
+                  <p className="text-sm text-gray-600">
+                    आवेदक की वर्तमान आजीविका या कार्यक्षेत्र चुनें। Matches enterprise subsidies, artisan toolkits, and NRLM credit.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {WORK_CATEGORIES.map((wc) => {
+                      const isSelected = occupation === wc.id;
+                      return (
+                        <button
+                          key={wc.id}
+                          type="button"
+                          onClick={() => setOccupation(wc.id)}
+                          className={`p-5 rounded-xl text-left transition-all border flex flex-col justify-between space-y-2 cursor-pointer ${
+                            isSelected
+                              ? 'border-[#EA3C36] bg-red-50 text-[#EA3C36] shadow-xs'
+                              : 'border-gray-200 hover:border-gray-300 bg-white text-gray-800'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <p className="font-bold text-base">{wc.label}</p>
+                            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-gray-100 text-gray-700">
+                              {wc.labelHi}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-500 leading-relaxed">{wc.desc}</p>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
 
-              {/* Step 4: Status (Matches Stitch exact design) */}
+              {/* Step 4: Marital Status */}
               {step === 4 && (
                 <div className="space-y-4">
-                  <div className="space-y-1">
-                    <h2 className="font-headline-sm text-headline-sm text-primary">
-                      Please choose the applicant's current marital or family status
-                    </h2>
-                    <p className="font-body-md text-body-md text-on-surface-variant">
-                      आवेदक की वर्तमान वैवाहिक स्थिति चुनें। This enables matching with specific pension, remarriage grant, or single-mother benefit programs.
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-                    {/* Option 1: Widowed */}
-                    <button
-                      type="button"
-                      onClick={() => setMaritalStatus('widowed')}
-                      className={`text-left p-5 rounded-xl transition-all flex flex-col justify-between space-y-3 ${
-                        maritalStatus === 'widowed'
-                          ? 'bg-surface-container border-2 border-primary shadow-sm'
-                          : 'bg-surface-container-low hover:bg-surface-container'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span
-                          className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                            maritalStatus === 'widowed'
-                              ? 'bg-primary text-on-primary'
-                              : 'bg-surface-container-high text-outline'
+                  <p className="text-sm text-gray-600">
+                    आवेदक की वर्तमान वैवाहिक स्थिति चुनें। Enables matching with specific pension, remarriage grant, or single-mother benefit programs.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {[
+                      {
+                        id: 'widowed',
+                        label: 'Widowed',
+                        labelHi: 'कल्याणी / विधवा',
+                        desc: 'Qualifies for MP Kalyani Social Security Pension (₹600/month) and child education aid.',
+                      },
+                      {
+                        id: 'married',
+                        label: 'Married',
+                        labelHi: 'विवाहित',
+                        desc: 'Eligible for maternal health incentives (PMMVY), Ladli Behna, and joint SHG loans.',
+                      },
+                      {
+                        id: 'unmarried',
+                        label: 'Single / Unmarried',
+                        labelHi: 'अविवाहित (18+ वर्ष)',
+                        desc: 'Access higher skill training, entrepreneurship stipends, and rural credit programs.',
+                      },
+                      {
+                        id: 'divorced',
+                        label: 'Separated / Abandoned',
+                        labelHi: 'परित्यक्ता / अलग',
+                        desc: 'Qualifies for legal aid assistance, safe transition housing, and emergency stipends.',
+                      },
+                    ].map((st) => {
+                      const isSelected = maritalStatus === st.id;
+                      return (
+                        <button
+                          key={st.id}
+                          type="button"
+                          onClick={() => setMaritalStatus(st.id as any)}
+                          className={`p-5 rounded-xl text-left transition-all border flex flex-col justify-between space-y-3 cursor-pointer ${
+                            isSelected
+                              ? 'border-[#EA3C36] bg-red-50 text-[#EA3C36] shadow-xs'
+                              : 'border-gray-200 hover:border-gray-300 bg-white text-gray-800'
                           }`}
                         >
-                          <span className="material-symbols-outlined text-[18px]">
-                            {maritalStatus === 'widowed' ? 'check' : 'radio_button_unchecked'}
-                          </span>
-                        </span>
-                        <span className="px-2 py-0.5 rounded-full bg-surface-container-high text-primary font-label-caps text-label-caps font-semibold">
-                          Active Selection
-                        </span>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="font-title-md text-title-md text-primary font-bold">Widowed</p>
-                        <p className="font-label-md text-label-md text-secondary font-medium">कल्याणी / विधवा</p>
-                        <p className="font-body-sm text-body-sm text-on-surface-variant pt-1 leading-snug">
-                          Qualifies for MP Kalyani Social Security Pension and dependent education concessions.
-                        </p>
-                      </div>
-                    </button>
-
-                    {/* Option 2: Married */}
-                    <button
-                      type="button"
-                      onClick={() => setMaritalStatus('married')}
-                      className={`text-left p-5 rounded-xl transition-all flex flex-col justify-between space-y-3 ${
-                        maritalStatus === 'married'
-                          ? 'bg-surface-container border-2 border-primary shadow-sm'
-                          : 'bg-surface-container-low hover:bg-surface-container'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span
-                          className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                            maritalStatus === 'married'
-                              ? 'bg-primary text-on-primary'
-                              : 'bg-surface-container-high text-outline'
-                          }`}
-                        >
-                          <span className="material-symbols-outlined text-[18px]">
-                            {maritalStatus === 'married' ? 'check' : 'radio_button_unchecked'}
-                          </span>
-                        </span>
-                        <span className="font-label-caps text-label-caps text-on-surface-variant">Standard</span>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="font-title-md text-title-md text-primary font-semibold">Married</p>
-                        <p className="font-label-md text-label-md text-on-surface-variant font-medium">विवाहित</p>
-                        <p className="font-body-sm text-body-sm text-on-surface-variant pt-1 leading-snug">
-                          Eligible for maternal health support, Ladli Behna Yojana, and SHG joint asset grants.
-                        </p>
-                      </div>
-                    </button>
-
-                    {/* Option 3: Single / Unmarried */}
-                    <button
-                      type="button"
-                      onClick={() => setMaritalStatus('unmarried')}
-                      className={`text-left p-5 rounded-xl transition-all flex flex-col justify-between space-y-3 ${
-                        maritalStatus === 'unmarried'
-                          ? 'bg-surface-container border-2 border-primary shadow-sm'
-                          : 'bg-surface-container-low hover:bg-surface-container'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span
-                          className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                            maritalStatus === 'unmarried'
-                              ? 'bg-primary text-on-primary'
-                              : 'bg-surface-container-high text-outline'
-                          }`}
-                        >
-                          <span className="material-symbols-outlined text-[18px]">
-                            {maritalStatus === 'unmarried' ? 'check' : 'radio_button_unchecked'}
-                          </span>
-                        </span>
-                        <span className="font-label-caps text-label-caps text-on-surface-variant">Special</span>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="font-title-md text-title-md text-primary font-semibold">Single / Unmarried</p>
-                        <p className="font-label-md text-label-md text-on-surface-variant font-medium">अविवाहित (18+ वर्ष)</p>
-                        <p className="font-body-sm text-body-sm text-on-surface-variant pt-1 leading-snug">
-                          Access higher skill certifications, entrepreneurship stipends, and rural credit programs.
-                        </p>
-                      </div>
-                    </button>
-
-                    {/* Option 4: Separated */}
-                    <button
-                      type="button"
-                      onClick={() => setMaritalStatus('divorced')}
-                      className={`text-left p-5 rounded-xl transition-all flex flex-col justify-between space-y-3 ${
-                        maritalStatus === 'divorced'
-                          ? 'bg-surface-container border-2 border-primary shadow-sm'
-                          : 'bg-surface-container-low hover:bg-surface-container'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span
-                          className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                            maritalStatus === 'divorced'
-                              ? 'bg-primary text-on-primary'
-                              : 'bg-surface-container-high text-outline'
-                          }`}
-                        >
-                          <span className="material-symbols-outlined text-[18px]">
-                            {maritalStatus === 'divorced' ? 'check' : 'radio_button_unchecked'}
-                          </span>
-                        </span>
-                        <span className="font-label-caps text-label-caps text-on-surface-variant">Protective</span>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="font-title-md text-title-md text-primary font-semibold">Separated / Abandoned</p>
-                        <p className="font-label-md text-label-md text-on-surface-variant font-medium">परित्यक्ता / अलग</p>
-                        <p className="font-body-sm text-body-sm text-on-surface-variant pt-1 leading-snug">
-                          Qualifies for legal aid assistance, safe transition housing, and emergency stipends.
-                        </p>
-                      </div>
-                    </button>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-white/80 border border-gray-100">
+                              {st.labelHi}
+                            </span>
+                            {isSelected ? (
+                              <CheckCircle2 className="w-5 h-5 text-[#EA3C36]" />
+                            ) : (
+                              <Circle className="w-5 h-5 text-gray-300" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-bold text-base">{st.label}</p>
+                            <p className="text-xs text-gray-500 mt-1 leading-snug">{st.desc}</p>
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
 
-              {/* Step 5: SHG Member */}
+              {/* Step 5: SHG Affiliation */}
               {step === 5 && (
                 <div className="space-y-4">
-                  <div className="space-y-1">
-                    <h2 className="font-headline-sm text-headline-sm text-primary">
-                      Are you an active member of a Self-Help Group (SHG)?
-                    </h2>
-                    <p className="font-body-md text-body-md text-on-surface-variant">
-                      क्या आप किसी ग्राम स्तरीय स्वयं सहायता समूह (SHG) की सदस्या हैं? DAY-NRLM micro-loans and community investment funds require SHG affiliation.
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                  <p className="text-sm text-gray-600">
+                    क्या आप किसी ग्राम स्तरीय स्वयं सहायता समूह (SHG) की सदस्या हैं? DAY-NRLM micro-loans and community investment funds require SHG affiliation.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <button
                       type="button"
                       onClick={() => setIsSHGMember(true)}
-                      className={`p-6 rounded-xl text-left transition-all ${
+                      className={`p-6 rounded-xl text-left transition-all border cursor-pointer ${
                         isSHGMember
-                          ? 'bg-surface-container border-2 border-primary shadow-sm'
-                          : 'bg-surface-container-low hover:bg-surface-container'
+                          ? 'border-[#EA3C36] bg-red-50 text-[#EA3C36] shadow-xs'
+                          : 'border-gray-200 hover:border-gray-300 bg-white text-gray-800'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <p className="font-title-md text-title-md text-primary font-bold">Yes, Active SHG Member</p>
-                        <span className="material-symbols-outlined text-primary text-[24px]">groups</span>
+                        <p className="font-bold text-base">Yes, Active SHG Member</p>
+                        <Users className="w-5 h-5 text-[#EA3C36]" />
                       </div>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant">
-                        Eligible for DAY-NRLM revolving funds, 4% interest subvention, and community toolkits.
+                      <p className="text-xs text-gray-500 leading-relaxed">
+                        Eligible for DAY-NRLM revolving funds, 4% interest subvention, and collective toolkits.
                       </p>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => setIsSHGMember(false)}
-                      className={`p-6 rounded-xl text-left transition-all ${
+                      className={`p-6 rounded-xl text-left transition-all border cursor-pointer ${
                         !isSHGMember
-                          ? 'bg-surface-container border-2 border-primary shadow-sm'
-                          : 'bg-surface-container-low hover:bg-surface-container'
+                          ? 'border-[#EA3C36] bg-red-50 text-[#EA3C36] shadow-xs'
+                          : 'border-gray-200 hover:border-gray-300 bg-white text-gray-800'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <p className="font-title-md text-title-md text-primary font-bold">No, Not in an SHG</p>
-                        <span className="material-symbols-outlined text-outline text-[24px]">person</span>
+                        <p className="font-bold text-base">No, Not in an SHG</p>
+                        <Circle className="w-5 h-5 text-gray-400" />
                       </div>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant">
-                        Matches individual direct pensions, DBT allowances, and maternal welfare programs.
+                      <p className="text-xs text-gray-500 leading-relaxed">
+                        Matches individual direct pensions, DBT cash allowances, and maternal welfare programs.
                       </p>
                     </button>
                   </div>
@@ -651,67 +549,62 @@ export const EligibilityPage: React.FC = () => {
               {/* Step 6: Ration Card & Maternal */}
               {step === 6 && (
                 <div className="space-y-4">
-                  <div className="space-y-1">
-                    <h2 className="font-headline-sm text-headline-sm text-primary">
-                      Does your household have a BPL or Antyodaya Ration Card?
-                    </h2>
-                    <p className="font-body-md text-body-md text-on-surface-variant">
-                      क्या आपके परिवार के पास गरीबी रेखा (BPL) अथवा अंत्योदय राशन कार्ड है?
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                  <p className="text-sm text-gray-600">
+                    क्या आपके परिवार के पास गरीबी रेखा (BPL) अथवा अंत्योदय राशन कार्ड है?
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <button
                       type="button"
                       onClick={() => setHasBPLCard(true)}
-                      className={`p-6 rounded-xl text-left transition-all ${
+                      className={`p-6 rounded-xl text-left transition-all border cursor-pointer ${
                         hasBPLCard
-                          ? 'bg-surface-container border-2 border-primary shadow-sm'
-                          : 'bg-surface-container-low hover:bg-surface-container'
+                          ? 'border-[#EA3C36] bg-red-50 text-[#EA3C36] shadow-xs'
+                          : 'border-gray-200 hover:border-gray-300 bg-white text-gray-800'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <p className="font-title-md text-title-md text-primary font-bold">Yes, BPL / Antyodaya</p>
-                        <span className="material-symbols-outlined text-primary text-[24px]">credit_card</span>
+                        <p className="font-bold text-base">Yes, BPL / Antyodaya Card</p>
+                        <CreditCard className="w-5 h-5 text-[#EA3C36]" />
                       </div>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant">
-                        Unlocks maximum income-subsidized benefits and full state fee exemptions.
+                      <p className="text-xs text-gray-500 leading-relaxed">
+                        Unlocks maximum income-subsidized benefits, free healthcare desks, and full state fee exemptions.
                       </p>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => setHasBPLCard(false)}
-                      className={`p-6 rounded-xl text-left transition-all ${
+                      className={`p-6 rounded-xl text-left transition-all border cursor-pointer ${
                         !hasBPLCard
-                          ? 'bg-surface-container border-2 border-primary shadow-sm'
-                          : 'bg-surface-container-low hover:bg-surface-container'
+                          ? 'border-[#EA3C36] bg-red-50 text-[#EA3C36] shadow-xs'
+                          : 'border-gray-200 hover:border-gray-300 bg-white text-gray-800'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <p className="font-title-md text-title-md text-primary font-bold">No BPL Card</p>
-                        <span className="material-symbols-outlined text-outline text-[24px]">credit_card_off</span>
+                        <p className="font-bold text-base">No BPL Card (General / APL)</p>
+                        <Circle className="w-5 h-5 text-gray-400" />
                       </div>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant">
-                        Universal entitlement schemes (e.g. Ladli Behna, PMMVY) remain fully open.
+                      <p className="text-xs text-gray-500 leading-relaxed">
+                        Universal entitlement schemes (e.g. Ladli Behna, PMMVY, youth skilling) remain fully open.
                       </p>
                     </button>
                   </div>
 
-                  {/* Maternity Checkbox */}
-                  <div className="p-4 rounded-xl bg-surface-container-low border border-[#E8EAE5] mt-4">
+                  {/* Maternal Healthcare Add-on */}
+                  <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 mt-4">
                     <label className="flex items-start gap-3 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={isPregnantOrNewMother}
                         onChange={(e) => setIsPregnantOrNewMother(e.target.checked)}
-                        className="w-4 h-4 mt-1 rounded text-primary focus:ring-primary"
+                        className="w-4 h-4 mt-1 rounded text-[#EA3C36] focus:ring-[#EA3C36]"
                       />
                       <div>
-                        <p className="font-label-md text-label-md font-semibold text-primary">
+                        <p className="text-xs font-bold text-gray-900">
                           Currently Pregnant or Nursing First Child (गर्भवती अथवा धात्री माता)
                         </p>
-                        <p className="font-body-sm text-body-sm text-on-surface-variant">
-                          Check this if you qualify for Pradhan Mantri Matru Vandana Yojana (PMMVY 2.0 direct ₹5,000 cash grant).
+                        <p className="text-[11px] text-gray-500 mt-0.5">
+                          Check this to match Pradhan Mantri Matru Vandana Yojana (PMMVY 2.0 direct ₹5,000 cash grant).
                         </p>
                       </div>
                     </label>
@@ -720,283 +613,242 @@ export const EligibilityPage: React.FC = () => {
               )}
             </div>
 
-            {/* Supportive Micro-Copy & Navigation Controls */}
-            <div className="pt-4 border-t border-[#E8EAE5] flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
-                <span className="material-symbols-outlined text-[18px] text-secondary">info</span>
-                <span>
-                  {step === 4
-                    ? 'Helps check qualification for MP Social Security Kalyani Pension (₹600/month) and remarriage rehabilitation aid.'
-                    : '100% confidential. No personal identity data is stored or forwarded.'}
-                </span>
+            {/* Stepper Footer & Next/Prev Controls */}
+            <div className="pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <HelpCircle className="w-4 h-4 text-[#EA3C36]" />
+                <span>100% confidential. No personal identity data is stored or forwarded.</span>
               </div>
               <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
                 {step > 1 && (
                   <button
                     type="button"
                     onClick={handlePrev}
-                    className="px-5 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md transition-colors flex items-center gap-1.5"
+                    className="px-5 py-2.5 rounded-lg border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
                   >
-                    <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-                    <span>Previous Question</span>
+                    <ArrowLeft className="w-4 h-4" />
+                    <span>Previous</span>
                   </button>
                 )}
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="px-6 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md transition-colors shadow-sm flex items-center gap-1.5"
+                  className="px-7 py-3 rounded-lg bg-[#EA3C36] hover:bg-[#D32F2F] text-white text-xs font-bold transition-all shadow-md hover-lift flex items-center gap-2 cursor-pointer"
                 >
                   <span>{step === 6 ? 'Find My Eligible Schemes' : `Continue to Next (Step ${step + 1})`}</span>
-                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                  <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
           </section>
         )}
 
-        {/* Dynamic Real-Time Matched Results Banner */}
+        {/* ========================================================= */}
+        {/* MATCHED RESULTS VIEW                                      */}
+        {/* ========================================================= */}
         {!isEvaluating && result && (
           <div className="space-y-10 animate-fadeIn">
-            {/* Results Top Headline Bar */}
-            <section className="space-y-6 pt-2">
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-3 h-3 rounded-full bg-secondary"></span>
-                    <h2 className="font-headline-md text-headline-md text-primary tracking-tight">
-                      {result.eligibleSchemes.length} Schemes Match Your Profile
-                    </h2>
-                    <span className="px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-caps text-label-caps font-semibold">
-                      95%+ Match Confidence
-                    </span>
-                  </div>
-                  <p className="font-body-md text-body-md text-on-surface-variant max-w-3xl">
-                    Based on your answers (District: {district}, Age: {ageRange}, Status: {maritalStatus}, SHG: {isSHGMember ? 'Yes' : 'No'}, Ration: {hasBPLCard ? 'BPL' : 'General'}). These schemes have active sanctioned budgets for direct transfer.
-                  </p>
-                </div>
-
-                {/* Quick Action Share & Download */}
+            {/* Top Results Headline Bar */}
+            <section className="bg-white p-6 rounded-xl border border-gray-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => window.print()}
-                    className="px-3.5 py-2 rounded-xl bg-surface-container-low hover:bg-surface-container text-primary font-label-sm text-label-sm flex items-center gap-1.5 transition-colors border border-[#E8EAE5]"
-                    type="button"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">print</span>
-                    <span>Print Summary</span>
-                  </button>
-                  <button
-                    onClick={resetCalculator}
-                    className="px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-primary font-label-sm text-label-sm flex items-center gap-1.5 transition-colors"
-                    type="button"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">restart_alt</span>
-                    <span>Recalculate</span>
-                  </button>
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#EA3C36] animate-pulse"></span>
+                  <h2 className="text-2xl font-extrabold text-[#1A1A1A]">
+                    {result.eligibleSchemes.length} Programs Match Your Profile
+                  </h2>
+                  <span className="px-2.5 py-0.5 rounded-full bg-red-50 text-[#EA3C36] text-xs font-bold">
+                    95%+ Confidence
+                  </span>
                 </div>
+                <p className="text-xs text-gray-600">
+                  Profile: District: {district} • Age: {ageRange} • Status: {maritalStatus} • SHG: {isSHGMember ? 'Yes' : 'No'} • Ration: {hasBPLCard ? 'BPL' : 'General'}
+                </p>
               </div>
 
-              {/* Matched Schemes Bento Arrangement */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {result.eligibleSchemes.map((scheme, idx) => (
-                  <article
-                    key={scheme.schemeId}
-                    className="bg-surface-container-lowest rounded-2xl border border-[#E8EAE5] shadow-sm p-6 lg:p-7 space-y-6 flex flex-col justify-between hover:shadow-md transition-shadow"
-                  >
-                    <div className="space-y-4">
-                      {/* Top Category & Match Pill */}
-                      <div className="flex items-center justify-between flex-wrap gap-2">
-                        <span className="px-3 py-1 rounded-full bg-secondary/10 text-secondary font-label-caps text-label-caps font-semibold">
-                          {scheme.schemeCode} • {scheme.nameHi || 'Direct Welfare'}
-                        </span>
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm font-semibold">
-                          <span className="material-symbols-outlined text-[14px]">verified</span>{' '}
-                          {idx === 0 ? '98% Match' : idx === 1 ? '95% Match' : '92% Match'}
-                        </span>
-                      </div>
-
-                      {/* Title & Key Metric Callout */}
-                      <div className="space-y-2">
-                        <h3 className="font-title-md text-title-md text-primary font-bold">
-                          {scheme.name}
-                        </h3>
-                        <p className="font-label-sm text-label-sm text-on-surface-variant">
-                          {scheme.nameHi ? `${scheme.nameHi} • ` : ''}Social Security Department MP
-                        </p>
-
-                        {/* Financial Benefit Callout */}
-                        <div className="p-3.5 rounded-xl bg-surface-container-low flex items-center justify-between border border-[#E8EAE5]">
-                          <div>
-                            <p className="font-label-caps text-label-caps uppercase text-on-surface-variant">
-                              Sanctioned Direct Benefit
-                            </p>
-                            <p className="font-headline-sm text-headline-sm text-primary font-bold">
-                              {scheme.benefit.split('(')[0] || 'Direct Transfer'}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <span className="material-symbols-outlined text-secondary text-[28px]">payments</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Match Reason Logic Pill */}
-                      <div className="p-3 rounded-lg bg-surface-container text-primary font-body-sm text-body-sm flex items-start gap-2">
-                        <span className="material-symbols-outlined text-[18px] text-primary shrink-0 mt-0.5">
-                          check_circle
-                        </span>
-                        <span>
-                          <strong>Matched:</strong> {scheme.matchingReasons?.join(' ') || scheme.benefit}
-                        </span>
-                      </div>
-
-                      {/* Required Documents Inline Tags */}
-                      <div className="space-y-1.5">
-                        <p className="font-label-caps text-label-caps uppercase text-on-surface-variant">
-                          Required Documents Preview
-                        </p>
-                        <div className="flex flex-wrap gap-1.5">
-                          <span className="px-2.5 py-1 rounded-md bg-surface-container-low text-on-surface font-label-sm text-label-sm">
-                            Samagra ID (समग्र आईडी)
-                          </span>
-                          <span className="px-2.5 py-1 rounded-md bg-surface-container-low text-on-surface font-label-sm text-label-sm">
-                            Aadhaar Card
-                          </span>
-                          <span className="px-2.5 py-1 rounded-md bg-surface-container-low text-on-surface font-label-sm text-label-sm">
-                            Active Bank Passbook
-                          </span>
-                          <span className="px-2.5 py-1 rounded-md bg-surface-container-low text-on-surface font-label-sm text-label-sm">
-                            Ration Card / BPL Survey
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Action Controls */}
-                    <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[#E8EAE5]">
-                      <Link
-                        to={`/schemes/${scheme.slug}`}
-                        className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md transition-colors"
-                      >
-                        <span>View Full Scheme Details</span>
-                        <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-                      </Link>
-                      <button
-                        onClick={() =>
-                          setCallbackModal({
-                            isOpen: true,
-                            schemeCode: scheme.schemeCode,
-                            schemeName: scheme.name,
-                          })
-                        }
-                        className="w-full sm:w-auto inline-flex items-center justify-center gap-1 px-3 py-2 rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface font-label-sm text-label-sm transition-colors border border-[#E8EAE5]"
-                        type="button"
-                      >
-                        <span className="material-symbols-outlined text-[16px] text-secondary">support_agent</span>
-                        <span>Ask Sakhi Sahayika</span>
-                      </button>
-                    </div>
-                  </article>
-                ))}
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => window.print()}
+                  className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold flex items-center gap-1.5 transition-colors border border-gray-200 cursor-pointer"
+                  type="button"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>Print Checklist</span>
+                </button>
+                <button
+                  onClick={resetCalculator}
+                  className="px-4 py-2 rounded-lg bg-[#EA3C36] hover:bg-[#D32F2F] text-white text-xs font-bold flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
+                  type="button"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  <span>Recalculate</span>
+                </button>
               </div>
             </section>
 
-            {/* Grassroots Human Assistance Module */}
-            <section className="bg-surface-container-low rounded-2xl p-6 lg:p-8 space-y-6 border border-[#E8EAE5]">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                {/* Editorial Text & Sahayika Info */}
-                <div className="lg:col-span-8 space-y-4">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container text-secondary font-label-caps text-label-caps uppercase tracking-wider font-semibold">
-                    <span className="material-symbols-outlined text-[16px]">volunteer_activism</span>
-                    <span>Free Doorstep Support</span>
-                  </div>
-                  <h3 className="font-headline-sm text-headline-sm text-primary">
-                    Need Help Applying? A Certified Sakhi Sahayika Can Assist You for Free
-                  </h3>
-                  <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-                    Don't worry if document verification feels confusing. In {district} district, trained{' '}
-                    <strong>Sakhi Sahayikas</strong> visit Gram Panchayats weekly. They will print your checklist, review your Samagra ID, and help prepare your file for the Gram Panchayat Secretary.
-                  </p>
+            {/* Matched Schemes Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {result.eligibleSchemes.map((scheme, idx) => (
+                <article
+                  key={scheme.schemeId}
+                  className="bg-white rounded-xl border border-gray-200 shadow-xs p-6 sm:p-7 space-y-5 flex flex-col justify-between hover-lift transition-all"
+                >
+                  <div className="space-y-4">
+                    {/* Top Badges */}
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <span className="px-2.5 py-1 rounded-md bg-red-50 text-[#EA3C36] text-xs font-bold">
+                        {scheme.schemeCode}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#00A3C4]">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        {idx === 0 ? '98% High Match' : idx === 1 ? '95% Match' : '92% Match'}
+                      </span>
+                    </div>
 
-                  {/* Key Support Guarantees */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-                    <div className="flex items-center gap-2 text-primary font-label-sm text-label-sm">
-                      <span className="material-symbols-outlined text-[18px] text-primary">price_check</span>
-                      <span>100% Free of Charge</span>
+                    {/* Scheme Title & Benefit */}
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-bold text-[#1A1A1A] leading-snug">
+                        {scheme.name}
+                      </h3>
+                      {scheme.nameHi && (
+                        <p className="text-xs font-bold text-[#EA3C36] font-hindi">
+                          {scheme.nameHi}
+                        </p>
+                      )}
+
+                      {/* Financial Benefit Callout */}
+                      <div className="p-3.5 rounded-lg bg-gray-50 flex items-center justify-between border border-gray-100 mt-2">
+                        <div>
+                          <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+                            Sanctioned Direct Benefit
+                          </p>
+                          <p className="text-xl font-extrabold text-[#1A1A1A]">
+                            {scheme.benefit.split('(')[0] || 'Direct Transfer'}
+                          </p>
+                        </div>
+                        <span className="px-2.5 py-1 rounded-full bg-red-50 text-[#EA3C36] text-[10px] font-bold">
+                          DBT Direct
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 text-primary font-label-sm text-label-sm">
-                      <span className="material-symbols-outlined text-[18px] text-primary">home_pin</span>
-                      <span>Doorstep / Panchayat Hall</span>
+
+                    {/* Matched Reasoning Box */}
+                    <div className="p-3 rounded-lg bg-red-50/50 text-[#1A1A1A] text-xs flex items-start gap-2 border border-red-100">
+                      <CheckCircle2 className="w-4 h-4 text-[#EA3C36] shrink-0 mt-0.5" />
+                      <span>
+                        <strong>Why you matched:</strong> {scheme.matchingReasons?.join(' ') || scheme.benefit}
+                      </span>
                     </div>
-                    <div className="flex items-center gap-2 text-primary font-label-sm text-label-sm">
-                      <span className="material-symbols-outlined text-[18px] text-primary">translate</span>
-                      <span>Bilingual Hindi / Malwi</span>
+
+                    {/* Documents Needed Tags */}
+                    <div className="space-y-1.5 pt-1">
+                      <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+                        Required Documents Checklist
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        <span className="px-2.5 py-0.5 rounded bg-gray-100 text-gray-700 text-xs">
+                          Samagra ID (समग्र)
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded bg-gray-100 text-gray-700 text-xs">
+                          Aadhaar Card
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded bg-gray-100 text-gray-700 text-xs">
+                          Active Bank Passbook
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded bg-gray-100 text-gray-700 text-xs">
+                          Ration Card / BPL
+                        </span>
+                      </div>
                     </div>
                   </div>
+
+                  {/* Actions */}
+                  <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-gray-100">
+                    <Link
+                      to={`/schemes/${scheme.slug}`}
+                      className="w-full sm:flex-1 py-2.5 px-4 rounded-lg bg-[#EA3C36] hover:bg-[#D32F2F] text-white text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5 shadow-xs"
+                    >
+                      <span>View Guidelines</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                    <button
+                      onClick={() =>
+                        setCallbackModal({
+                          isOpen: true,
+                          schemeCode: scheme.schemeCode,
+                          schemeName: scheme.name,
+                        })
+                      }
+                      className="w-full sm:w-auto py-2.5 px-4 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold transition-colors border border-gray-200 flex items-center justify-center gap-1.5 cursor-pointer"
+                      type="button"
+                    >
+                      <Headphones className="w-4 h-4 text-[#EA3C36]" />
+                      <span>Ask Volunteer</span>
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            {/* Grassroots Free Doorstep Helpdesk Box */}
+            <section className="bg-white rounded-xl p-6 sm:p-8 border border-gray-200 shadow-xs space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div className="lg:col-span-8 space-y-3">
+                  <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider text-[#EA3C36] font-bold">
+                    <HeartHandshake className="w-4 h-4 text-[#EA3C36]" />
+                    <span>Free Doorstep Community Support</span>
+                  </div>
+                  <h3 className="text-2xl font-extrabold text-[#1A1A1A]">
+                    Need Help Filing? Certified Community Volunteers Can Assist You for Free
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                    Don't worry if document verification feels confusing. In {district} district, trained{' '}
+                    <strong>volunteers</strong> visit Gram Panchayats weekly. They will print your checklist, review your Samagra ID, and help prepare your file for the Gram Panchayat Secretary with zero facilitation fees.
+                  </p>
                 </div>
 
-                {/* Action Box: Schedule Request */}
-                <div className="lg:col-span-4 bg-surface-container-lowest p-6 rounded-2xl shadow-sm space-y-4 border border-[#E8EAE5]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed">
-                      <span className="material-symbols-outlined text-[24px]">support_agent</span>
-                    </div>
-                    <div>
-                      <p className="font-title-md text-title-md text-primary font-semibold">Request a Callback</p>
-                      <p className="font-label-sm text-label-sm text-on-surface-variant">From {district} Block Coordinator</p>
-                    </div>
+                {/* Inline Callback Card */}
+                <div className="lg:col-span-4 bg-gray-50 p-5 rounded-xl border border-gray-200 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Headphones className="w-4 h-4 text-[#EA3C36]" />
+                    <p className="text-xs font-bold text-gray-900">Request a Free Callback</p>
                   </div>
 
                   {callbackSuccess ? (
-                    <div className="p-4 rounded-xl bg-surface-container text-primary font-body-sm text-body-sm text-center">
+                    <div className="p-3 bg-red-50 text-red-700 rounded-lg text-xs text-center border border-red-200">
                       <p className="font-bold">धन्यवाद! Callback Scheduled.</p>
-                      <p className="text-xs text-on-surface-variant mt-1">
-                        Our field facilitator for {district} will contact you shortly.
+                      <p className="text-[11px] text-gray-600 mt-0.5">
+                        Our facilitator for {district} will contact you shortly.
                       </p>
                     </div>
                   ) : (
-                    <form onSubmit={submitInlineCallback} className="space-y-3">
+                    <form onSubmit={submitInlineCallback} className="space-y-2">
                       <input
                         value={callbackVillage}
                         onChange={(e) => setCallbackVillage(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-surface text-on-surface placeholder:text-outline text-body-md font-body-md border border-[#E8EAE5] focus:outline-hidden focus:ring-2 focus:ring-primary/20"
-                        placeholder="Enter Village / Gram Panchayat Name"
+                        className="w-full px-3 py-2 rounded-lg bg-white text-xs border border-gray-300 focus:border-[#EA3C36] focus:outline-hidden"
+                        placeholder="Village / Gram Panchayat"
                         type="text"
                       />
                       <input
                         value={callbackPhone}
                         onChange={(e) => setCallbackPhone(e.target.value)}
                         required
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-surface text-on-surface placeholder:text-outline text-body-md font-body-md border border-[#E8EAE5] focus:outline-hidden focus:ring-2 focus:ring-primary/20"
+                        className="w-full px-3 py-2 rounded-lg bg-white text-xs border border-gray-300 focus:border-[#EA3C36] focus:outline-hidden"
                         placeholder="Mobile Number (10 digits)"
                         type="tel"
                       />
                       <button
                         type="submit"
                         disabled={callbackLoading}
-                        className="w-full py-2.5 rounded-xl bg-secondary hover:bg-[#B56C4A] text-on-secondary font-label-md text-label-md transition-colors shadow-sm disabled:opacity-50"
+                        className="w-full py-2 bg-[#EA3C36] hover:bg-[#D32F2F] text-white text-xs font-bold rounded-lg shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                       >
-                        {callbackLoading ? 'Scheduling...' : 'Connect With Field Sahayika'}
+                        {callbackLoading ? 'Scheduling...' : 'Connect With Field Volunteer'}
                       </button>
                     </form>
                   )}
-                  <p className="font-label-sm text-label-sm text-outline-variant text-center leading-tight text-xs">
-                    We never share your phone number with private agents.
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            {/* Statutory Disclaimer & Re-screen Footer */}
-            <section className="p-5 rounded-2xl bg-surface-container-high/60 space-y-3 border border-[#E8EAE5]">
-              <div className="flex items-start gap-3">
-                <span className="material-symbols-outlined text-on-surface-variant text-[20px] shrink-0 mt-0.5">policy</span>
-                <div className="space-y-1">
-                  <h4 className="font-label-caps text-label-caps uppercase tracking-wider text-primary font-bold">
-                    Preliminary Match Legal Notice
-                  </h4>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
-                    SakhiSetu is an independent grassroots facilitation and digital civil-society platform. This screener provides heuristic matching based purely on self-reported inputs. Official sanction, verification, and disbursement are the sovereign prerogative of the Government of Madhya Pradesh and the Government of India.
+                  <p className="text-[10px] text-gray-400 text-center leading-tight">
+                    We never share your phone number with commercial agents.
                   </p>
                 </div>
               </div>

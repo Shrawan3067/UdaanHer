@@ -50,7 +50,7 @@ export const AdminDonationsPage: React.FC = () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `SakhiSetu_80G_${receiptNumber.replace(/\//g, '_')}.pdf`;
+      a.download = `UdaanHer_80G_${receiptNumber.replace(/\//g, '_')}.pdf`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -65,7 +65,7 @@ export const AdminDonationsPage: React.FC = () => {
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto w-full animate-fadeIn">
       {/* Header */}
-      <div className="p-6 rounded-2xl bg-surface-container-lowest shadow-sm border border-[#E8EAE5] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-6 rounded-2xl bg-surface-container-lowest shadow-sm border border-[#E5E7EB] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="font-label-caps text-label-caps uppercase text-secondary font-bold tracking-wider">
             Financial Ledger &amp; Compliance
@@ -80,7 +80,7 @@ export const AdminDonationsPage: React.FC = () => {
       </div>
 
       {/* Filter Row */}
-      <div className="bg-surface-container-lowest rounded-2xl border border-[#E8EAE5] p-4 flex flex-col sm:flex-row gap-3 items-center justify-between shadow-sm">
+      <div className="bg-surface-container-lowest rounded-2xl border border-[#E5E7EB] p-4 flex flex-col sm:flex-row gap-3 items-center justify-between shadow-sm">
         <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-96">
           <span className="material-symbols-outlined text-[18px] text-on-surface-variant absolute left-3.5 top-1/2 -translate-y-1/2">
             search
@@ -90,7 +90,7 @@ export const AdminDonationsPage: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by donor name, email, PAN, receipt..."
-            className="w-full pl-10 pr-4 py-2 text-sm bg-surface-container-low rounded-xl border border-[#E8EAE5] focus:outline-hidden"
+            className="w-full pl-10 pr-4 py-2 text-sm bg-surface-container-low rounded-xl border border-[#E5E7EB] focus:outline-hidden"
           />
         </form>
 
@@ -101,7 +101,7 @@ export const AdminDonationsPage: React.FC = () => {
               setStatus(e.target.value);
               setPage(1);
             }}
-            className="px-3.5 py-2 text-sm bg-surface-container-low border border-[#E8EAE5] rounded-xl font-label-md font-semibold text-on-surface cursor-pointer focus:outline-hidden"
+            className="px-3.5 py-2 text-sm bg-surface-container-low border border-[#E5E7EB] rounded-xl font-label-md font-semibold text-on-surface cursor-pointer focus:outline-hidden"
           >
             <option value="">All Statuses</option>
             <option value="SUCCESS">SUCCESS</option>
@@ -112,7 +112,7 @@ export const AdminDonationsPage: React.FC = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-[#E8EAE5] overflow-hidden">
+      <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-[#E5E7EB] overflow-hidden">
         {isLoading ? (
           <div className="p-12 text-center text-on-surface-variant">Loading donation registry...</div>
         ) : donations.length === 0 ? (
@@ -125,7 +125,7 @@ export const AdminDonationsPage: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider border-b border-[#E8EAE5]">
+                <tr className="bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider border-b border-[#E5E7EB]">
                   <th className="py-3 px-6 font-semibold">Receipt &amp; Date</th>
                   <th className="py-3 px-6 font-semibold">Donor Details</th>
                   <th className="py-3 px-6 font-semibold">PAN</th>
@@ -135,7 +135,7 @@ export const AdminDonationsPage: React.FC = () => {
                   <th className="py-3 px-6 font-semibold text-right">Certificate</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E8EAE5]">
+              <tbody className="divide-y divide-[#E5E7EB]">
                 {donations.map((d) => (
                   <tr key={d.id} className="hover:bg-surface-container-low/40 transition-colors">
                     <td className="py-3.5 px-6">
@@ -211,7 +211,7 @@ export const AdminDonationsPage: React.FC = () => {
 
         {/* Pagination */}
         {pagination.totalPages > 1 && (
-          <div className="p-4 border-t border-[#E8EAE5] flex items-center justify-between">
+          <div className="p-4 border-t border-[#E5E7EB] flex items-center justify-between">
             <span className="font-label-sm text-xs text-on-surface-variant">
               Page {page} of {pagination.totalPages} ({pagination.total} donations)
             </span>

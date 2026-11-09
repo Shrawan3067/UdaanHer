@@ -1,4 +1,4 @@
-import { CampaignStatus, Prisma } from '@prisma/client';
+import { CampaignStatus } from '../../types/models.js';
 import { prisma } from '../../config/database.js';
 import { AppError } from '../../utils/app-error.js';
 
@@ -72,7 +72,7 @@ export class CampaignService {
       data: {
         ...data,
         slug,
-        goalAmount: new Prisma.Decimal(data.goalAmount),
+        goalAmount: Number(data.goalAmount),
         startDate: data.startDate ? new Date(data.startDate) : new Date(),
         endDate: data.endDate ? new Date(data.endDate) : null,
       },
@@ -107,7 +107,7 @@ export class CampaignService {
       data: {
         ...data,
         slug,
-        goalAmount: data.goalAmount ? new Prisma.Decimal(data.goalAmount) : undefined,
+        goalAmount: data.goalAmount ? Number(data.goalAmount) : undefined,
         startDate: data.startDate ? new Date(data.startDate) : undefined,
         endDate: data.endDate !== undefined ? (data.endDate ? new Date(data.endDate) : null) : undefined,
       },

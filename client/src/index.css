@@ -1,27 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --primary: 0 53 39;
-    --background: 242 252 242;
-    --text: 21 30 24;
+    --primary: 234 60 54;
+    --primary-rgb: 234, 60, 54;
+    --secondary-rgb: 0, 163, 196;
+    --background: 255 255 255;
+    --text: 26 26 26;
+  }
+
+  *, ::before, ::after {
+    border-color: #E5E7EB;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif !important;
   }
 
   body {
-    background-color: #f2fcf2;
-    color: #151e18;
-    font-family: 'Inter', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #FFFFFF;
+    color: #1A1A1A;
+    font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif !important;
+    overflow-x: hidden;
+  }
+
+  header, nav, section, main, aside, footer, h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea {
+    font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Plus Jakarta Sans', 'Noto Sans Devanagari', sans-serif;
+    letter-spacing: -0.015em;
+    color: #1A1A1A;
+  }
+
+  ::selection {
+    background-color: #FEE2E2;
+    color: #991B1B;
   }
 }
 
+/* Material Symbols Outlined Custom Alignment */
 .material-symbols-outlined {
-  font-family: 'Material Symbols Outlined';
+  font-family: 'Material Symbols Outlined' !important;
   font-weight: normal;
   font-style: normal;
   font-size: 24px;
@@ -32,22 +60,204 @@
   white-space: nowrap;
   word-wrap: normal;
   direction: ltr;
+  vertical-align: middle;
   -webkit-font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
+  user-select: none;
 }
 
-/* Custom subtle animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+/* Clean Modern Scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F3F4F6;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(234, 60, 54, 0.4);
+  border-radius: 9999px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(234, 60, 54, 0.75);
+}
+
+/* Header & Card Surfaces */
+.glass-header {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.glass-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+}
+
+.glass-card-warm {
+  background: #FFFFFF;
+  border: 1px solid #FEE2E2;
+  box-shadow: 0 1px 3px 0 rgba(234, 60, 54, 0.04);
+}
+
+.glass-pill {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+}
+
+/* Red Cross Clean Backgrounds */
+.bg-mesh-hero {
+  background-color: #FFFFFF;
+}
+
+.bg-mesh-subtle {
+  background-color: #F8F9FA;
+}
+
+.bg-mesh-card {
+  background-color: #FFFFFF;
+}
+
+/* Micro-Interactions & Hover Lift */
+.hover-lift {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.08), 0 4px 8px -2px rgba(0, 0, 0, 0.03);
+}
+
+.hover-lift-sm {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-lift-sm:hover {
+  transform: translateY(-1px);
+}
+
+/* Red Cross Primary & Secondary Buttons */
+.btn-primary-gradient {
+  background-color: #EA3C36;
+  background: linear-gradient(135deg, #EA3C36 0%, #D32F2F 100%);
+  color: #FFFFFF;
+  box-shadow: 0 2px 6px -1px rgba(234, 60, 54, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-primary-gradient:hover {
+  background: linear-gradient(135deg, #D32F2F 0%, #C92A25 100%);
+  box-shadow: 0 4px 12px -2px rgba(234, 60, 54, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-primary-gradient:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px 0 rgba(234, 60, 54, 0.2);
+}
+
+.btn-secondary-gradient {
+  background-color: #EA3C36;
+  background: linear-gradient(135deg, #EA3C36 0%, #D32F2F 100%);
+  color: #FFFFFF;
+  box-shadow: 0 2px 6px -1px rgba(234, 60, 54, 0.25);
+  transition: all 0.2s ease;
+}
+
+.btn-secondary-gradient:hover {
+  background: linear-gradient(135deg, #D32F2F 0%, #C92A25 100%);
+  box-shadow: 0 4px 12px -2px rgba(234, 60, 54, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-secondary-gradient:active {
+  transform: translateY(0);
+}
+
+/* Subtle Shimmer for progress & badges */
+.shimmer-active {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-active::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translateX(-100%);
+  animation: shimmerSweep 2.2s infinite;
+}
+
+@keyframes shimmerSweep {
+  100% {
+    transform: translateX(100%);
   }
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.25s ease-out forwards;
+/* Form Controls with Refined Polish */
+.input-premium {
+  background-color: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 0.5rem;
+  padding: 0.65rem 0.9rem;
+  color: #1A1A1A;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+}
+
+.input-premium:focus {
+  border-color: #EA3C36;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(234, 60, 54, 0.12), 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+  background-color: #FFFFFF;
+}
+
+.input-premium::placeholder {
+  color: #9CA3AF;
+}
+
+/* Status Chips & Badges */
+.badge-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  background-color: #FFF1F0;
+  border: 1px solid #FEE2E2;
+  color: #EA3C36;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.badge-warm {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  background-color: #FFF1F0;
+  border: 1px solid #FEE2E2;
+  color: #EA3C36;
+  font-size: 0.75rem;
+  font-weight: 600;
 }

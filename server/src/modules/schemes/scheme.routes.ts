@@ -4,7 +4,7 @@ import { validate } from '../../middleware/validate.middleware.js';
 import { listSchemesQuerySchema, createSchemeSchema, updateSchemeSchema } from './scheme.validator.js';
 import { optionalAuthenticate, authenticate } from '../../middleware/auth.middleware.js';
 import { requireRole } from '../../middleware/role.middleware.js';
-import { Role } from '@prisma/client';
+import { Role } from '../../types/models.js';
 
 export const publicSchemeRouter = Router();
 export const adminSchemeRouter = Router();

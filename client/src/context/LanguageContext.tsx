@@ -134,13 +134,13 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<Language>(() => {
-    const saved = localStorage.getItem('sakhisetu_lang');
+    const saved = localStorage.getItem('udaanher_lang') || localStorage.getItem('sakhisetu_lang');
     return (saved as Language) || 'HI'; // Default to Hindi as per prompt
   });
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem('sakhisetu_lang', lang);
+    localStorage.setItem('udaanher_lang', lang);
   };
 
   const t = (key: string): string => {

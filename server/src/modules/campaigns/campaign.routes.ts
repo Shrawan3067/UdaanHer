@@ -4,7 +4,7 @@ import { validate } from '../../middleware/validate.middleware.js';
 import { createCampaignSchema, updateCampaignSchema } from './campaign.validator.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { requireRole } from '../../middleware/role.middleware.js';
-import { Role } from '@prisma/client';
+import { Role } from '../../types/models.js';
 
 export const publicCampaignRouter = Router();
 export const adminCampaignRouter = Router();

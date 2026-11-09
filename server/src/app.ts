@@ -65,7 +65,7 @@ export function createApp(): Express {
 
   app.get('/health/ready', async (_req: Request, res: Response) => {
     try {
-      await prisma.$queryRaw`SELECT 1`;
+      await prisma.user.findFirst({ select: { id: true } });
       res.status(200).json({
         status: 'READY',
         database: 'CONNECTED',

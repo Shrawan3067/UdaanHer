@@ -77,7 +77,7 @@ export const AdminAIReviewsPage: React.FC = () => {
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto w-full animate-fadeIn">
       {/* Header & Pipeline Status Banner */}
-      <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-[#E8EAE5] space-y-4">
+      <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-[#E5E7EB] space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-caps text-label-caps uppercase font-bold">
@@ -93,7 +93,7 @@ export const AdminAIReviewsPage: React.FC = () => {
           </div>
 
           {/* Filter Pills */}
-          <div className="inline-flex p-1 bg-surface-container rounded-xl border border-[#E8EAE5]">
+          <div className="inline-flex p-1 bg-surface-container rounded-xl border border-[#E5E7EB]">
             {['PENDING', 'APPROVED', 'REJECTED', 'ALL'].map((status) => (
               <button
                 key={status}
@@ -116,7 +116,7 @@ export const AdminAIReviewsPage: React.FC = () => {
       {isLoading ? (
         <div className="p-12 text-center text-on-surface-variant">Loading AI review queue...</div>
       ) : reviews.length === 0 ? (
-        <div className="bg-surface-container-lowest rounded-2xl p-12 text-center space-y-3 border border-[#E8EAE5]">
+        <div className="bg-surface-container-lowest rounded-2xl p-12 text-center space-y-3 border border-[#E5E7EB]">
           <span className="material-symbols-outlined text-4xl text-outline">done_all</span>
           <h3 className="font-title-md text-primary font-bold">Queue Empty</h3>
           <p className="font-body-sm text-on-surface-variant">
@@ -132,10 +132,10 @@ export const AdminAIReviewsPage: React.FC = () => {
             return (
               <article
                 key={rev.id}
-                className="bg-surface-container-lowest rounded-2xl p-6 lg:p-7 shadow-sm border border-[#E8EAE5] space-y-6"
+                className="bg-surface-container-lowest rounded-2xl p-6 lg:p-7 shadow-sm border border-[#E5E7EB] space-y-6"
               >
                 {/* Top Meta */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E8EAE5] pb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E5E7EB] pb-4">
                   <div className="flex items-center gap-3">
                     <span className="px-3 py-1 rounded-full bg-primary-container text-on-primary-container font-label-caps text-label-caps font-bold">
                       {rev.scheme?.schemeCode || 'SCHEME'}
@@ -169,7 +169,7 @@ export const AdminAIReviewsPage: React.FC = () => {
                 {/* Content Comparison */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                   {/* Left: Original Scheme Context */}
-                  <div className="space-y-2 p-4 rounded-xl bg-surface-container-low border border-[#E8EAE5]">
+                  <div className="space-y-2 p-4 rounded-xl bg-surface-container-low border border-[#E5E7EB]">
                     <span className="font-label-caps text-on-surface-variant uppercase font-semibold">
                       Original Scheme Mandate (Official Source)
                     </span>
@@ -235,7 +235,7 @@ export const AdminAIReviewsPage: React.FC = () => {
 
                 {/* Review Action Controls */}
                 {rev.status === 'PENDING' && (
-                  <div className="pt-2 border-t border-[#E8EAE5] flex items-center justify-end gap-3">
+                  <div className="pt-2 border-t border-[#E5E7EB] flex items-center justify-end gap-3">
                     <button
                       type="button"
                       disabled={isActing}

@@ -1,4 +1,4 @@
-import { DonationStatus, Role } from '@prisma/client';
+import { DonationStatus, Role } from '../../types/models.js';
 import { prisma } from '../../config/database.js';
 import { maskPAN } from '../../utils/logger.js';
 import { getFinancialYear } from '../../utils/financial-year.js';
@@ -152,11 +152,11 @@ export class ReportService {
       donorName: r.donorName,
       donorPAN: r.donorPAN,
       donorPANMasked: maskPAN(r.donorPAN),
-      donorAddress: r.donation.donorAddress,
+      donorAddress: r.donation?.donorAddress || 'N/A',
       donationAmount: Number(r.donationAmount),
-      modeOfDonation: r.donation.paymentMethod || 'Online',
-      paymentReference: r.donation.paymentReference || 'N/A',
-      campaign: r.donation.campaign.title,
+      modeOfDonation: r.donation?.paymentMethod || 'Online',
+      paymentReference: r.donation?.paymentReference || 'N/A',
+      campaign: r.donation?.campaign?.title || 'General Fund',
       dateOfDonation: r.issuedAt,
       financialYear: r.financialYear,
     }));

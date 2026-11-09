@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { reportController } from './report.controller.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { requireRole } from '../../middleware/role.middleware.js';
-import { Role } from '@prisma/client';
+import { Role } from '../../types/models.js';
 
 const router = Router();
 

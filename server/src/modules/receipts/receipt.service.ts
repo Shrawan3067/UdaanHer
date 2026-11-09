@@ -1,4 +1,4 @@
-import { Role } from '@prisma/client';
+import { Role } from '../../types/models.js';
 import { prisma } from '../../config/database.js';
 import { AppError } from '../../utils/app-error.js';
 import { receiptPdfGenerator, ReceiptPdfData } from './receipt.pdf.js';

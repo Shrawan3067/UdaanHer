@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { AIReviewStatus, Scheme } from '@prisma/client';
+import { AIReviewStatus, Scheme } from '../../types/models.js';
 import { prisma } from '../../config/database.js';
 import { env } from '../../config/env.js';
 import { AppError } from '../../utils/app-error.js';

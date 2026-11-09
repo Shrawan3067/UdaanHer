@@ -89,7 +89,7 @@ export const AdminCampaignsPage: React.FC = () => {
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto w-full animate-fadeIn">
       {/* Header */}
-      <div className="p-6 rounded-2xl bg-surface-container-lowest shadow-sm border border-[#E8EAE5] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-6 rounded-2xl bg-surface-container-lowest shadow-sm border border-[#E5E7EB] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="font-label-caps text-label-caps uppercase text-secondary font-bold tracking-wider">
             Philanthropic Governance
@@ -116,7 +116,7 @@ export const AdminCampaignsPage: React.FC = () => {
       {isLoading ? (
         <div className="p-12 text-center text-on-surface-variant">Loading campaigns...</div>
       ) : campaigns.length === 0 ? (
-        <div className="bg-surface-container-lowest rounded-2xl p-12 text-center space-y-2 border border-[#E8EAE5]">
+        <div className="bg-surface-container-lowest rounded-2xl p-12 text-center space-y-2 border border-[#E5E7EB]">
           <span className="material-symbols-outlined text-4xl text-outline">volunteer_activism</span>
           <h4 className="font-title-md text-primary font-bold">No Campaigns Found</h4>
           <p className="font-body-sm text-on-surface-variant">Create a new impact initiative to start fundraising.</p>
@@ -128,7 +128,7 @@ export const AdminCampaignsPage: React.FC = () => {
             return (
               <article
                 key={c.id}
-                className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm border border-[#E8EAE5] flex flex-col justify-between hover:shadow-md transition-shadow"
+                className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm border border-[#E5E7EB] flex flex-col justify-between hover:shadow-md transition-shadow"
               >
                 <div>
                   <div className="relative h-44 w-full overflow-hidden bg-surface-container-high">
@@ -166,7 +166,7 @@ export const AdminCampaignsPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="p-6 pt-0 border-t border-[#E8EAE5] flex items-center justify-between gap-2 mt-4">
+                <div className="p-6 pt-0 border-t border-[#E5E7EB] flex items-center justify-between gap-2 mt-4">
                   <span
                     className={`px-2.5 py-0.5 rounded-full font-label-sm text-xs font-semibold ${
                       c.status === 'ACTIVE'
@@ -195,8 +195,8 @@ export const AdminCampaignsPage: React.FC = () => {
       {/* CREATE / EDIT MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-surface-container-lowest max-w-xl w-full rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6 border border-[#E8EAE5] animate-fadeIn">
-            <div className="flex items-center justify-between border-b border-[#E8EAE5] pb-4">
+          <div className="bg-surface-container-lowest max-w-xl w-full rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6 border border-[#E5E7EB] animate-fadeIn">
+            <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-4">
               <h3 className="font-title-md text-title-md text-primary font-bold">
                 {editingCampaign ? 'Edit Campaign' : 'Create New Campaign'}
               </h3>
@@ -219,7 +219,7 @@ export const AdminCampaignsPage: React.FC = () => {
                   required
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E8EAE5] focus:outline-hidden"
+                  className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E5E7EB] focus:outline-hidden"
                 />
               </div>
 
@@ -229,7 +229,7 @@ export const AdminCampaignsPage: React.FC = () => {
                   <select
                     value={form.category}
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E8EAE5] focus:outline-hidden"
+                    className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E5E7EB] focus:outline-hidden"
                   >
                     <option value="Livelihood">Livelihood &amp; Enterprise</option>
                     <option value="Healthcare">Healthcare &amp; Vans</option>
@@ -245,7 +245,7 @@ export const AdminCampaignsPage: React.FC = () => {
                     required
                     value={form.goalAmount}
                     onChange={(e) => setForm({ ...form, goalAmount: Number(e.target.value) })}
-                    className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E8EAE5] focus:outline-hidden"
+                    className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E5E7EB] focus:outline-hidden"
                   />
                 </div>
               </div>
@@ -257,7 +257,7 @@ export const AdminCampaignsPage: React.FC = () => {
                   required
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E8EAE5] focus:outline-hidden"
+                  className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E5E7EB] focus:outline-hidden"
                 />
               </div>
 
@@ -267,7 +267,7 @@ export const AdminCampaignsPage: React.FC = () => {
                   type="url"
                   value={form.imageUrl}
                   onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E8EAE5] focus:outline-hidden"
+                  className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E5E7EB] focus:outline-hidden"
                 />
               </div>
 
@@ -276,7 +276,7 @@ export const AdminCampaignsPage: React.FC = () => {
                 <select
                   value={form.status}
                   onChange={(e) => setForm({ ...form, status: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E8EAE5] focus:outline-hidden"
+                  className="w-full px-3 py-2 rounded-xl bg-surface-container-low text-sm border border-[#E5E7EB] focus:outline-hidden"
                 >
                   <option value="ACTIVE">ACTIVE</option>
                   <option value="COMPLETED">COMPLETED</option>
@@ -284,7 +284,7 @@ export const AdminCampaignsPage: React.FC = () => {
                 </select>
               </div>
 
-              <div className="pt-4 flex items-center justify-end gap-3 border-t border-[#E8EAE5]">
+              <div className="pt-4 flex items-center justify-end gap-3 border-t border-[#E5E7EB]">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}

@@ -1,4 +1,5 @@
-import { CampaignStatus, DonationStatus, DonationType, Prisma, Role } from '@prisma/client';
+import crypto from 'crypto';
+import { CampaignStatus, DonationStatus, DonationType, Role } from '../../types/models.js';
 import { prisma } from '../../config/database.js';
 import { AppError } from '../../utils/app-error.js';
 import { maskPAN } from '../../utils/logger.js';
@@ -68,11 +69,11 @@ export class DonationService {
       data: {
         campaignId: dto.campaignId,
         donorId: donorId || null,
-        amount: new Prisma.Decimal(dto.amount),
+        amount: Number(dto.amount),
         currency: 'INR',
         donationType: dto.donationType === 'MONTHLY' ? DonationType.MONTHLY : DonationType.ONE_TIME,
         status: DonationStatus.PENDING,
-        idempotencyKey: dto.idempotencyKey,
+        idempotencyKey: dto.idempotencyKey?.trim() || `IDEMP-${crypto.randomUUID()}`,
         donorName: dto.donorName,
         donorEmail: dto.donorEmail.toLowerCase(),
         donorPhone: dto.donorPhone,
@@ -158,7 +159,7 @@ export class DonationService {
     const { search, status, campaignId, page, limit } = params;
     const skip = (page - 1) * limit;
 
-    const where: Prisma.DonationWhereInput = {};
+    const where: any = {};
 
     if (status) {
       where.status = status;

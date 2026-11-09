@@ -1,15 +1,15 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const aiSummaryResponseSchema = z.object({
-  hindiSummary: z.string().min(20, 'Hindi summary must be comprehensive'),
-  englishSummary: z.string().min(20, 'English summary must be comprehensive'),
+  hindiSummary: z.string().min(20, "Hindi summary must be comprehensive"),
+  englishSummary: z.string().min(20, "English summary must be comprehensive"),
   missingInformation: z.array(z.string()).default([]),
   sourceBased: z.boolean().default(true),
 });
 
 export type AISummaryResponse = z.infer<typeof aiSummaryResponseSchema>;
 
-export const HINDI_SUMMARY_SYSTEM_PROMPT = `You are an expert welfare communications assistant helping an Indian charitable trust (SakhiSetu, Bhopal, Madhya Pradesh) explain government welfare schemes in clear, simple Hindi.
+export const HINDI_SUMMARY_SYSTEM_PROMPT = `You are an expert welfare communications assistant helping an Indian charitable trust (UdaanHer: Giving women wings to fly, Bhopal, Madhya Pradesh) explain government welfare schemes in clear, simple Hindi.
 
 Generate a concise, accurate, easy-to-understand Hindi summary using ONLY the provided scheme information.
 
@@ -35,4 +35,3 @@ Strict Rules:
     "missingInformation": ["..."],
     "sourceBased": true
   }`;
-

@@ -4,6 +4,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { api } from '../../services/api';
 import { Scheme } from '../../types';
 import { CallbackModal } from '../../components/common/CallbackModal';
+import { CheckCircle2, ShieldCheck, Printer, Headphones, ArrowLeft, ExternalLink, FileText } from 'lucide-react';
 
 export const SchemeDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -25,7 +26,7 @@ export const SchemeDetailPage: React.FC = () => {
         setScheme(data.scheme);
         setRelatedSchemes(data.relatedSchemes);
       } catch (err: any) {
-        setError(err.message || 'Scheme not found');
+        setError(err.message || 'Program not found');
       } finally {
         setIsLoading(false);
       }
@@ -36,7 +37,7 @@ export const SchemeDetailPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <span className="material-symbols-outlined text-4xl text-primary animate-spin">refresh</span>
+        <span className="material-symbols-outlined text-4xl text-[#EA3C36] animate-spin">refresh</span>
       </div>
     );
   }
@@ -44,14 +45,13 @@ export const SchemeDetailPage: React.FC = () => {
   if (error || !scheme) {
     return (
       <div className="max-w-3xl mx-auto px-6 py-16 text-center space-y-4">
-        <span className="material-symbols-outlined text-4xl text-error">warning</span>
-        <h2 className="font-headline-sm text-headline-sm text-primary font-bold">Scheme Not Found</h2>
-        <p className="font-body-sm text-on-surface-variant">{error || 'The requested scheme could not be found.'}</p>
+        <h2 className="text-xl text-[#EA3C36] font-bold">Program Not Found</h2>
+        <p className="text-sm text-gray-600">{error || 'The requested program could not be found.'}</p>
         <Link
           to="/schemes"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-on-primary font-label-md text-label-md font-semibold"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#EA3C36] text-white text-xs font-bold"
         >
-          <span>← Back to Schemes Directory</span>
+          <span>← Back to Programs Directory</span>
         </Link>
       </div>
     );
@@ -62,50 +62,36 @@ export const SchemeDetailPage: React.FC = () => {
   const steps = Array.isArray(scheme.applicationSteps) ? scheme.applicationSteps : [];
 
   return (
-    <div className="flex flex-col w-full bg-surface animate-fadeIn">
-      {/* Editorial Scheme Header */}
-      <section className="w-full bg-surface-container-low/70 py-10 px-6 lg:px-12 border-b border-[#E8EAE5]">
+    <div className="flex flex-col w-full bg-white animate-fadeIn text-[#1A1A1A]">
+      {/* Program Header */}
+      <section className="w-full bg-[#F8F9FA] py-10 px-6 lg:px-12 border-b border-gray-200">
         <div className="max-w-7xl mx-auto space-y-6">
-          {/* Breadcrumb */}
-          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm">
-            <Link to="/" className="hover:text-primary transition-colors flex items-center gap-1">
-              <span className="material-symbols-outlined text-[16px]">home</span>
-              <span>Home</span>
-            </Link>
-            <span className="text-outline-variant font-label-sm">/</span>
-            <Link to="/schemes" className="hover:text-primary transition-colors">
-              Schemes Directory
-            </Link>
-            <span className="text-outline-variant font-label-sm">/</span>
-            <span className="text-primary font-semibold">{scheme.schemeCode}</span>
-          </nav>
-
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-8 space-y-4">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="px-3 py-1 rounded-full bg-primary/10 text-primary font-label-caps text-label-caps uppercase font-bold">
+                <span className="px-3 py-1 rounded-full bg-red-50 text-[#EA3C36] text-xs font-bold">
                   {scheme.schemeCode}
                 </span>
-                <span className="px-3 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm font-medium">
+                <span className="px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-xs font-medium">
                   {scheme.category}
                 </span>
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-semibold">
-                  <span className="material-symbols-outlined text-[16px]">bolt</span> DBT Enabled
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-50 text-[#00A3C4] text-xs font-bold">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Direct Benefit Transfer
                 </span>
               </div>
 
               <div className="space-y-1">
-                <h1 className="font-headline-lg text-headline-lg text-primary tracking-tight font-bold">
+                <h1 className="text-3xl lg:text-4xl font-extrabold text-[#1A1A1A] tracking-tight">
                   {scheme.name}
                 </h1>
                 {scheme.nameHi && (
-                  <p className="font-headline-sm text-headline-sm text-secondary font-medium font-hindi">
+                  <p className="text-xl text-[#EA3C36] font-bold font-hindi">
                     {scheme.nameHi}
                   </p>
                 )}
               </div>
 
-              <p className="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+              <p className="text-sm text-gray-600 leading-relaxed">
                 {scheme.description}
               </p>
 
@@ -113,51 +99,51 @@ export const SchemeDetailPage: React.FC = () => {
               <div className="pt-2 flex flex-wrap items-center gap-3">
                 <Link
                   to="/eligibility"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-on-primary font-label-md text-label-md font-semibold hover:bg-primary-container shadow-sm transition-all"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#EA3C36] hover:bg-[#D32F2F] text-white text-xs font-bold shadow-xs hover-lift transition-all"
                 >
-                  <span className="material-symbols-outlined text-[18px]">verified_user</span>
+                  <CheckCircle2 className="w-4 h-4" />
                   <span>Check My Eligibility</span>
                 </Link>
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-container-high text-on-surface font-label-md text-label-md hover:bg-surface-container-highest transition-colors border border-[#E8EAE5]"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold transition-all border border-gray-200 cursor-pointer shadow-xs"
                 >
-                  <span className="material-symbols-outlined text-[18px]">print</span>
+                  <Printer className="w-4 h-4" />
                   <span>Print Checklist</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsCallbackOpen(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-secondary text-on-secondary font-label-md text-label-md font-semibold hover:bg-[#B56C4A] shadow-sm transition-colors"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-red-50 hover:bg-red-100 text-[#EA3C36] text-xs font-bold transition-all cursor-pointer border border-red-200"
                 >
-                  <span className="material-symbols-outlined text-[18px]">support_agent</span>
-                  <span>Ask Field Sahayika</span>
+                  <Headphones className="w-4 h-4" />
+                  <span>Ask Field Volunteer</span>
                 </button>
               </div>
             </div>
 
             {/* Quick Summary Snapshot Card */}
-            <div className="lg:col-span-4 bg-surface-container-lowest p-6 rounded-2xl shadow-sm space-y-4 border border-[#E8EAE5]">
-              <div className="flex items-center justify-between pb-3 border-b border-[#E8EAE5]">
-                <span className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider font-semibold">
+            <div className="lg:col-span-4 bg-white p-6 rounded-xl shadow-xs border border-gray-200 space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+                <span className="text-xs uppercase tracking-wider text-gray-500 font-bold">
                   Benefit Disbursal
                 </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm font-medium">
+                <span className="text-xs text-[#EA3C36] font-bold">
                   Verified Entitlement
                 </span>
               </div>
               <div className="space-y-1">
-                <p className="font-headline-sm text-headline-sm text-primary font-bold">{scheme.benefit}</p>
-                <p className="font-body-sm text-body-sm text-on-surface-variant">
-                  Deposited directly into Aadhaar-seeded NPCI bank accounts without intermediate deduction.
+                <p className="text-2xl font-extrabold text-[#EA3C36]">{scheme.benefit}</p>
+                <p className="text-xs text-gray-600 leading-relaxed">
+                  Deposited directly into verified bank accounts without intermediary deduction.
                 </p>
               </div>
-              <div className="p-3 rounded-xl bg-surface-container-low flex items-center gap-3 border border-[#E8EAE5]">
-                <span className="material-symbols-outlined text-primary text-[24px]">account_balance</span>
-                <div className="min-w-0 flex-1">
-                  <p className="font-label-sm text-label-sm font-semibold text-on-surface">Zero Intermediary Fee</p>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant text-xs">Official processing fee: ₹0.00</p>
+              <div className="p-3.5 rounded-lg bg-gray-50 flex items-center gap-3 border border-gray-100">
+                <ShieldCheck className="w-5 h-5 text-[#EA3C36] shrink-0" />
+                <div>
+                  <p className="text-xs font-bold text-gray-900">Zero Facilitation Fee</p>
+                  <p className="text-[11px] text-gray-500">Official processing fee: ₹0.00</p>
                 </div>
               </div>
             </div>
@@ -170,44 +156,29 @@ export const SchemeDetailPage: React.FC = () => {
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           {/* Left Column (8 cols) */}
           <div className="lg:col-span-8 space-y-8">
-            {/* Plain-Hindi Summary Box (Human-in-the-loop AI summary if approved) */}
-            {scheme.aiReviews && scheme.aiReviews.length > 0 && scheme.aiReviews[0].status === 'APPROVED' && (
-              <div className="bg-primary/5 p-6 rounded-2xl border border-primary/20 space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary text-[22px]">psychology_alt</span>
-                  <h3 className="font-title-md text-title-md text-primary font-bold">
-                    योजना का सरल हिंदी सारांश (सत्यापित)
-                  </h3>
-                </div>
-                <p className="font-body-md text-body-md text-on-surface leading-relaxed font-hindi">
-                  {scheme.aiReviews[0].generatedHindiSummary}
-                </p>
-              </div>
-            )}
-
             {/* Eligibility Criteria Module */}
-            <div className="bg-surface-container-lowest p-6 lg:p-8 rounded-2xl shadow-sm border border-[#E8EAE5] space-y-6">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-secondary text-[24px]">checklist</span>
-                <h2 className="font-headline-sm text-headline-sm text-primary font-bold">
-                  Eligibility Criteria &amp; Rules
+            <div className="bg-white p-6 lg:p-8 rounded-xl shadow-xs border border-gray-200 space-y-6">
+              <div className="border-b border-gray-100 pb-3">
+                <span className="text-xs uppercase tracking-wider text-[#EA3C36] font-bold">CRITERIA</span>
+                <h2 className="text-xl font-bold text-[#1A1A1A]">
+                  Eligibility Criteria &amp; Guidelines
                 </h2>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {rules.minAge !== undefined && (
-                  <div className="p-4 rounded-xl bg-surface-container-low border border-[#E8EAE5] space-y-1">
-                    <p className="font-label-caps text-on-surface-variant uppercase">Age Requirements</p>
-                    <p className="font-title-md text-primary font-bold">
+                  <div className="p-4 rounded-lg bg-gray-50 border border-gray-100 space-y-1">
+                    <p className="text-xs text-gray-500 font-bold uppercase">Age Requirements</p>
+                    <p className="text-base font-bold text-[#1A1A1A]">
                       {rules.minAge} – {rules.maxAge || 79} Years
                     </p>
                   </div>
                 )}
 
                 {rules.maritalStatus && (
-                  <div className="p-4 rounded-xl bg-surface-container-low border border-[#E8EAE5] space-y-1">
-                    <p className="font-label-caps text-on-surface-variant uppercase">Marital Status</p>
-                    <p className="font-title-md text-primary font-bold capitalize">
+                  <div className="p-4 rounded-lg bg-gray-50 border border-gray-100 space-y-1">
+                    <p className="text-xs text-gray-500 font-bold uppercase">Marital Status</p>
+                    <p className="text-base font-bold text-[#1A1A1A] capitalize">
                       {Array.isArray(rules.maritalStatus)
                         ? rules.maritalStatus.join(', ')
                         : rules.maritalStatus}
@@ -216,19 +187,19 @@ export const SchemeDetailPage: React.FC = () => {
                 )}
 
                 {rules.requiresBPL !== undefined && (
-                  <div className="p-4 rounded-xl bg-surface-container-low border border-[#E8EAE5] space-y-1">
-                    <p className="font-label-caps text-on-surface-variant uppercase">BPL Card Requirement</p>
-                    <p className="font-title-md text-primary font-bold">
-                      {rules.requiresBPL ? 'Mandatory BPL / Antyodaya' : 'Not Required (Universal)'}
+                  <div className="p-4 rounded-lg bg-gray-50 border border-gray-100 space-y-1">
+                    <p className="text-xs text-gray-500 font-bold uppercase">Income / Ration Card</p>
+                    <p className="text-base font-bold text-[#1A1A1A]">
+                      {rules.requiresBPL ? 'Mandatory BPL / Antyodaya' : 'Universal (Open to all)'}
                     </p>
                   </div>
                 )}
 
                 {rules.requiresSHG !== undefined && (
-                  <div className="p-4 rounded-xl bg-surface-container-low border border-[#E8EAE5] space-y-1">
-                    <p className="font-label-caps text-on-surface-variant uppercase">SHG Affiliation</p>
-                    <p className="font-title-md text-primary font-bold">
-                      {rules.requiresSHG ? 'Active SHG Member' : 'Individual Application Open'}
+                  <div className="p-4 rounded-lg bg-gray-50 border border-gray-100 space-y-1">
+                    <p className="text-xs text-gray-500 font-bold uppercase">SHG Affiliation</p>
+                    <p className="text-base font-bold text-[#1A1A1A]">
+                      {rules.requiresSHG ? 'Active SHG Member' : 'Individual Open'}
                     </p>
                   </div>
                 )}
@@ -237,26 +208,26 @@ export const SchemeDetailPage: React.FC = () => {
 
             {/* Step-by-Step Application Roadmap */}
             {steps.length > 0 && (
-              <div className="bg-surface-container-lowest p-6 lg:p-8 rounded-2xl shadow-sm border border-[#E8EAE5] space-y-6">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary text-[24px]">route</span>
-                  <h2 className="font-headline-sm text-headline-sm text-primary font-bold">
+              <div className="bg-white p-6 lg:p-8 rounded-xl shadow-xs border border-gray-200 space-y-6">
+                <div className="border-b border-gray-100 pb-3">
+                  <span className="text-xs uppercase tracking-wider text-[#EA3C36] font-bold">APPLICATION FLOW</span>
+                  <h2 className="text-xl font-bold text-[#1A1A1A]">
                     How to Apply: Step-by-Step
                   </h2>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {steps.map((st: any, idx: number) => (
-                    <div key={idx} className="flex items-start gap-4 p-4 rounded-xl bg-surface-container-low border border-[#E8EAE5]">
-                      <div className="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-sm shrink-0">
+                    <div key={idx} className="flex items-start gap-4 p-4 rounded-lg bg-gray-50 border border-gray-100">
+                      <div className="w-7 h-7 rounded-full bg-[#EA3C36] text-white flex items-center justify-center font-bold text-xs shrink-0">
                         {idx + 1}
                       </div>
                       <div className="space-y-1">
-                        <p className="font-title-md text-primary font-semibold">
+                        <p className="text-sm font-bold text-[#1A1A1A]">
                           {typeof st === 'string' ? st : st.step || st.title}
                         </p>
                         {typeof st !== 'string' && st.description && (
-                          <p className="font-body-sm text-on-surface-variant">{st.description}</p>
+                          <p className="text-xs text-gray-600">{st.description}</p>
                         )}
                       </div>
                     </div>
@@ -267,19 +238,19 @@ export const SchemeDetailPage: React.FC = () => {
 
             {/* Required Documents Checklist */}
             {documents.length > 0 && (
-              <div className="bg-surface-container-lowest p-6 lg:p-8 rounded-2xl shadow-sm border border-[#E8EAE5] space-y-6">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-secondary text-[24px]">description</span>
-                  <h2 className="font-headline-sm text-headline-sm text-primary font-bold">
+              <div className="bg-white p-6 lg:p-8 rounded-xl shadow-xs border border-gray-200 space-y-6">
+                <div className="border-b border-gray-100 pb-3">
+                  <span className="text-xs uppercase tracking-wider text-[#EA3C36] font-bold">DOCUMENTATION</span>
+                  <h2 className="text-xl font-bold text-[#1A1A1A]">
                     Required Documents Checklist
                   </h2>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {documents.map((doc: any, idx: number) => (
-                    <div key={idx} className="flex items-center gap-3 p-3.5 rounded-xl bg-surface-container-low border border-[#E8EAE5]">
-                      <span className="material-symbols-outlined text-primary text-[20px]">task_alt</span>
-                      <span className="font-label-md text-on-surface font-medium">
+                    <div key={idx} className="flex items-center gap-3 p-3.5 rounded-lg bg-gray-50 border border-gray-100">
+                      <FileText className="w-4 h-4 text-[#EA3C36]" />
+                      <span className="text-xs font-semibold text-gray-800">
                         {typeof doc === 'string' ? doc : doc.name}
                       </span>
                     </div>
@@ -290,49 +261,48 @@ export const SchemeDetailPage: React.FC = () => {
           </div>
 
           {/* Right Column (4 cols) */}
-          <aside className="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
-            {/* Doorstep Support Helpdesk Card */}
-            <div className="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-[#E8EAE5] space-y-4">
+          <aside className="lg:col-span-4 space-y-6 lg:sticky lg:top-28">
+            {/* Volunteer Support Helpdesk Card */}
+            <div className="bg-white p-6 rounded-xl shadow-xs border border-gray-200 space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed">
-                  <span className="material-symbols-outlined text-[26px]">support_agent</span>
+                <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center text-[#EA3C36]">
+                  <Headphones className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-title-md text-primary font-bold">Local Sakhi Sahayika</h3>
-                  <p className="font-label-sm text-on-surface-variant">Bhopal &amp; 9 Districts Desk</p>
+                  <h3 className="text-sm font-bold text-[#1A1A1A]">Community Volunteer Desk</h3>
+                  <p className="text-xs text-gray-500">Free Doorstep Assistance</p>
                 </div>
               </div>
 
-              <p className="font-body-sm text-on-surface-variant">
-                Need help checking documents or filling forms? Our certified field coordinator visits your Gram Panchayat weekly at zero charge.
+              <p className="text-xs text-gray-600 leading-relaxed">
+                Need help verifying eligibility papers or filing applications? Our certified community volunteers visit Panchayats weekly at zero charge.
               </p>
 
               <button
                 onClick={() => setIsCallbackOpen(true)}
-                className="w-full py-3 px-4 rounded-xl bg-secondary text-on-secondary font-label-md text-label-md font-semibold hover:bg-[#B56C4A] shadow-sm transition-colors flex items-center justify-center gap-2"
+                className="w-full py-2.5 px-4 rounded-lg bg-[#EA3C36] hover:bg-[#D32F2F] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[18px]">phone_in_talk</span>
-                <span>Request Free Guidance</span>
+                Request Free Guidance
               </button>
             </div>
 
             {/* Official Source Link */}
             {scheme.officialSourceUrl && (
-              <div className="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-[#E8EAE5] space-y-3">
-                <span className="font-label-caps text-on-surface-variant uppercase font-semibold">
-                  Official Statutory Source
+              <div className="bg-white p-6 rounded-xl shadow-xs border border-gray-200 space-y-2">
+                <span className="text-xs uppercase tracking-wider text-gray-500 font-bold">
+                  Official Portal
                 </span>
-                <p className="font-body-sm text-on-surface-variant">
-                  Access official government gazette, portal rules, and Jan Seva Kendra links.
+                <p className="text-xs text-gray-600">
+                  Access government gazette, portal rules, and Jan Seva Kendra links directly.
                 </p>
                 <a
                   href={scheme.officialSourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-primary hover:text-secondary font-label-md font-semibold transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs text-[#EA3C36] hover:underline font-bold pt-1"
                 >
                   <span>Open Government Portal</span>
-                  <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               </div>
             )}

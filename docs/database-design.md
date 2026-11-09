@@ -1,18 +1,19 @@
-# SakhiSetu — Database Design & Schema Reference
+# UdaanHer: Giving women wings to fly — Database Design & Schema Reference (MongoDB Atlas)
 
-## 1. Relational Database Overview
+## 1. Document Database Overview
 
-The SakhiSetu platform is powered by a normalized relational PostgreSQL database managed through Prisma ORM. Financial integrity, zero floating-point arithmetic errors, and strict non-destructive constraints govern all tables.
+The UdaanHer platform is powered by **MongoDB Atlas**, managed through the official native MongoDB Node.js driver (`mongodb`). Financial integrity, zero floating-point calculation errors, and strict non-destructive constraints govern all collections.
 
 ### Design Principles:
-1. **Precise Decimal Handling**: Monetary values (`goalAmount`, `collectedAmount`, `amount`, `donationAmount`) use `Decimal(12, 2)` in PostgreSQL, never raw IEEE-754 floating-point numbers.
-2. **Non-Destructive Deletions**: Financial records (`Donation`, `Payment`, `Receipt`, `Campaign`) enforce `onDelete: Restrict` to preserve financial auditability.
-3. **Atomic Concurrency**: Sequence numbering utilizes an isolated row-level locking table (`ReceiptSequence`) with `UPDATE ... RETURNING`.
-4. **Data Minimization & Snapshotting**: Receipts store a frozen historical snapshot of the donor's name, PAN, and trust details at the moment of issuance, ensuring receipts remain legally intact even if the donor later edits their profile.
+
+1. **Document-Based Data Modeling**: Core entities are modeled as flexible, high-performance MongoDB documents with embedded JSON sub-structures (`eligibilityRules`, `requiredDocuments`, `applicationSteps`, `nearestHelpCentre`) where appropriate for atomic reads.
+2. **Multi-Document ACID Transactions**: Financial workflows (`Donation`, `Payment`, `Receipt`, and `ReceiptSequence`) execute within multi-document replica set sessions (`session.withTransaction`) with retry backoff for conflict-free atomic execution.
+3. **Atomic Sequence Generation**: Receipt numbering utilizes an isolated collection (`ReceiptSequence`) using atomic `upsert` with `{ increment: 1 }`.
+4. **Data Minimization & Snapshotting**: Receipts store a frozen historical snapshot of the donor's name, PAN, and trust details at the moment of issuance, ensuring receipts remain legally intact under Section 80G even if the donor later edits their profile.
 
 ---
 
-## 2. Entity-Relationship (ER) Diagram
+## 2. Collection Relationship Diagram
 
 ```mermaid
 erDiagram
@@ -25,7 +26,7 @@ erDiagram
     DONATION ||--|| RECEIPT : "issues"
 
     USER {
-        uuid id PK
+        string id PK "_id"
         string fullName
         string email UK
         string phone
@@ -38,14 +39,14 @@ erDiagram
     }
 
     CAMPAIGN {
-        uuid id PK
+        string id PK "_id"
         string title
         string slug UK
         string description
         string category
         string imageUrl
-        decimal goalAmount
-        decimal collectedAmount
+        float goalAmount
+        float collectedAmount
         timestamp startDate
         timestamp endDate
         enum status "ACTIVE | COMPLETED | PAUSED | ARCHIVED"
@@ -54,7 +55,7 @@ erDiagram
     }
 
     SCHEME {
-        uuid id PK
+        string id PK "_id"
         string schemeCode UK
         string name
         string nameHi
@@ -68,7 +69,7 @@ erDiagram
         json eligibilityRules
         json requiredDocuments
         json applicationSteps
-        json applicableDistricts
+        stringArray applicableDistricts
         string officialSourceUrl
         json nearestHelpCentre
         timestamp lastCheckedAt
@@ -78,10 +79,10 @@ erDiagram
     }
 
     DONATION {
-        uuid id PK
-        uuid donorId FK "nullable"
-        uuid campaignId FK
-        decimal amount
+        string id PK "_id"
+        string donorId FK "nullable"
+        string campaignId FK
+        float amount
         string currency "INR"
         enum donationType "ONE_TIME | MONTHLY"
         enum status "PENDING | SUCCESS | FAILED"
@@ -98,9 +99,9 @@ erDiagram
     }
 
     PAYMENT {
-        uuid id PK
-        uuid donationId FK
-        string provider
+        string id PK "_id"
+        string donationId FK
+        string provider "MOCK_PAYMENT_SIMULATOR"
         string transactionReference UK
         enum status "PENDING | SUCCESS | FAILED"
         json responseMetadata
@@ -108,12 +109,12 @@ erDiagram
     }
 
     RECEIPT {
-        uuid id PK
-        uuid donationId FK UK
+        string id PK "_id"
+        string donationId FK "unique"
         string receiptNumber UK
         string donorName
         string donorPAN
-        decimal donationAmount
+        float donationAmount
         string trustPAN
         string trust80GRegistrationNumber
         string financialYear
@@ -123,28 +124,28 @@ erDiagram
     }
 
     RECEIPT_SEQUENCE {
-        uuid id PK
+        string id PK "_id"
         string financialYear UK
         int nextNumber
         timestamp updatedAt
     }
 
     AI_REVIEW {
-        uuid id PK
-        uuid schemeId FK
+        string id PK "_id"
+        string schemeId FK
         string generatedHindiSummary
         string generatedEnglishSummary
         json missingInformation
         enum status "PENDING | APPROVED | REJECTED"
-        uuid reviewedById FK "nullable"
+        string reviewedById FK
         timestamp reviewedAt
         timestamp createdAt
         timestamp updatedAt
     }
 
     AUDIT_LOG {
-        uuid id PK
-        uuid userId FK "nullable"
+        string id PK "_id"
+        string userId FK
         string action
         string entityType
         string entityId
@@ -153,7 +154,7 @@ erDiagram
     }
 
     HELP_REQUEST {
-        uuid id PK
+        string id PK "_id"
         string name
         string phone
         string district
@@ -167,76 +168,69 @@ erDiagram
 
 ---
 
-## 3. Table Schemas and Constraints
+## 3. Collections Specification
 
-### 3.1 `User`
-- **id**: `UUID`, Primary Key.
-- **email**: `VARCHAR(255)`, Unique, Indexed.
-- **passwordHash**: `VARCHAR(255)` (bcrypt hash with 10 salt rounds).
-- **role**: Enum (`DONOR`, `ADMIN`).
-- **preferredLanguage**: Enum (`EN`, `HI`).
-- **isActive**: `BOOLEAN`, default `true`.
+### 3.1 `User` Collection
 
-### 3.2 `Campaign`
-- **id**: `UUID`, Primary Key.
-- **slug**: `VARCHAR(255)`, Unique, Indexed.
-- **goalAmount**: `Decimal(12, 2)`, strictly positive.
-- **collectedAmount**: `Decimal(12, 2)`, incremented transactionally upon successful payment.
-- **status**: Enum (`ACTIVE`, `COMPLETED`, `PAUSED`, `ARCHIVED`).
+- **\_id**: `String` (UUID / ObjectId string).
+- **email**: `String`, Unique index.
+- **role**: Enum (`DONOR`, `ADMIN`), default `DONOR`. Indexed for administrative filtering.
+- **passwordHash**: `String`, 10-round bcrypt hash.
+- **isActive**: `Boolean`, soft deactivation flag.
 
-### 3.3 `Scheme`
-- **schemeCode**: `VARCHAR(50)`, Unique, Indexed (e.g. `SCH-014`, `SCH-022`, `SCH-031`).
-- **slug**: `VARCHAR(255)`, Unique, Indexed.
-- **eligibilityRules**: `JSONB` containing deterministic rule boundaries (`minAge`, `maxAge`, `maritalStatus`, `requiresBPL`, `requiresSHG`).
-- **requiredDocuments**: `JSONB` array of required verification items.
-- **applicableDistricts**: `JSONB` array of districts (e.g., 9 Madhya Pradesh districts).
-- **status**: Enum (`DRAFT`, `PUBLISHED`, `ARCHIVED`). Indexed on `(status, category)`.
+### 3.2 `Campaign` Collection
 
-### 3.4 `Donation`
-- **amount**: `Decimal(12, 2)`.
-- **idempotencyKey**: `VARCHAR(255)`, Unique. Prevents duplicate records on network retries.
-- **donorPAN**: `VARCHAR(10)`. Formatted per Indian ITD rules (`[A-Z]{5}[0-9]{4}[A-Z]{1}`). Masked for display.
-- **status**: Enum (`PENDING`, `SUCCESS`, `FAILED`). Indexed.
+- **\_id**: `String` (UUID).
+- **slug**: `String`, Unique index for SEO-friendly URLs (`/campaigns/:slug`).
+- **goalAmount** & **collectedAmount**: `Float`, INR monetary values.
+- **status**: Enum (`ACTIVE`, `COMPLETED`, `PAUSED`, `ARCHIVED`). Indexed.
 
-### 3.5 `Receipt`
-- **donationId**: `UUID`, Unique, Foreign Key (`Donation.id`, `onDelete: Restrict`).
-- **receiptNumber**: `VARCHAR(50)`, Unique, Indexed. Format: `SAKHI/80G/YYYY-YY/XXXXXX`.
-- **donorName**: Immutable string snapshot at issuance.
-- **donorPAN**: Immutable string snapshot at issuance.
-- **donationAmount**: `Decimal(12, 2)` snapshot.
-- **trustPAN**: Snapshotted trust PAN (`AAATC1234D`).
-- **trust80GRegistrationNumber**: Snapshotted 80G registration (`CIT(E)/BPL/80G/2021-22/A-1089`).
-- **financialYear**: Indian financial year (e.g., `2026-27`).
+### 3.3 `Scheme` Collection
 
-### 3.6 `ReceiptSequence`
-- **financialYear**: `VARCHAR(10)`, Unique (e.g. `2026-27`).
-- **nextNumber**: `INT`, atomically incremented via PostgreSQL:
-  ```sql
-  INSERT INTO "ReceiptSequence" ("id", "financialYear", "nextNumber", "updatedAt")
-  VALUES (gen_random_uuid()::text, $1, 1, NOW())
-  ON CONFLICT ("financialYear") DO UPDATE
-  SET "nextNumber" = "ReceiptSequence"."nextNumber" + 1, "updatedAt" = NOW()
-  RETURNING "id", "financialYear", "nextNumber";
-  ```
+- **schemeCode**: `String`, Unique index (e.g., `SCH-014`).
+- **slug**: `String`, Unique index (`kalyani-pension-scheme`).
+- **eligibilityRules**: `Json`, deterministic structured criteria matching rule engine.
+- **applicableDistricts**: Array of `String`, indexed for multi-district matching.
+- **status**: Enum (`DRAFT`, `PUBLISHED`, `ARCHIVED`). Compound index on `[status, category]`.
+
+### 3.4 `Donation` Collection
+
+- **idempotencyKey**: `String`, Unique index. Auto-generated if omitted to ensure MongoDB sparse unique integrity.
+- **status**: Enum (`PENDING`, `SUCCESS`, `FAILED`).
+- **donorPAN**: `String`, 10-character Indian PAN. Masked in public APIs (`AB******4F`).
+- **createdAt**: `DateTime`, indexed for Form 10BD annual reporting.
+
+### 3.5 `Receipt` Collection
+
+- **receiptNumber**: `String`, Unique index (`UDAAN/80G/YYYY-YY/000001`).
+- **financialYear**: `String`, indexed (`2026-27`).
+- **donationAmount**: `Float`, frozen amount in INR.
+
+### 3.6 `ReceiptSequence` Collection
+
+- **financialYear**: `String`, Unique index.
+- **nextNumber**: `Int`, atomically incremented via MongoDB `$inc` within a transaction.
 
 ---
 
-## 4. Indexing Strategy
+## 4. Indexing Strategy on MongoDB Atlas
 
-| Table | Index Columns | Purpose |
-|---|---|---|
-| `User` | `email` | Fast O(1) login lookup |
-| `User` | `role` | Role-based filtering |
-| `Scheme` | `slug` | Public URL routing |
-| `Scheme` | `schemeCode` | CMS and eligibility code matching |
-| `Scheme` | `status, category` | Multi-column filter for public listing |
-| `Campaign` | `status` | Filter active campaigns |
-| `Campaign` | `slug` | Public campaign routing |
-| `Donation` | `donorId` | Fast donor portal history fetch |
-| `Donation` | `campaignId` | Campaign donor count aggregation |
-| `Donation` | `status, createdAt` | Dashboard analytics & admin listing |
-| `Donation` | `idempotencyKey` | Duplicate request prevention |
-| `Receipt` | `receiptNumber` | Unique verification and receipt lookup |
-| `Receipt` | `financialYear` | Form 10BD annual statement compilation |
-| `AIReview` | `schemeId, status` | Review desk queue filtering |
+To guarantee millisecond query performance across high volumes of schemes and donations:
 
+| Collection        | Indexed Fields        | Index Type    | Purpose                             |
+| ----------------- | --------------------- | ------------- | ----------------------------------- |
+| `User`            | `email`               | Unique        | Login lookup & duplicate prevention |
+| `User`            | `role`                | Single Field  | RBAC query filtering                |
+| `Campaign`        | `slug`                | Unique        | Public URL routing                  |
+| `Campaign`        | `status`              | Single Field  | Active campaign discovery           |
+| `Scheme`          | `slug`, `schemeCode`  | Unique        | Direct scheme lookup                |
+| `Scheme`          | `status, category`    | Compound      | Filtered scheme discovery           |
+| `Donation`        | `idempotencyKey`      | Unique        | Payment idempotency protection      |
+| `Donation`        | `donorId, campaignId` | Single Fields | Donor portal & campaign rollups     |
+| `Donation`        | `status, createdAt`   | Compound      | Form 10BD and admin reports         |
+| `Receipt`         | `receiptNumber`       | Unique        | 80G verification lookup             |
+| `Receipt`         | `donationId`          | Unique        | 1:1 relation with donation          |
+| `Receipt`         | `financialYear`       | Single Field  | Annual statement generation         |
+| `ReceiptSequence` | `financialYear`       | Unique        | Atomic sequential allocation        |
+| `AIReview`        | `schemeId, status`    | Compound      | Admin review queue                  |
+| `HelpRequest`     | `status, createdAt`   | Compound      | Field coordinator workflow          |

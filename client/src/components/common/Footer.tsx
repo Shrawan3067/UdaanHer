@@ -1,134 +1,411 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useLanguage } from '../../context/LanguageContext';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useLanguage } from "../../context/LanguageContext";
+import {
+  Phone,
+  Mail,
+  MapPin,
+  ChevronUp,
+  ShieldCheck,
+  Heart,
+  Send,
+  CheckCircle2,
+} from "lucide-react";
 
 export const Footer: React.FC = () => {
   const { language } = useLanguage();
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleNewsletterSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail || !newsletterEmail.includes("@")) return;
+    setNewsletterSubscribed(true);
+    setNewsletterEmail("");
+    setTimeout(() => setNewsletterSubscribed(false), 5000);
+  };
 
   return (
-    <footer className="w-full bg-surface-container-low border-t border-[#E8EAE5] mt-space-xl">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 pt-space-xl pb-space-lg">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-space-lg mb-space-xl">
-          {/* Brand & Description */}
-          <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-on-primary">
-                <span className="font-bold text-lg font-hindi">स</span>
+    <footer className="w-full bg-[#1A1A1A] text-white relative mt-auto border-t-4 border-[#EA3C36]">
+      {/* 1. TOP CONTACT STRIP */}
+      <div className="border-b border-[#2C2D30] py-6 px-6 lg:px-12 bg-[#202124]">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-12 w-full lg:w-auto">
+            {/* Phone Number */}
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-full bg-[#EA3C36] flex items-center justify-center text-white shrink-0 shadow-sm">
+                <Phone className="w-4 h-4" />
               </div>
-              <span className="font-title-md text-title-md text-primary tracking-tight font-bold">
-                {language === 'HI' ? 'सखीसेतु' : 'SakhiSetu'}
-              </span>
+              <div>
+                <p className="text-xs text-gray-400 font-medium">
+                  Emergency &amp; Support Phone
+                </p>
+                <p className="text-sm font-semibold text-white tracking-tight">
+                  +91-755-2551234, +91 98260 12345
+                </p>
+              </div>
             </div>
-            <p className="font-body-md text-body-md text-on-surface-variant max-w-sm">
-              {language === 'HI'
-                ? 'मध्य प्रदेश के 9 ज़िलों में महिलाओं की आजीविका, स्वास्थ्य सुरक्षा और सामाजिक स्वावलंबन के लिए समर्पित एक पंजीकृत धर्मार्थ ट्रस्ट।'
-                : "Bridging grassroots women's collectives, rural self-help groups, and official state entitlement programs with verifiable transparency and compassionate community stewardship."}
-            </p>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-high border border-outline-variant/60">
-              <span className="w-2 h-2 rounded-full bg-primary-container"></span>
-              <span className="font-label-sm text-label-sm text-on-surface">
-                Section 8 Non-Profit | Trust 80G Reg: CIT(E)/BPL/80G/2021-22/A-1089
-              </span>
+
+            {/* Email Address */}
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-full bg-[#EA3C36] flex items-center justify-center text-white shrink-0 shadow-sm">
+                <Mail className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 font-medium">
+                  Humanitarian Helpdesk Email
+                </p>
+                <p className="text-sm font-semibold text-white tracking-tight">
+                  support@udaanher.org, info@udaanher.org
+                </p>
+              </div>
+            </div>
+
+            {/* Office Address */}
+            <div className="flex items-center gap-3.5 sm:col-span-2 lg:col-span-1">
+              <div className="w-10 h-10 rounded-full bg-[#EA3C36] flex items-center justify-center text-white shrink-0 shadow-sm">
+                <MapPin className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 font-medium">
+                  Headquarters Address
+                </p>
+                <p className="text-sm font-semibold text-white tracking-tight">
+                  Plot 14, Arera Hills, Bhopal, Madhya Pradesh - 462011, India
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Portals & Tools */}
-          <div className="space-y-3">
-            <h4 className="font-label-caps text-label-caps uppercase tracking-wider text-on-surface-variant font-semibold">
-              {language === 'HI' ? 'पोर्टल और साधन' : 'Portals & Tools'}
-            </h4>
-            <ul className="space-y-2.5">
-              <li className="leading-none">
-                <Link
-                  to="/schemes"
-                  className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors inline-block"
-                >
-                  {language === 'HI' ? 'केंद्रीय एवं राज्य योजनाएं' : 'Central & State Schemes'}
-                </Link>
-              </li>
-              <li className="leading-none">
-                <Link
-                  to="/eligibility"
-                  className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors inline-block"
-                >
-                  {language === 'HI' ? 'पात्रता कैलकुलेटर' : 'Eligibility Screener'}
-                </Link>
-              </li>
-              <li className="leading-none">
-                <Link
-                  to="/campaigns"
-                  className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors inline-block"
-                >
-                  {language === 'HI' ? 'सामुदायिक अभियान' : 'Active Impact Campaigns'}
-                </Link>
-              </li>
-              <li className="leading-none">
-                <Link
-                  to="/donate"
-                  className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors inline-block"
-                >
-                  {language === 'HI' ? 'ऑनलाइन दान (80G रसीद)' : 'Online Donation (80G)'}
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Districts Covered */}
-          <div className="space-y-3">
-            <h4 className="font-label-caps text-label-caps uppercase tracking-wider text-on-surface-variant font-semibold">
-              {language === 'HI' ? 'कार्यक्षेत्र (9 ज़िले)' : '9 Operational Districts'}
-            </h4>
-            <ul className="space-y-2 font-body-sm text-body-sm text-on-surface-variant">
-              <li>• भोपाल (Bhopal) &amp; सीहोर (Sehore)</li>
-              <li>• रायसेन (Raisen) &amp; राजगढ़ (Rajgarh)</li>
-              <li>• विदिशा (Vidisha) &amp; होशंगाबाद (Hoshangabad)</li>
-              <li>• हरदा (Harda), बैतूल (Betul) &amp; गुना (Guna)</li>
-            </ul>
-          </div>
-
-          {/* Tax Exemption Box */}
-          <div className="space-y-3">
-            <h4 className="font-label-caps text-label-caps uppercase tracking-wider text-on-surface-variant font-semibold">
-              {language === 'HI' ? 'कर छूट एवं रसीद' : 'Tax & Contributions'}
-            </h4>
-            <div className="p-4 rounded-xl bg-surface-container-lowest border border-[#E8EAE5] space-y-2">
-              <p className="font-label-sm text-label-sm font-semibold text-primary">
-                {language === 'HI' ? 'धारा 80G छूट' : '80G Tax Exemption'}
-              </p>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">
-                {language === 'HI'
-                  ? 'सभी दान भारतीय आयकर अधिनियम की धारा 80G के तहत 50% कर कटौती के लिए पात्र हैं। तुरंत डिजिटल रसीद जारी।'
-                  : 'All voluntary domestic donations are eligible for a 50% deduction under Section 80G of the Indian Income Tax Act. Instant vector PDF receipts generated.'}
-              </p>
-            </div>
-          </div>
+          {/* Red Donate Now Button */}
+          <Link
+            to="/donate"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#EA3C36] hover:bg-[#D32F2F] text-white font-bold px-8 py-3 rounded-lg text-sm shadow-md transition-all hover-lift shrink-0 active:scale-[0.98]"
+          >
+            <Heart className="w-4 h-4 fill-current" />
+            <span>{language === "HI" ? "दान करें" : "Donate Now"}</span>
+          </Link>
         </div>
+      </div>
 
-        {/* Disclaimer & Bottom Bar */}
-        <div className="pt-6 border-t border-[#E8EAE5] space-y-4">
-          <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed text-xs">
-            {language === 'HI'
-              ? 'आधिकारिक सूचना: सखीसेतु एक गैर-लाभकारी सुविधा मंच है। सभी योजना मानदंड राज्य व केंद्र सरकार के नियमों के अधीन हैं। अंतिम अनुमोदन सरकारी अधिकारियों द्वारा देय है।'
-              : 'Official Statutory Disclaimer: SakhiSetu is an independent grassroots facilitation and social-impact non-profit initiative. SakhiSetu does not represent, execute on behalf of, or replace official statutory portals. Official entitlement sanctions rest solely with designated government authorities.'}
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-            <p className="font-label-sm text-label-sm text-on-surface-variant">
-              © 2024-2025 SakhiSetu Charitable Trust. Built for dignified social equity.
-            </p>
-            <div className="flex items-center gap-6">
-              <Link to="/schemes" className="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors">
-                Schemes
-              </Link>
-              <Link to="/eligibility" className="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors">
-                Eligibility
-              </Link>
-              <Link to="/donate" className="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors">
-                Donate
-              </Link>
-            </div>
+      {/* 2. EMERGENCY WOMEN SAFETY & 80G REGULATORY STRIP */}
+      <div className="bg-[#141414] border-b border-[#2C2D30] py-3.5 px-6 lg:px-12 text-xs text-gray-300">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3 text-center md:text-left">
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-3 text-[11px]">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#2A2B2E] text-white font-semibold border border-[#3A3B3E]">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#00A3C4]" />
+              <span>Section 80G Tax Exemption Certified</span>
+            </span>
+            <span className="text-gray-400">
+              80G Reg: CIT(E)/BPL/80G/2021-22/A-1089
+            </span>
+            <span className="text-gray-600 hidden sm:inline">•</span>
+            <span className="text-gray-400">PAN: AAATC1234D</span>
+          </div>
+
+          {/* Women Helplines Banner */}
+          <div className="flex flex-wrap items-center justify-center gap-2 text-[11px]">
+            <span className="text-red-400 font-bold uppercase tracking-wider">
+              Women Safety 24x7:
+            </span>
+            <span className="bg-red-950/70 text-red-300 px-2 py-0.5 rounded border border-red-800/60 font-bold">
+              181 (Women in Distress)
+            </span>
+            <span className="bg-red-950/70 text-red-300 px-2 py-0.5 rounded border border-red-800/60 font-bold">
+              1091 (Police Helpline)
+            </span>
           </div>
         </div>
       </div>
+
+      {/* 3. MAIN 5-COLUMN FOOTER */}
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 pt-12 pb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-10">
+          {/* Column 1 & 2: Brand Mission & Newsletter */}
+          <div className="lg:col-span-2 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-[#EA3C36] flex items-center justify-center text-white shadow-xs">
+                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                  <path d="M19 10.5h-5.5V5c0-.55-.45-1-1-1h-1c-.55 0-1 .45-1 1v5.5H5c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h5.5V19c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-5.5H19c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1z" />
+                </svg>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-lg text-white font-bold leading-tight">
+                  UdaanHer Charitable Foundation
+                </span>
+                <span className="text-xs text-[#EA3C36] font-semibold">
+                  Giving women wings to fly • India
+                </span>
+              </div>
+            </div>
+
+            <p className="text-xs text-gray-400 max-w-sm leading-relaxed">
+              The mission of UdaanHer is to give women wings to fly: empower
+              Indian women, eradicate poverty, and foster economic autonomy
+              through community Self-Help Groups (SHGs), direct government
+              welfare scheme navigation, and verified grassroots humanitarian
+              relief across India.
+            </p>
+
+            {/* Newsletter Subscription Box */}
+            <div className="pt-2 max-w-sm">
+              <p className="text-xs text-gray-300 font-semibold mb-2">
+                Subscribe for humanitarian updates &amp; welfare reports:
+              </p>
+              {newsletterSubscribed ? (
+                <div className="flex items-center gap-2 p-2.5 bg-emerald-950/60 border border-emerald-700/60 text-emerald-300 text-xs rounded-lg">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  <span>Thank you for subscribing to UdaanHer updates!</span>
+                </div>
+              ) : (
+                <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
+                  <input
+                    type="email"
+                    value={newsletterEmail}
+                    onChange={(e) => setNewsletterEmail(e.target.value)}
+                    placeholder="Enter your email address"
+                    required
+                    className="flex-1 bg-[#252629] border border-[#3C3D42] rounded-lg px-3 py-2 text-xs text-white placeholder:text-gray-500 focus:outline-hidden focus:border-[#EA3C36] transition-colors"
+                  />
+                  <button
+                    type="submit"
+                    className="bg-[#EA3C36] hover:bg-[#D32F2F] text-white px-3.5 py-2 rounded-lg text-xs font-bold flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                    aria-label="Subscribe to newsletter"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                  </button>
+                </form>
+              )}
+            </div>
+
+            {/* Social Icons */}
+            <div className="flex items-center gap-2 pt-2">
+              <a
+                href="#facebook"
+                className="w-8 h-8 rounded-md bg-[#2B2C2F] hover:bg-[#EA3C36] flex items-center justify-center text-gray-300 hover:text-white transition-colors"
+                aria-label="Facebook"
+              >
+                <span className="text-xs font-bold">f</span>
+              </a>
+              <a
+                href="#twitter"
+                className="w-8 h-8 rounded-md bg-[#2B2C2F] hover:bg-[#EA3C36] flex items-center justify-center text-gray-300 hover:text-white transition-colors"
+                aria-label="Twitter"
+              >
+                <span className="text-xs font-bold">t</span>
+              </a>
+              <a
+                href="#youtube"
+                className="w-8 h-8 rounded-md bg-[#2B2C2F] hover:bg-[#EA3C36] flex items-center justify-center text-gray-300 hover:text-white transition-colors"
+                aria-label="YouTube"
+              >
+                <span className="text-xs font-bold">▶</span>
+              </a>
+            </div>
+          </div>
+
+          {/* Column 3: Quick Links */}
+          <div className="space-y-3">
+            <h4 className="text-sm font-bold text-white tracking-wide">
+              Quick Links
+            </h4>
+            <ul className="space-y-2 text-xs text-gray-400">
+              <li>
+                <Link to="/" className="hover:text-white transition-colors">
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/schemes"
+                  className="hover:text-white transition-colors"
+                >
+                  Programs &amp; Services
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/eligibility"
+                  className="hover:text-white transition-colors"
+                >
+                  Eligibility Calculator
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/campaigns"
+                  className="hover:text-white transition-colors"
+                >
+                  Campaigns &amp; Impact
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/donate"
+                  className="hover:text-white transition-colors"
+                >
+                  Tax-Deductible Donations
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 4: Welfare Services */}
+          <div className="space-y-3">
+            <h4 className="text-sm font-bold text-white tracking-wide">
+              Welfare Initiatives
+            </h4>
+            <ul className="space-y-2 text-xs text-gray-400">
+              <li>
+                <Link
+                  to="/schemes?category=Healthcare+%26+Nutrition"
+                  className="hover:text-white transition-colors"
+                >
+                  Maternal Healthcare
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/schemes?category=Livelihood+%26+Finance"
+                  className="hover:text-white transition-colors"
+                >
+                  SHG Micro-Enterprises
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/schemes?category=Social+Security"
+                  className="hover:text-white transition-colors"
+                >
+                  Widow Pension Support
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/schemes?category=Education+%26+Training"
+                  className="hover:text-white transition-colors"
+                >
+                  Digital Rights Caravan
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/eligibility"
+                  className="hover:text-white transition-colors"
+                >
+                  Free Assistance Request
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 5: For Donors & Volunteers */}
+          <div className="space-y-3">
+            <h4 className="text-sm font-bold text-white tracking-wide">
+              For Donors
+            </h4>
+            <ul className="space-y-2 text-xs text-gray-400">
+              <li>
+                <Link
+                  to="/donate"
+                  className="hover:text-white transition-colors"
+                >
+                  Online Donation (UPI/Card)
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/donor/dashboard"
+                  className="hover:text-white transition-colors"
+                >
+                  Download 80G Receipts
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/campaigns"
+                  className="hover:text-white transition-colors"
+                >
+                  Fund Raisers &amp; Audit Logs
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/donate"
+                  className="hover:text-white transition-colors"
+                >
+                  Donation FAQs &amp; FCRA Rules
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/login"
+                  className="hover:text-white transition-colors"
+                >
+                  Donor Portal Login
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Support Hotline Text */}
+        <div className="pt-6 border-t border-[#2C2D30] text-center">
+          <p className="text-xs text-gray-400">
+            Need help with your donation or welfare guidance? Please call{" "}
+            <a
+              href="tel:+917552551234"
+              className="text-white font-semibold hover:underline"
+            >
+              +91-755-2551234
+            </a>{" "}
+            or{" "}
+            <a
+              href="tel:+919826012345"
+              className="text-white font-semibold hover:underline"
+            >
+              +91 98260 12345
+            </a>
+          </p>
+        </div>
+
+        {/* Bottom Copyright Bar */}
+        <div className="mt-6 pt-4 border-t border-[#252628] flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-500 gap-2">
+          <p>
+            © 2026 UdaanHer Charitable Trust (Bhopal, India). Section 80G IT Act
+            Compliant. All rights reserved.
+          </p>
+          <p className="text-gray-400">
+            Giving women wings to fly • Built with ISO-standard audit trails
+            &amp; instant 80G tax receipt compliance.
+          </p>
+        </div>
+      </div>
+
+      {/* Floating Scroll to Top Red Button */}
+      {showScrollTop && (
+        <button
+          type="button"
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 w-11 h-11 rounded-full bg-[#EA3C36] hover:bg-[#D32F2F] text-white flex items-center justify-center shadow-lg transition-all hover-lift z-40 cursor-pointer active:scale-95"
+          aria-label="Scroll to top"
+        >
+          <ChevronUp className="w-5 h-5" />
+        </button>
+      )}
     </footer>
   );
 };

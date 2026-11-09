@@ -1,19 +1,17 @@
 import React from 'react';
-import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
+import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useLanguage } from '../context/LanguageContext';
 import { Navbar } from '../components/common/Navbar';
 import { Footer } from '../components/common/Footer';
 
 export const DonorLayout: React.FC = () => {
   const { user, isLoading } = useAuth();
-  const { language } = useLanguage();
   const location = useLocation();
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-surface">
-        <span className="material-symbols-outlined text-4xl text-primary animate-spin">refresh</span>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <span className="material-symbols-outlined text-4xl text-[#EA3C36] animate-spin">refresh</span>
       </div>
     );
   }
@@ -23,13 +21,11 @@ export const DonorLayout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-surface text-on-surface">
+    <div className="min-h-screen flex flex-col bg-white text-[#1A1A1A]">
       <Navbar />
-
-      <main className="flex-1 pt-20">
+      <main className="flex-1 pt-16 md:pt-[106px]">
         <Outlet />
       </main>
-
       <Footer />
     </div>
   );

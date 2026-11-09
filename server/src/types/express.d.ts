@@ -1,4 +1,4 @@
-import { Role } from '@prisma/client';
+import { Role } from './models.js';
 
 export interface AuthenticatedUser {
   id: string;
@@ -14,4 +14,3 @@ declare global {
     }
   }
 }
-

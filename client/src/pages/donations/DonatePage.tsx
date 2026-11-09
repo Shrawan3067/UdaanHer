@@ -4,17 +4,20 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import { Campaign } from '../../types';
+import { Heart, Shield, CheckCircle2, Building, CreditCard, Smartphone, ArrowRight, Lock } from 'lucide-react';
 
 export const DonatePage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const campaignParam = searchParams.get('campaign');
+  const amountParam = searchParams.get('amount');
+  const typeParam = searchParams.get('type');
   const { language } = useLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
 
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [selectedCampaignId, setSelectedCampaignId] = useState<string>('');
-  const [amount, setAmount] = useState<number>(2500);
+  const [amount, setAmount] = useState<number>(amountParam ? parseInt(amountParam, 10) || 1000 : 1000);
   const [customAmount, setCustomAmount] = useState<string>('');
   const [donationType, setDonationType] = useState<'ONE_TIME' | 'MONTHLY'>('ONE_TIME');
 
@@ -162,166 +165,75 @@ export const DonatePage: React.FC = () => {
   const estimatedTaxSaved = Math.round(taxDeduction * 0.312); // ~30% slab + 4% cess
 
   return (
-    <div className="flex flex-col w-full bg-surface">
-      {/* Top Editorial Header & Trust Anchor */}
-      <section className="w-full bg-surface-container-low/70 py-12 px-6 lg:px-12 border-b border-[#E8EAE5]">
+    <div className="flex flex-col w-full bg-white text-[#1A1A1A]">
+      {/* Top Banner Matching PDF */}
+      <section className="w-full bg-[#F8F9FA] py-12 px-6 lg:px-12 border-b border-gray-200">
         <div className="max-w-7xl mx-auto flex flex-col gap-6">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary font-label-caps text-label-caps uppercase tracking-wider">
-              <span className="w-2 h-2 rounded-full bg-primary"></span>
-              Transparent Philanthropy • 100% Direct Allocation
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-[#EA3C36] text-xs uppercase font-bold tracking-wider">
+              <span className="w-2 h-2 rounded-full bg-[#EA3C36]"></span>
+              Ways to Donate • Red Cross Humanitarian Network
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm">
-              <span className="material-symbols-outlined text-[16px] text-primary">verified</span>
-              Section 8 Non-Profit Reg. #CIT(E)/BPL/80G/2021-22/A-1089
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-xs font-semibold">
+              <Shield className="w-3.5 h-3.5 text-[#EA3C36]" />
+              Section 8 Non-Profit • 80G Tax Exemption
             </span>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <div className="lg:col-span-8 space-y-4">
-              <h1 className="font-display-hero text-headline-lg lg:text-display-hero text-primary tracking-tight leading-tight font-bold">
-                Be the Reason Someone Gets a New Beginning.
+            <div className="lg:col-span-8 space-y-3">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1A1A1A] tracking-tight leading-tight">
+                Your Gift Could Change Someone's Life
               </h1>
-              <p className="font-body-lg text-body-lg text-on-surface-variant max-w-3xl leading-relaxed">
-                Every rupee contributed directly powers women's collectives, maternal healthcare vans, and girls' digital classrooms across Madhya Pradesh. All contributions qualify for a 50% deduction under Section 80G of the Indian Income Tax Act with instant Form 10BE filing.
+              <p className="text-gray-600 text-base leading-relaxed max-w-2xl">
+                The mission of UdaanHer Charitable Trust is to give women wings to fly: empower Indian women, support families in distress, and provide 100% transparent Section 80G tax-exempt charitable aid across India.
               </p>
             </div>
 
-            <div className="lg:col-span-4 bg-surface-container-lowest p-6 rounded-2xl shadow-sm space-y-4 border border-[#E8EAE5]">
-              <div className="flex items-center justify-between pb-3 border-b border-[#E8EAE5]">
-                <span className="font-label-caps text-label-caps uppercase text-on-surface-variant font-semibold">
-                  Statutory Compliance
-                </span>
-                <span className="inline-flex items-center gap-1 text-primary font-label-sm text-label-sm font-semibold">
-                  <span className="material-symbols-outlined text-[16px]">shield</span> IT Act 1961
-                </span>
+            {/* Transparency Highlight from PDF */}
+            <div className="lg:col-span-4 bg-white p-6 rounded-xl border border-gray-200 shadow-xs space-y-3">
+              <div className="flex items-center gap-2 text-[#EA3C36] font-bold text-sm">
+                <Heart className="w-4 h-4 fill-current" />
+                <span>Where Your Money Goes</span>
               </div>
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between font-body-sm text-body-sm">
-                  <span className="text-on-surface-variant">80G Approval URN</span>
-                  <span className="font-semibold text-on-surface">AACTS1982RE20214</span>
-                </div>
-                <div className="flex items-center justify-between font-body-sm text-body-sm">
-                  <span className="text-on-surface-variant">NITI Aayog Darpan ID</span>
-                  <span className="font-semibold text-on-surface">MP/2021/02981</span>
-                </div>
-                <div className="flex items-center justify-between font-body-sm text-body-sm">
-                  <span className="text-on-surface-variant">Admin Overhead Fee</span>
-                  <span className="font-semibold text-primary">0% (100% to Field Ops)</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Trust Badges Strip */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
-            <div className="flex items-center gap-3 p-3.5 rounded-xl bg-surface-container-lowest shadow-sm border border-[#E8EAE5]">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-primary text-[20px]">percent</span>
-              </div>
-              <div>
-                <p className="font-title-md text-[14px] text-on-surface font-semibold leading-tight">50% Deduction</p>
-                <p className="font-body-sm text-label-sm text-on-surface-variant">Section 80G guaranteed</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-3.5 rounded-xl bg-surface-container-lowest shadow-sm border border-[#E8EAE5]">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-primary text-[20px]">account_balance</span>
-              </div>
-              <div>
-                <p className="font-title-md text-[14px] text-on-surface font-semibold leading-tight">Zero Platform Cut</p>
-                <p className="font-body-sm text-label-sm text-on-surface-variant">Every rupee enters field ops</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-3.5 rounded-xl bg-surface-container-lowest shadow-sm border border-[#E8EAE5]">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-primary text-[20px]">lock</span>
-              </div>
-              <div>
-                <p className="font-title-md text-[14px] text-on-surface font-semibold leading-tight">PCI-DSS Gateway</p>
-                <p className="font-body-sm text-label-sm text-on-surface-variant">256-Bit bank grade security</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-3.5 rounded-xl bg-surface-container-lowest shadow-sm border border-[#E8EAE5]">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-primary text-[20px]">description</span>
-              </div>
-              <div>
-                <p className="font-title-md text-[14px] text-on-surface font-semibold leading-tight">Instant 80G Receipt</p>
-                <p className="font-body-sm text-label-sm text-on-surface-variant">Vector PDF with serial code</p>
-              </div>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                <strong className="text-gray-900 font-bold">92% of the donation</strong> will go directly to core humanitarian services, healthcare, and livelihood programs, and the rest 8% to operation, management, and logistics.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Interactive Stepper */}
-      <section className="w-full bg-surface py-6 px-6 lg:px-12">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-surface-container-lowest p-5 rounded-2xl shadow-sm border border-[#E8EAE5]">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex items-center gap-3 p-2 rounded-xl bg-primary/5">
-                <div className="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center font-title-md text-[14px]">
-                  1
-                </div>
-                <div>
-                  <p className="font-title-md text-[14px] text-primary font-semibold leading-none">Select Impact &amp; Tier</p>
-                  <p className="font-label-sm text-label-sm text-on-surface-variant mt-1">₹{amount.toLocaleString('en-IN')} Contribution</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-2 rounded-xl bg-primary-container text-on-primary-container">
-                <div className="w-9 h-9 rounded-full bg-on-primary-container text-primary-container flex items-center justify-center font-title-md text-[14px]">
-                  2
-                </div>
-                <div>
-                  <p className="font-title-md text-[14px] text-on-primary font-semibold leading-none">Donor &amp; 80G Tax Details</p>
-                  <p className="font-label-sm text-label-sm text-on-primary-container mt-1">PAN verification required</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-2 rounded-xl opacity-75">
-                <div className="w-9 h-9 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-title-md text-[14px]">
-                  3
-                </div>
-                <div>
-                  <p className="font-title-md text-[14px] text-on-surface font-semibold leading-none">Simulated Checkout</p>
-                  <p className="font-label-sm text-label-sm text-on-surface-variant mt-1">Digital receipt &amp; ledger proof</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Two-Column Checkout Experience */}
-      <main className="w-full px-6 lg:px-12 py-8">
+      {/* Main Donation Container */}
+      <main className="w-full px-6 lg:px-12 py-10">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          {/* Left Column: Checkout Inputs (~65%) */}
+          {/* Left Column: Form Inputs (8 cols) */}
           <div className="lg:col-span-8 flex flex-col gap-8">
             {formError && (
-              <div className="p-4 rounded-xl bg-error-container text-on-error-container flex items-start gap-3 border border-error/20">
-                <span className="material-symbols-outlined text-[20px] text-error shrink-0 mt-0.5">error</span>
-                <p className="font-body-sm text-body-sm leading-relaxed">{formError}</p>
+              <div className="p-4 rounded-xl bg-red-50 text-red-700 flex items-start gap-3 border border-red-200">
+                <span className="material-symbols-outlined text-[20px] text-red-600 shrink-0 mt-0.5">error</span>
+                <p className="text-sm leading-relaxed">{formError}</p>
               </div>
             )}
 
-            {/* Step 1: Select Impact Initiative */}
-            <section className="bg-surface-container-lowest p-6 lg:p-8 rounded-2xl shadow-sm space-y-6 border border-[#E8EAE5]">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <span className="font-label-caps text-label-caps text-secondary font-semibold uppercase tracking-wider">
-                    Step 01
+            {/* Step 1: Campaign Selection */}
+            <section className="bg-white p-6 lg:p-8 rounded-xl shadow-xs border border-gray-200 space-y-5">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+                <div>
+                  <span className="text-xs uppercase tracking-wider text-[#EA3C36] font-bold">
+                    STEP 01
                   </span>
-                  <h2 className="font-headline-sm text-headline-sm text-primary font-bold">
-                    Choose Your Dedicated Beneficiary Circle
+                  <h2 className="text-xl font-bold text-[#1A1A1A]">
+                    Select Campaign &amp; Program
                   </h2>
                 </div>
-                <span className="px-3 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">
-                  100% Direct Allocation
+                <span className="px-3 py-1 rounded-full bg-red-50 text-[#EA3C36] text-xs font-bold">
+                  92% Core Aid
                 </span>
               </div>
 
               {isLoadingCampaigns ? (
-                <div className="p-8 text-center text-on-surface-variant">Loading impact drives...</div>
+                <div className="p-8 text-center text-gray-500">Loading programs...</div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {campaigns.map((camp) => {
@@ -334,47 +246,32 @@ export const DonatePage: React.FC = () => {
                       <div
                         key={camp.id}
                         onClick={() => setSelectedCampaignId(camp.id)}
-                        className={`relative flex flex-col justify-between p-5 rounded-2xl cursor-pointer transition-all space-y-4 border ${
+                        className={`p-4 rounded-xl cursor-pointer transition-all border flex flex-col justify-between space-y-3 ${
                           isSelected
-                            ? 'bg-surface-container-low border-primary shadow-md'
-                            : 'bg-surface-container border-transparent hover:border-[#E8EAE5]'
+                            ? 'border-[#EA3C36] bg-red-50/50 shadow-sm'
+                            : 'border-gray-200 hover:border-gray-300 bg-white'
                         }`}
                       >
-                        <div className="space-y-2.5">
-                          <div className="flex items-center justify-between">
-                            <span
-                              className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                                isSelected
-                                  ? 'bg-primary text-on-primary'
-                                  : 'bg-surface-container-highest text-on-surface'
-                              }`}
-                            >
-                              <span className="material-symbols-outlined text-[18px]">
-                                {camp.category === 'HEALTH'
-                                  ? 'medical_services'
-                                  : camp.category === 'EDUCATION'
-                                  ? 'school'
-                                  : 'handyman'}
-                              </span>
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-gray-100 text-gray-700">
+                              {camp.category}
                             </span>
-                            <span className="px-2 py-0.5 rounded-full bg-secondary text-on-secondary font-label-caps text-[10px] uppercase">
-                              Active
-                            </span>
+                            {isSelected && (
+                              <CheckCircle2 className="w-4 h-4 text-[#EA3C36]" />
+                            )}
                           </div>
-                          <h3 className="font-title-md text-[16px] text-primary font-bold leading-snug">
+                          <h3 className="font-bold text-sm text-[#1A1A1A] leading-snug">
                             {camp.title}
                           </h3>
-                          <p className="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">
-                            {camp.description}
-                          </p>
                         </div>
-                        <div className="space-y-1.5 pt-2">
-                          <div className="flex justify-between font-label-sm text-label-sm text-on-surface-variant">
-                            <span>Raised: ₹{(camp.collectedAmount || 0).toLocaleString('en-IN')}</span>
-                            <span className="font-semibold text-primary">{percent}%</span>
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-xs text-gray-500">
+                            <span>₹{(camp.collectedAmount || 0).toLocaleString('en-IN')}</span>
+                            <span className="font-bold text-[#EA3C36]">{percent}%</span>
                           </div>
-                          <div className="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
-                            <div className="bg-primary h-full rounded-full" style={{ width: `${percent}%` }}></div>
+                          <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="bg-[#EA3C36] h-full rounded-full" style={{ width: `${percent}%` }}></div>
                           </div>
                         </div>
                       </div>
@@ -382,36 +279,28 @@ export const DonatePage: React.FC = () => {
                   })}
                 </div>
               )}
-
-              <div className="flex items-center gap-3 p-3.5 rounded-xl bg-surface-container-low text-on-surface-variant font-body-sm text-body-sm border border-[#E8EAE5]">
-                <span className="material-symbols-outlined text-primary text-[20px]">info</span>
-                <span>
-                  Prefer flexible allocation? Select any drive and funds will be deployed directly where critical need arises across 9 MP districts.
-                </span>
-              </div>
             </section>
 
-            {/* Step 2: Choose Donation Tier & Amount */}
-            <section className="bg-surface-container-lowest p-6 lg:p-8 rounded-2xl shadow-sm space-y-6 border border-[#E8EAE5]">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <span className="font-label-caps text-label-caps text-secondary font-semibold uppercase tracking-wider">
-                    Step 02
+            {/* Step 2: Donation Amount Card Matching Page 2 of PDF */}
+            <section className="bg-white p-6 lg:p-8 rounded-xl shadow-xs border border-gray-200 space-y-6">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+                <div>
+                  <span className="text-xs uppercase tracking-wider text-[#EA3C36] font-bold">
+                    STEP 02
                   </span>
-                  <h2 className="font-headline-sm text-headline-sm text-primary font-bold">
-                    Choose Donation Tier &amp; Frequency
+                  <h2 className="text-xl font-bold text-[#1A1A1A]">
+                    Donation Amount
                   </h2>
                 </div>
-
-                {/* Frequency Switcher */}
-                <div className="inline-flex p-1 rounded-xl bg-surface-container-high border border-outline-variant/40">
+                {/* Frequency switch */}
+                <div className="flex items-center gap-1 p-1 rounded-lg bg-gray-100">
                   <button
                     type="button"
                     onClick={() => setDonationType('ONE_TIME')}
-                    className={`px-4 py-1.5 rounded-lg font-label-sm text-label-sm transition-all ${
+                    className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${
                       donationType === 'ONE_TIME'
-                        ? 'bg-primary text-on-primary font-semibold shadow-xs'
-                        : 'text-on-surface-variant hover:text-on-surface'
+                        ? 'bg-[#EA3C36] text-white shadow-xs'
+                        : 'text-gray-600 hover:text-gray-900'
                     }`}
                   >
                     One-Time
@@ -419,147 +308,117 @@ export const DonatePage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setDonationType('MONTHLY')}
-                    className={`px-4 py-1.5 rounded-lg font-label-sm text-label-sm transition-all ${
+                    className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${
                       donationType === 'MONTHLY'
-                        ? 'bg-primary text-on-primary font-semibold shadow-xs'
-                        : 'text-on-surface-variant hover:text-on-surface'
+                        ? 'bg-[#EA3C36] text-white shadow-xs'
+                        : 'text-gray-600 hover:text-gray-900'
                     }`}
                   >
-                    Monthly Guardian
+                    Monthly
                   </button>
                 </div>
               </div>
 
-              {/* Suggested Amount Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {[
-                  { val: 500, desc: 'Diagnostics & vitamins for 2 expectant mothers' },
-                  { val: 1000, desc: '1 month STEM & tablet education for a rural girl' },
-                  { val: 2500, desc: 'Supplies raw yarn & loom tools for 1 woman weaver', popular: true },
-                  { val: 5000, desc: 'Equips rural Anganwadi with digital screening kits' },
-                ].map((tier) => {
-                  const isSelected = amount === tier.val && !customAmount;
-                  return (
-                    <button
-                      key={tier.val}
-                      type="button"
-                      onClick={() => handleAmountSelect(tier.val)}
-                      className={`text-left p-4 rounded-xl transition-all flex flex-col justify-between h-28 relative ${
-                        isSelected
-                          ? 'bg-primary text-on-primary shadow-md border-2 border-primary'
-                          : 'bg-surface-container hover:bg-surface-container-high text-on-surface border border-transparent'
-                      }`}
-                    >
-                      {tier.popular && (
-                        <span className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full bg-secondary text-on-secondary font-label-caps text-[10px] tracking-wide uppercase">
-                          Most Popular
-                        </span>
-                      )}
-                      <span className={`font-headline-sm text-headline-sm ${isSelected ? 'text-on-primary' : 'text-on-surface'}`}>
-                        ₹{tier.val.toLocaleString('en-IN')}
-                      </span>
-                      <span className={`font-body-sm text-body-sm ${isSelected ? 'text-on-primary/80' : 'text-on-surface-variant'}`}>
-                        {tier.desc}
-                      </span>
-                    </button>
-                  );
-                })}
+              {/* Currency: Indian Rupee (INR) */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-700">Currency &amp; Compliance</label>
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-50 text-[#EA3C36] font-bold text-xs border border-red-200">
+                    <span className="w-2 h-2 rounded-full bg-[#EA3C36]" />
+                    <span>₹ Indian Rupee (INR)</span>
+                  </div>
+                  <span className="text-[11px] text-gray-500 font-medium">
+                    Domestic Indian contributions only • Section 80G Tax Exemption Eligible
+                  </span>
+                </div>
               </div>
 
-              {/* Custom Amount Row */}
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center pt-2">
-                <div className="sm:col-span-5">
-                  <label className="font-label-md text-label-md text-on-surface-variant block mb-1.5">
-                    Or Enter Custom Amount (INR)
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-title-md text-on-surface-variant">
-                      ₹
-                    </span>
-                    <input
-                      type="number"
-                      value={customAmount}
-                      onChange={handleCustomAmountChange}
-                      placeholder="e.g. 10000"
-                      className="w-full bg-surface-container-low text-on-surface pl-8 pr-4 py-2.5 rounded-xl font-body-md text-body-md border border-[#E8EAE5] focus:bg-surface-container-lowest focus:outline-hidden"
-                    />
-                  </div>
+              {/* Quick Amounts Grid */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-700">Select or enter an amount</label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {[100, 500, 1000, 5000].map((amt) => {
+                    const isSelected = amount === amt && !customAmount;
+                    return (
+                      <button
+                        key={amt}
+                        type="button"
+                        onClick={() => handleAmountSelect(amt)}
+                        className={`py-3 rounded-lg text-sm font-bold border transition-all cursor-pointer flex flex-col items-center justify-center ${
+                          isSelected
+                            ? 'border-[#EA3C36] bg-red-50 text-[#EA3C36] shadow-xs'
+                            : 'border-gray-200 text-gray-700 hover:border-gray-300 bg-white'
+                        }`}
+                      >
+                        <span>₹{amt.toLocaleString('en-IN')}</span>
+                      </button>
+                    );
+                  })}
                 </div>
-                <div className="sm:col-span-7 flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm pt-4 sm:pt-6">
-                  <span className="material-symbols-outlined text-primary text-[18px]">verified_user</span>
-                  <span>All amounts above ₹100 immediately generate an official Section 80G tax receipt.</span>
+
+                {/* Custom Amount */}
+                <div className="pt-2">
+                  <input
+                    type="number"
+                    value={customAmount}
+                    onChange={handleCustomAmountChange}
+                    placeholder="Custom amount (e.g. 10000)"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm focus:border-[#EA3C36] focus:outline-hidden"
+                  />
                 </div>
               </div>
             </section>
 
-            {/* Step 3: Donor Information & Tax Exemption */}
-            <section className="bg-surface-container-lowest p-6 lg:p-8 rounded-2xl shadow-sm space-y-6 border border-[#E8EAE5]">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-label-caps text-label-caps text-secondary font-semibold uppercase tracking-wider">
-                    Step 03
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-label-caps text-[10px]">
-                    Mandatory for 80G Deduction
-                  </span>
-                </div>
-                <h2 className="font-headline-sm text-headline-sm text-primary font-bold">
-                  Donor &amp; Tax Identification Details
+            {/* Step 3: Donor Details for 80G Receipt */}
+            <section className="bg-white p-6 lg:p-8 rounded-xl shadow-xs border border-gray-200 space-y-6">
+              <div className="border-b border-gray-100 pb-4">
+                <span className="text-xs uppercase tracking-wider text-[#EA3C36] font-bold">
+                  STEP 03
+                </span>
+                <h2 className="text-xl font-bold text-[#1A1A1A]">
+                  Donor Information &amp; 80G Tax Exemption
                 </h2>
-                <p className="font-body-sm text-body-sm text-on-surface-variant">
-                  Required by the Ministry of Finance to submit electronic donor returns via Form 10BD/10BE.
+                <p className="text-xs text-gray-500 mt-1">
+                  Required under IT Act for Form 10BD submission &amp; 50% deduction certificate.
                 </p>
               </div>
 
               <form onSubmit={handleCreateDonationOrder} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="font-label-md text-label-md text-on-surface font-medium">
-                    Full Legal Name (as per PAN Card) *
-                  </label>
+                  <label className="text-xs font-bold text-gray-700">Full Legal Name *</label>
                   <input
                     type="text"
                     required
                     value={donorName}
                     onChange={(e) => setDonorName(e.target.value)}
-                    className="w-full bg-surface-container-low text-on-surface px-4 py-2.5 rounded-xl font-body-md text-body-md border border-[#E8EAE5] focus:outline-hidden"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm focus:border-[#EA3C36] focus:outline-hidden"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="font-label-md text-label-md text-on-surface font-medium">
-                    Email Address (for 80G PDF Certificate) *
-                  </label>
+                  <label className="text-xs font-bold text-gray-700">Email Address (for 80G PDF) *</label>
                   <input
                     type="email"
                     required
                     value={donorEmail}
                     onChange={(e) => setDonorEmail(e.target.value)}
-                    className="w-full bg-surface-container-low text-on-surface px-4 py-2.5 rounded-xl font-body-md text-body-md border border-[#E8EAE5] focus:outline-hidden"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm focus:border-[#EA3C36] focus:outline-hidden"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="font-label-md text-label-md text-on-surface font-medium">
-                    Mobile Number (WhatsApp Receipt) *
-                  </label>
+                  <label className="text-xs font-bold text-gray-700">Phone Number *</label>
                   <input
                     type="tel"
                     required
                     value={donorPhone}
                     onChange={(e) => setDonorPhone(e.target.value)}
-                    className="w-full bg-surface-container-low text-on-surface px-4 py-2.5 rounded-xl font-body-md text-body-md border border-[#E8EAE5] focus:outline-hidden"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm focus:border-[#EA3C36] focus:outline-hidden"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <div className="flex justify-between items-center">
-                    <label className="font-label-md text-label-md text-on-surface font-medium">
-                      PAN Card Number *
-                    </label>
-                    <span className="inline-flex items-center gap-1 font-label-sm text-label-sm text-primary">
-                      <span className="material-symbols-outlined text-[14px]">check_circle</span> Verified PAN
-                    </span>
-                  </div>
+                  <label className="text-xs font-bold text-gray-700">PAN Card Number *</label>
                   <input
                     type="text"
                     required
@@ -567,143 +426,122 @@ export const DonatePage: React.FC = () => {
                     value={donorPAN}
                     onChange={(e) => setDonorPAN(e.target.value.toUpperCase())}
                     placeholder="ABCPS1234F"
-                    className="w-full uppercase font-mono tracking-wider bg-surface-container-low text-on-surface px-4 py-2.5 rounded-xl font-body-md text-body-md border border-[#E8EAE5] focus:outline-hidden"
+                    className="w-full uppercase font-mono px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm focus:border-[#EA3C36] focus:outline-hidden"
                   />
                 </div>
 
                 <div className="sm:col-span-2 space-y-1.5">
-                  <label className="font-label-md text-label-md text-on-surface font-medium">
-                    Full Residential Address (Statutory CBDT Requirement) *
-                  </label>
+                  <label className="text-xs font-bold text-gray-700">Full Residential Address *</label>
                   <input
                     type="text"
                     required
                     value={donorAddress}
                     onChange={(e) => setDonorAddress(e.target.value)}
-                    placeholder="House/Plot No., Street, City, State, PIN"
-                    className="w-full bg-surface-container-low text-on-surface px-4 py-2.5 rounded-xl font-body-md text-body-md border border-[#E8EAE5] focus:outline-hidden"
+                    placeholder="Plot / Flat, Street, City, State, PIN Code"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm focus:border-[#EA3C36] focus:outline-hidden"
                   />
                 </div>
 
-                {/* FCRA Simulation Checkbox (Explicitly Tested Requirement) */}
-                <div className="sm:col-span-2 p-3.5 rounded-xl bg-surface-container-low border border-[#E8EAE5]">
+                {/* FCRA Checkbox Safeguard */}
+                <div className="sm:col-span-2 p-3 rounded-lg bg-gray-50 border border-gray-200">
                   <label className="flex items-start gap-3 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={simulateForeignCard}
                       onChange={(e) => setSimulateForeignCard(e.target.checked)}
-                      className="w-4 h-4 mt-0.5 text-secondary rounded focus:ring-secondary"
+                      className="w-4 h-4 mt-0.5 text-[#EA3C36] rounded focus:ring-[#EA3C36]"
                     />
                     <div>
-                      <p className="font-label-md text-label-md font-semibold text-secondary">
+                      <p className="text-xs font-bold text-gray-800">
                         Simulate Foreign Card / Non-Resident Contribution (Test Mode)
                       </p>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant text-xs">
-                        SakhiSetu does not process foreign online donations currently because FCRA is outside this phase. Enabling this simulates the active rejection safeguard required by law.
+                      <p className="text-[11px] text-gray-500">
+                        Simulates statutory FCRA non-acceptance rule. Only domestic contributions accepted.
                       </p>
                     </div>
                   </label>
                 </div>
 
-                {/* Primary Submit Action */}
+                {/* Big Red Continue CTA Button Matching PDF */}
                 <div className="sm:col-span-2 pt-4">
                   <button
                     type="submit"
                     disabled={isSubmittingOrder}
-                    className="w-full py-4 px-6 rounded-xl bg-primary text-on-primary font-title-md text-title-md font-semibold hover:bg-primary-container shadow-md transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                    className="w-full bg-[#EA3C36] hover:bg-[#D32F2F] text-white font-bold py-4 px-6 rounded-lg text-base shadow-md hover-lift transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     <span>
                       {isSubmittingOrder
                         ? 'Initiating Contribution Order...'
-                        : `Proceed to Payment Simulation (₹${amount.toLocaleString('en-IN')})`}
+                        : `CONTINUE (₹${amount.toLocaleString('en-IN')})`}
                     </span>
-                    <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+                    <ArrowRight className="w-5 h-5" />
                   </button>
-                  <div className="flex flex-wrap items-center justify-center gap-4 text-on-surface-variant font-label-sm text-label-sm pt-3">
-                    <span className="flex items-center gap-1">
-                      <span className="material-symbols-outlined text-[16px] text-primary">verified</span>
-                      Verified Section 8 Non-Profit
-                    </span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1">
-                      <span className="material-symbols-outlined text-[16px] text-primary">bolt</span>
-                      Instant 80G PDF Dispatch
-                    </span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1">
-                      <span className="material-symbols-outlined text-[16px] text-primary">lock</span>
-                      50% Tax Deductible
-                    </span>
-                  </div>
                 </div>
               </form>
             </section>
           </div>
 
-          {/* Right Column: Sticky Summary & 80G Tax Benefits (~35%) */}
-          <aside className="lg:col-span-4 flex flex-col gap-6 lg:sticky lg:top-24">
-            {/* Live Contribution Summary */}
-            <div className="bg-surface-container-lowest p-6 rounded-2xl shadow-sm space-y-5 border border-[#E8EAE5]">
-              <div className="flex items-center justify-between pb-3 border-b border-[#E8EAE5]">
-                <span className="font-title-md text-title-md text-primary font-bold">Contribution Summary</span>
-                <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm font-semibold">
-                  100% Impact
-                </span>
-              </div>
-              <div className="space-y-3 font-body-sm text-body-sm">
-                <div className="flex justify-between text-on-surface-variant">
-                  <span>Selected Cause:</span>
-                  <span className="font-medium text-on-surface text-right max-w-[200px] truncate">
-                    {selectedCampaign?.title || 'General Women Welfare Fund'}
+          {/* Right Column: Sticky Summary & Tax Benefit Card (4 cols) */}
+          <aside className="lg:col-span-4 flex flex-col gap-6 lg:sticky lg:top-28">
+            {/* Contribution Summary */}
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-xs space-y-4">
+              <h3 className="text-base font-bold text-[#1A1A1A] border-b border-gray-100 pb-3">
+                Donation Summary
+              </h3>
+
+              <div className="space-y-3 text-xs text-gray-600">
+                <div className="flex justify-between">
+                  <span>Program:</span>
+                  <span className="font-semibold text-gray-900 text-right max-w-[180px] truncate">
+                    {selectedCampaign?.title || 'General Donation'}
                   </span>
                 </div>
-                <div className="flex justify-between text-on-surface-variant">
+                <div className="flex justify-between">
                   <span>Frequency:</span>
-                  <span className="font-medium text-on-surface">
-                    {donationType === 'MONTHLY' ? 'Monthly Guardian' : 'One-Time Contribution'}
+                  <span className="font-semibold text-gray-900">
+                    {donationType === 'MONTHLY' ? 'Monthly' : 'One-Time'}
                   </span>
                 </div>
-                <div className="flex justify-between text-on-surface-variant">
-                  <span>Base Contribution:</span>
-                  <span className="font-medium text-on-surface">₹{amount.toLocaleString('en-IN')}</span>
+                <div className="flex justify-between">
+                  <span>Amount:</span>
+                  <span className="font-semibold text-gray-900">₹{amount.toLocaleString('en-IN')}</span>
                 </div>
-                <div className="flex justify-between text-on-surface-variant">
-                  <span>Platform &amp; Gateway Fee:</span>
-                  <span className="font-semibold text-primary">₹0 (Zero Deduction)</span>
+                <div className="flex justify-between">
+                  <span>Platform Fee:</span>
+                  <span className="font-bold text-[#EA3C36]">₹0 (0%)</span>
                 </div>
-                <div className="flex justify-between items-center pt-3 border-t border-[#E8EAE5] text-on-surface">
-                  <span className="font-title-md text-title-md font-bold text-primary">Total Payable:</span>
-                  <span className="font-headline-sm text-headline-sm font-bold text-primary">
+
+                <div className="flex justify-between items-center pt-3 border-t border-gray-100 text-sm">
+                  <span className="font-bold text-[#1A1A1A]">Total Amount:</span>
+                  <span className="text-xl font-extrabold text-[#EA3C36]">
                     ₹{amount.toLocaleString('en-IN')}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Section 80G Tax Savings Calculator Card */}
-            <div className="bg-primary text-on-primary p-6 rounded-2xl shadow-md space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-secondary-fixed text-[22px]">savings</span>
-                  <h3 className="font-title-md text-[16px] text-on-primary font-semibold">
-                    80G Tax Benefit Breakdown
-                  </h3>
-                </div>
-                <span className="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-caps text-[10px] uppercase font-bold">
-                  50% Deductible
+            {/* Section 80G Tax Benefits Card */}
+            <div className="bg-[#1A1A1A] text-white p-6 rounded-xl shadow-md space-y-3">
+              <div className="flex items-center justify-between border-b border-[#2C2D30] pb-3">
+                <span className="text-xs uppercase tracking-wider text-[#EA3C36] font-bold">
+                  80G Tax Benefit
+                </span>
+                <span className="text-[10px] bg-[#EA3C36] text-white font-bold px-2 py-0.5 rounded">
+                  50% Deduction
                 </span>
               </div>
-              <div className="space-y-2.5 font-body-sm text-body-sm text-on-primary/90">
+
+              <div className="space-y-2 text-xs text-gray-300">
                 <div className="flex justify-between">
-                  <span>50% Eligible Deduction (Sec 80G):</span>
-                  <span className="font-bold text-on-primary">₹{taxDeduction.toLocaleString('en-IN')}</span>
+                  <span>Eligible 50% Deduction:</span>
+                  <span className="font-bold text-white">₹{taxDeduction.toLocaleString('en-IN')}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Estimated Tax Saved (30% slab):</span>
-                  <span className="font-bold text-secondary-fixed">₹{estimatedTaxSaved.toLocaleString('en-IN')}</span>
+                  <span>Estimated Tax Saved:</span>
+                  <span className="font-bold text-[#EA3C36]">₹{estimatedTaxSaved.toLocaleString('en-IN')}</span>
                 </div>
-                <p className="font-label-sm text-[11px] text-on-primary/70 pt-2 leading-tight">
-                  Calculation illustrative under Old Tax Regime. Instant signed PDF receipt generated for Form 10BD/10BE filing.
+                <p className="text-[11px] text-gray-400 pt-2 leading-relaxed">
+                  Instant signed vector PDF receipt issued immediately upon donation confirmation.
                 </p>
               </div>
             </div>
@@ -711,137 +549,80 @@ export const DonatePage: React.FC = () => {
         </div>
       </main>
 
-      {/* PAYMENT SIMULATOR MODAL */}
+      {/* Payment Simulation Modal */}
       {showSimulatorModal && createdDonation && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-surface-container-lowest max-w-xl w-full rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6 border border-[#E8EAE5] animate-fadeIn">
-            <div className="flex items-center justify-between border-b border-[#E8EAE5] pb-4">
+          <div className="bg-white max-w-md w-full rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6 border border-gray-200 animate-fadeIn text-[#1A1A1A]">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-secondary animate-pulse"></span>
-                <h3 className="font-title-md text-title-md text-primary font-bold">
-                  Simulated Payment Gateway (Test Mode)
+                <span className="w-2.5 h-2.5 rounded-full bg-[#EA3C36] animate-pulse"></span>
+                <h3 className="font-bold text-base text-[#1A1A1A]">
+                  Select Payment Gateway
                 </h3>
               </div>
               <button
+                type="button"
                 onClick={() => setShowSimulatorModal(false)}
-                className="text-on-surface-variant hover:text-on-surface"
+                className="text-gray-400 hover:text-gray-700 cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
-            <div className="p-4 rounded-xl bg-surface-container-low flex justify-between items-center">
+            <div className="p-3.5 rounded-xl bg-gray-50 flex justify-between items-center">
               <div>
-                <p className="font-label-sm text-label-sm text-on-surface-variant">Donation Order ID</p>
-                <p className="font-mono text-xs font-bold text-primary">{createdDonation.id}</p>
+                <p className="text-xs text-gray-500">Order Reference</p>
+                <p className="font-mono text-xs font-bold text-gray-800">{createdDonation.id.slice(0, 16)}...</p>
               </div>
               <div className="text-right">
-                <p className="font-label-sm text-label-sm text-on-surface-variant">Amount Payable</p>
-                <p className="font-headline-sm text-headline-sm font-bold text-primary">
+                <p className="text-xs text-gray-500">Amount</p>
+                <p className="text-lg font-bold text-[#EA3C36]">
                   ₹{createdDonation.amount.toLocaleString('en-IN')}
                 </p>
               </div>
             </div>
 
-            {/* Payment Method Tabs */}
-            <div className="flex items-center gap-2 p-1 bg-surface-container rounded-xl">
-              <button
-                type="button"
-                onClick={() => setPaymentMethod('UPI')}
-                className={`flex-1 py-2 rounded-lg font-label-sm text-label-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${
-                  paymentMethod === 'UPI' ? 'bg-primary text-on-primary shadow-xs' : 'text-on-surface-variant'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[16px]">qr_code</span> UPI / QR
-              </button>
-              <button
-                type="button"
-                onClick={() => setPaymentMethod('CARD')}
-                className={`flex-1 py-2 rounded-lg font-label-sm text-label-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${
-                  paymentMethod === 'CARD' ? 'bg-primary text-on-primary shadow-xs' : 'text-on-surface-variant'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[16px]">credit_card</span> Debit/Credit Card
-              </button>
-              <button
-                type="button"
-                onClick={() => setPaymentMethod('NET_BANKING')}
-                className={`flex-1 py-2 rounded-lg font-label-sm text-label-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${
-                  paymentMethod === 'NET_BANKING' ? 'bg-primary text-on-primary shadow-xs' : 'text-on-surface-variant'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[16px]">account_balance</span> Net Banking
-              </button>
+            {/* Payment Method Selector */}
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { id: 'UPI', label: 'UPI / Wallets', icon: 'smartphone' },
+                { id: 'CARD', label: 'Card / Visa', icon: 'credit_card' },
+                { id: 'NET_BANKING', label: 'Bank Transfer', icon: 'account_balance' },
+              ].map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => setPaymentMethod(m.id as any)}
+                  className={`p-3 rounded-lg border text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
+                    paymentMethod === m.id
+                      ? 'border-[#EA3C36] bg-red-50 text-[#EA3C36]'
+                      : 'border-gray-200 text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-[20px]">{m.icon}</span>
+                  <span>{m.label}</span>
+                </button>
+              ))}
             </div>
 
-            {/* Method Details */}
-            {paymentMethod === 'UPI' && (
-              <div className="p-4 rounded-xl bg-surface-container-low flex flex-col items-center space-y-3">
-                <svg className="w-28 h-28 text-primary" fill="currentColor" viewBox="0 0 100 100">
-                  <rect x="0" y="0" width="30" height="30" rx="4" />
-                  <rect x="5" y="5" width="20" height="20" fill="#FAF9F5" />
-                  <rect x="9" y="9" width="12" height="12" />
-                  <rect x="70" y="0" width="30" height="30" rx="4" />
-                  <rect x="75" y="5" width="20" height="20" fill="#FAF9F5" />
-                  <rect x="79" y="9" width="12" height="12" />
-                  <rect x="0" y="70" width="30" height="30" rx="4" />
-                  <rect x="5" y="75" width="20" height="20" fill="#FAF9F5" />
-                  <rect x="9" y="79" width="12" height="12" />
-                  <rect x="40" y="10" width="10" height="10" />
-                  <rect x="55" y="10" width="8" height="20" />
-                  <rect x="40" y="35" width="20" height="8" />
-                  <rect x="40" y="55" width="15" height="15" />
-                  <rect x="65" y="45" width="25" height="10" />
-                </svg>
-                <span className="font-label-caps text-[10px] text-on-surface-variant uppercase">
-                  Simulated VPA: sakhisetu@yesbank
-                </span>
-              </div>
-            )}
-
-            {paymentMethod === 'CARD' && (
-              <div className="p-4 rounded-xl bg-surface-container-low space-y-2">
-                <p className="font-label-sm text-label-sm font-semibold text-primary">Mock Indian RuPay / Visa Card</p>
-                <p className="font-body-sm text-body-sm text-on-surface-variant font-mono">
-                  •••• •••• •••• 4012 | EXP: 12/28
-                </p>
-              </div>
-            )}
-
-            {paymentMethod === 'NET_BANKING' && (
-              <div className="p-4 rounded-xl bg-surface-container-low space-y-2">
-                <p className="font-label-sm text-label-sm font-semibold text-primary">Mock Domestic Bank</p>
-                <p className="font-body-sm text-body-sm text-on-surface-variant">
-                  State Bank of India / HDFC Bank / ICICI Bank
-                </p>
-              </div>
-            )}
-
-            {/* Simulation Outcomes Trigger Buttons */}
-            <div className="space-y-3 pt-2">
-              <p className="font-label-sm text-label-sm text-on-surface-variant text-center font-medium">
-                Select test scenario to simulate payment provider webhook:
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  disabled={isProcessingPayment}
-                  onClick={() => handleExecutePaymentSimulation('SUCCESS')}
-                  className="py-3 px-4 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
-                >
-                  <span className="material-symbols-outlined text-[18px]">verified</span>
-                  <span>Simulate Success (Issue 80G)</span>
-                </button>
-                <button
-                  type="button"
-                  disabled={isProcessingPayment}
-                  onClick={() => handleExecutePaymentSimulation('FAILED')}
-                  className="py-3 px-4 rounded-xl bg-error hover:opacity-90 text-on-error font-label-md text-label-md font-semibold transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
-                >
-                  <span className="material-symbols-outlined text-[18px]">cancel</span>
-                  <span>Simulate Failure</span>
-                </button>
-              </div>
+            {/* Simulation Action Buttons */}
+            <div className="space-y-2 pt-2">
+              <button
+                type="button"
+                disabled={isProcessingPayment}
+                onClick={() => handleExecutePaymentSimulation('SUCCESS')}
+                className="w-full bg-[#EA3C36] hover:bg-[#D32F2F] text-white font-bold py-3 px-4 rounded-lg text-sm shadow-xs transition-all cursor-pointer disabled:opacity-50"
+              >
+                Simulate Successful Payment (Issue Receipt)
+              </button>
+              <button
+                type="button"
+                disabled={isProcessingPayment}
+                onClick={() => handleExecutePaymentSimulation('FAILED')}
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2.5 px-4 rounded-lg text-xs transition-all cursor-pointer disabled:opacity-50"
+              >
+                Simulate Failed Payment
+              </button>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { schemeService } from './scheme.service.js';
-import { Role } from '@prisma/client';
+import { Role } from '../../types/models.js';
 
 export class SchemeController {
   async listSchemes(req: Request, res: Response, next: NextFunction): Promise<void> {

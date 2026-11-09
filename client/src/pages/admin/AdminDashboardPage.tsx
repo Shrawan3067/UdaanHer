@@ -44,24 +44,24 @@ export const AdminDashboardPage: React.FC = () => {
   return (
     <div className="flex flex-col gap-8 max-w-[1600px] mx-auto w-full animate-fadeIn">
       {/* Sub-Header & Executive Controls */}
-      <div className="p-6 rounded-2xl bg-surface-container-lowest shadow-sm border border-[#E8EAE5] flex flex-col xl:flex-row xl:items-center justify-between gap-6">
-        <div className="flex flex-col gap-1 min-w-0">
+      <div className="p-6 lg:p-8 rounded-2xl glass-card shadow-xs border border-[#E5E7EB] flex flex-col xl:flex-row xl:items-center justify-between gap-6 hover-lift-sm">
+        <div className="flex flex-col gap-1.5 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-label-caps text-label-caps uppercase text-secondary font-bold tracking-wider">
               Mission Governance
             </span>
             <span className="text-outline-variant">•</span>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-label-caps text-label-caps font-semibold">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary font-label-caps text-xs font-semibold">
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
               NITI Aayog Darpan Synced
             </span>
             <span className="text-outline-variant">•</span>
-            <span className="font-label-sm text-label-sm text-on-surface-variant">CBDT 10BD Active</span>
+            <span className="font-label-sm text-xs text-on-surface-variant font-medium">CBDT 10BD Active</span>
           </div>
-          <h1 className="font-headline-md text-headline-md text-primary tracking-tight font-bold">
+          <h1 className="font-headline-md text-headline-md text-primary tracking-tight font-extrabold">
             Operations &amp; Impact Command Center
           </h1>
-          <p className="font-body-sm text-body-sm text-on-surface-variant">
+          <p className="font-body-sm text-body-sm text-on-surface-variant max-w-3xl leading-relaxed">
             Statutory oversight, Section 80G electronic generation, and grassroots scheme saturation across Madhya Pradesh.
           </p>
         </div>
@@ -71,7 +71,7 @@ export const AdminDashboardPage: React.FC = () => {
           {metrics.pendingAiReviewsCount > 0 && (
             <Link
               to="/admin/ai-reviews"
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-secondary text-on-secondary font-label-md text-label-md font-semibold hover:bg-[#B56C4A] shadow-sm transition-all"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl btn-secondary-gradient text-on-secondary font-label-md text-label-md font-bold shadow-xs hover-lift transition-all cursor-pointer"
             >
               <span className="material-symbols-outlined text-[18px]">psychology_alt</span>
               <span>{metrics.pendingAiReviewsCount} AI Reviews Pending</span>
@@ -80,7 +80,7 @@ export const AdminDashboardPage: React.FC = () => {
 
           <Link
             to="/admin/reports"
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-surface-container text-on-surface font-label-md text-label-md font-semibold hover:bg-surface-container-high border border-[#E8EAE5] transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-surface-container-high text-on-surface font-label-md text-label-md font-semibold hover:bg-surface-container-highest border border-[#E5E7EB] transition-all hover-lift-sm cursor-pointer shadow-xs"
           >
             <span className="material-symbols-outlined text-[18px] text-primary">download</span>
             <span>Form 10BD CSV</span>
@@ -88,7 +88,7 @@ export const AdminDashboardPage: React.FC = () => {
 
           <Link
             to="/admin/schemes"
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary text-on-primary font-label-md text-label-md font-semibold hover:bg-primary-container shadow-sm transition-all"
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl btn-primary-gradient text-on-primary font-label-md text-label-md font-bold shadow-xs hover-lift transition-all cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px]">add_circle</span>
             <span>+ Add Scheme</span>
@@ -99,7 +99,7 @@ export const AdminDashboardPage: React.FC = () => {
       {/* KPI Metrics Strip: 5 Columns */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         {/* KPI 1 */}
-        <div className="bg-surface-container-lowest rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col justify-between border border-[#E8EAE5]">
+        <div className="bg-surface-container-lowest rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col justify-between border border-[#E5E7EB]">
           <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary"></div>
           <div>
             <div className="flex items-center justify-between mb-1">
@@ -112,7 +112,7 @@ export const AdminDashboardPage: React.FC = () => {
               ₹{(metrics.totalAmountCollected || 0).toLocaleString('en-IN')}
             </div>
           </div>
-          <div className="mt-3 pt-2 border-t border-[#E8EAE5] flex items-center justify-between">
+          <div className="mt-3 pt-2 border-t border-[#E5E7EB] flex items-center justify-between">
             <span className="font-label-sm text-label-sm text-primary font-medium flex items-center gap-0.5">
               <span className="material-symbols-outlined text-[16px]">trending_up</span> +14.2% MoM
             </span>
@@ -121,7 +121,7 @@ export const AdminDashboardPage: React.FC = () => {
         </div>
 
         {/* KPI 2 */}
-        <div className="bg-surface-container-lowest rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col justify-between border border-[#E8EAE5]">
+        <div className="bg-surface-container-lowest rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col justify-between border border-[#E5E7EB]">
           <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-secondary"></div>
           <div>
             <div className="flex items-center justify-between mb-1">
@@ -134,14 +134,14 @@ export const AdminDashboardPage: React.FC = () => {
               {metrics.totalReceiptsIssued || 0}
             </div>
           </div>
-          <div className="mt-3 pt-2 border-t border-[#E8EAE5] flex items-center justify-between">
+          <div className="mt-3 pt-2 border-t border-[#E5E7EB] flex items-center justify-between">
             <span className="font-label-sm text-label-sm text-primary font-medium">100% Atomic</span>
             <span className="font-label-sm text-label-sm text-on-surface-variant">Safe Sequences</span>
           </div>
         </div>
 
         {/* KPI 3 */}
-        <div className="bg-surface-container-lowest rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col justify-between border border-[#E8EAE5]">
+        <div className="bg-surface-container-lowest rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col justify-between border border-[#E5E7EB]">
           <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary-container"></div>
           <div>
             <div className="flex items-center justify-between mb-1">
@@ -154,14 +154,14 @@ export const AdminDashboardPage: React.FC = () => {
               {metrics.publishedSchemesCount || 0}
             </div>
           </div>
-          <div className="mt-3 pt-2 border-t border-[#E8EAE5] flex items-center justify-between">
+          <div className="mt-3 pt-2 border-t border-[#E5E7EB] flex items-center justify-between">
             <span className="font-label-sm text-label-sm text-on-surface-variant">9 MP Districts</span>
             <span className="font-label-sm text-label-sm text-primary font-medium">Live Ingested</span>
           </div>
         </div>
 
         {/* KPI 4 */}
-        <div className="bg-surface-container-lowest rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col justify-between border border-[#E8EAE5]">
+        <div className="bg-surface-container-lowest rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col justify-between border border-[#E5E7EB]">
           <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary-fixed"></div>
           <div>
             <div className="flex items-center justify-between mb-1">
@@ -174,14 +174,14 @@ export const AdminDashboardPage: React.FC = () => {
               {metrics.activeCampaignsCount || 0}
             </div>
           </div>
-          <div className="mt-3 pt-2 border-t border-[#E8EAE5] flex items-center justify-between">
+          <div className="mt-3 pt-2 border-t border-[#E5E7EB] flex items-center justify-between">
             <span className="font-label-sm text-label-sm text-on-surface-variant">Health &amp; Livelihood</span>
             <span className="font-label-sm text-label-sm text-secondary font-medium">100% Field Ops</span>
           </div>
         </div>
 
         {/* KPI 5 */}
-        <div className="bg-surface-container-lowest rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col justify-between border border-[#E8EAE5]">
+        <div className="bg-surface-container-lowest rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col justify-between border border-[#E5E7EB]">
           <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-secondary-fixed"></div>
           <div>
             <div className="flex items-center justify-between mb-1">
@@ -194,7 +194,7 @@ export const AdminDashboardPage: React.FC = () => {
               {metrics.pendingAiReviewsCount || 0}
             </div>
           </div>
-          <div className="mt-3 pt-2 border-t border-[#E8EAE5] flex items-center justify-between">
+          <div className="mt-3 pt-2 border-t border-[#E5E7EB] flex items-center justify-between">
             <span className="font-label-sm text-label-sm text-secondary font-medium">Human Review Desk</span>
             <span className="font-label-sm text-label-sm text-on-surface-variant">Hindi Drafts</span>
           </div>
@@ -206,8 +206,8 @@ export const AdminDashboardPage: React.FC = () => {
         {/* Left Column: Recent Activity & Campaigns */}
         <div className="lg:col-span-8 flex flex-col gap-6">
           {/* Monthly Collection Chart */}
-          <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-[#E8EAE5] space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-[#E8EAE5]">
+          <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-[#E5E7EB] space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-[#E5E7EB]">
               <div>
                 <h3 className="font-title-md text-title-md text-primary font-bold">Monthly Donation Velocity</h3>
                 <p className="font-body-sm text-xs text-on-surface-variant">
@@ -231,22 +231,22 @@ export const AdminDashboardPage: React.FC = () => {
                     { name: 'Mar', amount: metrics.totalAmountCollected || 250000 },
                   ]}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E8EAE5" />
-                  <XAxis dataKey="name" stroke="#727B74" fontSize={12} />
-                  <YAxis stroke="#727B74" fontSize={12} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                  <XAxis dataKey="name" stroke="#6B7280" fontSize={12} />
+                  <YAxis stroke="#6B7280" fontSize={12} />
                   <Tooltip
                     formatter={(val: any) => [`₹${Number(val).toLocaleString('en-IN')}`, 'Amount']}
-                    contentStyle={{ backgroundColor: '#FAF9F5', borderRadius: '12px', border: '1px solid #E8EAE5' }}
+                    contentStyle={{ backgroundColor: '#FFFFFF', borderRadius: '8px', border: '1px solid #E5E7EB' }}
                   />
-                  <Bar dataKey="amount" fill="#003527" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="amount" fill="#EA3C36" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
           {/* Recent Donations Table */}
-          <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-[#E8EAE5] overflow-hidden">
-            <div className="p-6 border-b border-[#E8EAE5] flex items-center justify-between">
+          <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-[#E5E7EB] overflow-hidden">
+            <div className="p-6 border-b border-[#E5E7EB] flex items-center justify-between">
               <div>
                 <h3 className="font-title-md text-title-md text-primary font-bold">Latest Donor Transactions</h3>
                 <p className="font-body-sm text-xs text-on-surface-variant">
@@ -264,7 +264,7 @@ export const AdminDashboardPage: React.FC = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider border-b border-[#E8EAE5]">
+                  <tr className="bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider border-b border-[#E5E7EB]">
                     <th className="py-3 px-6 font-semibold">Donor</th>
                     <th className="py-3 px-6 font-semibold">Amount</th>
                     <th className="py-3 px-6 font-semibold">Campaign</th>
@@ -272,7 +272,7 @@ export const AdminDashboardPage: React.FC = () => {
                     <th className="py-3 px-6 font-semibold">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#E8EAE5]">
+                <tbody className="divide-y divide-[#E5E7EB]">
                   {(data?.recentDonations || []).slice(0, 5).map((d: any) => (
                     <tr key={d.id} className="hover:bg-surface-container-low/40">
                       <td className="py-3 px-6">
@@ -308,7 +308,7 @@ export const AdminDashboardPage: React.FC = () => {
         {/* Right Column: AI Reviews & Quick Links */}
         <div className="lg:col-span-4 flex flex-col gap-6">
           {/* AI Reviews Callout */}
-          <div className="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-[#E8EAE5] space-y-4">
+          <div className="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-[#E5E7EB] space-y-4">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-secondary text-[24px]">psychology_alt</span>
               <h3 className="font-title-md text-title-md text-primary font-bold">
@@ -318,7 +318,7 @@ export const AdminDashboardPage: React.FC = () => {
             <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
               Generate easy-to-read, plain-Hindi scheme summaries for rural beneficiaries with structured JSON output and human-in-the-loop review.
             </p>
-            <div className="p-3.5 rounded-xl bg-surface-container-low border border-[#E8EAE5] space-y-1">
+            <div className="p-3.5 rounded-xl bg-surface-container-low border border-[#E5E7EB] space-y-1">
               <div className="flex justify-between font-label-sm text-xs font-semibold">
                 <span className="text-on-surface-variant">Queue Status:</span>
                 <span className="text-secondary">{metrics.pendingAiReviewsCount || 0} Pending</span>
@@ -337,7 +337,7 @@ export const AdminDashboardPage: React.FC = () => {
           </div>
 
           {/* Quick Admin Actions */}
-          <div className="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-[#E8EAE5] space-y-3">
+          <div className="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-[#E5E7EB] space-y-3">
             <h3 className="font-title-md text-title-md text-primary font-bold">Quick Administrative Tools</h3>
             <div className="flex flex-col gap-2">
               <Link
