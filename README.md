@@ -156,6 +156,37 @@ npm run test:client
 
 ---
 
+## ☁️ Production Deployment on AWS EC2
+
+UdaanHer is fully production-ready for deployment on **AWS EC2 (Ubuntu 22.04 / 24.04 LTS)** with automated Docker Compose or PM2 + Host Nginx orchestration, Let's Encrypt SSL, and GitHub Actions CI/CD.
+
+For the comprehensive step-by-step AWS provisioning guide, see:
+👉 **[AWS EC2 Production Deployment Guide](docs/aws-ec2-deployment-guide.md)**
+
+### Fast-Track EC2 Deployment:
+
+```bash
+# 1. SSH into your AWS EC2 instance
+ssh -i your-key.pem ubuntu@<EC2_ELASTIC_IP>
+
+# 2. Clone repo & run automated system provisioning (installs Node 20, Docker, Nginx, PM2, and configures 2GB swap)
+git clone https://github.com/your-org/UdaanHer.git udaanher
+cd udaanher
+sudo ./scripts/ec2-setup.sh
+
+# 3. Configure production environment
+cp .env.production.example server/.env
+nano server/.env # Fill in MongoDB Atlas URI & JWT secret
+
+# 4. Deploy full-stack containers & seed database
+./scripts/deploy.sh --docker --seed
+
+# 5. (Optional) Issue free SSL certificate for your custom domain
+sudo ./scripts/ssl-setup.sh udaanher.org admin@udaanher.org
+```
+
+---
+
 ## 🔑 Demo Accounts
 
 Use these documented accounts to test role-based access control (RBAC):

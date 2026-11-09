@@ -246,6 +246,111 @@ export class SchemeService {
     return { id, deleted: true };
   }
 
+  async askQuestion(question: string, defaultDistrict?: string) {
+    const qLower = question.toLowerCase();
+
+    // 1. Detect MP district from question or defaultDistrict
+    const mpDistricts = [
+      { en: 'Bhopal', hi: 'भोपाल' },
+      { en: 'Sehore', hi: 'सीहोर' },
+      { en: 'Raisen', hi: 'रायसेन' },
+      { en: 'Rajgarh', hi: 'राजगढ़' },
+      { en: 'Vidisha', hi: 'विदिशा' },
+      { en: 'Hoshangabad', hi: 'होशंगाबाद' },
+      { en: 'Harda', hi: 'हरदा' },
+      { en: 'Betul', hi: 'बैतूल' },
+      { en: 'Guna', hi: 'गुना' },
+    ];
+
+    let detectedDistrict: string | undefined =
+      defaultDistrict && defaultDistrict !== 'All Districts' ? defaultDistrict : undefined;
+
+    for (const d of mpDistricts) {
+      if (qLower.includes(d.en.toLowerCase()) || question.includes(d.hi)) {
+        detectedDistrict = d.en;
+        break;
+      }
+    }
+
+    // 2. Detect Need / Domain Keywords
+    let detectedNeed: string | undefined;
+    const rulesUsed: string[] = [];
+
+    const pensionKeywords = ['पेंशन', 'विधवा', 'वृद्धा', 'कल्याणी', 'निराश्रित', 'pension', 'widow', 'elderly'];
+    const livelihoodKeywords = ['आजीविका', 'लोन', 'ऋण', 'स्व सहायता', 'समूह', 'shg', 'दुकान', 'व्यवसाय', 'सिलाई', 'livelihood', 'loan', 'self-help', 'रोजगार'];
+    const healthKeywords = ['मातृत्व', 'गर्भवती', 'प्रसूति', 'बच्चा', 'शिशु', 'स्वास्थ्य', 'maternity', 'pregnant', 'health', 'डिलीवरी'];
+    const educationKeywords = ['शिक्षा', 'छात्रवृत्ति', 'कॉलेज', 'लाडली', 'बेटी', 'school', 'education', 'scholarship', 'पढ़ाई'];
+
+    if (pensionKeywords.some((k) => qLower.includes(k) || question.includes(k))) {
+      detectedNeed = 'Pension';
+      rulesUsed.push('पहचानी गई आवश्यकता: विधवा / वृद्धावस्था सामाजिक सुरक्षा पेंशन');
+    } else if (livelihoodKeywords.some((k) => qLower.includes(k) || question.includes(k))) {
+      detectedNeed = 'Livelihood';
+      rulesUsed.push('पहचानी गई आवश्यकता: महिला स्व-सहायता समूह (SHG) व आजीविका ऋण सहायता');
+    } else if (healthKeywords.some((k) => qLower.includes(k) || question.includes(k))) {
+      detectedNeed = 'Health';
+      rulesUsed.push('पहचानी गई आवश्यकता: मातृत्व लाभ व संस्थागत प्रसव आर्थिक सहायता');
+    } else if (educationKeywords.some((k) => qLower.includes(k) || question.includes(k))) {
+      detectedNeed = 'Education';
+      rulesUsed.push('पहचानी गई आवश्यकता: बालिका शिक्षा एवं उच्च शिक्षा छात्रवृत्ति प्रोत्साहन');
+    }
+
+    if (detectedDistrict) {
+      rulesUsed.push(`लागू जिला: ${detectedDistrict} (मध्य प्रदेश के 9 अधिकृत जनपदों में सत्यापित)`);
+    }
+
+    if (['बीपीएल', 'राशन', 'bpl', 'ration', 'गरीबी'].some((k) => qLower.includes(k) || question.includes(k))) {
+      rulesUsed.push('बीपीएल राशन कार्ड प्राथमिकता नियम लागू');
+    }
+
+    // 3. Query Published Schemes
+    const allPublished = await prisma.scheme.findMany({
+      where: { status: SchemeStatus.PUBLISHED },
+    });
+
+    // Score schemes
+    const scored = allPublished.map((s) => {
+      let score = 0;
+      const sFullText = (
+        s.name + ' ' + (s.nameHi || '') + ' ' + s.description + ' ' + (s.descriptionHi || '') + ' ' + (s.need || '') + ' ' + (s.category || '')
+      ).toLowerCase();
+
+      // Match need
+      if (detectedNeed && s.need && s.need.toLowerCase().includes(detectedNeed.toLowerCase())) {
+        score += 20;
+      }
+
+      // Match district
+      if (detectedDistrict && s.applicableDistricts?.includes(detectedDistrict)) {
+        score += 10;
+      }
+
+      // Keyword matches
+      const tokens = question.split(/[\s,।?.!]+/);
+      for (const t of tokens) {
+        if (t.length > 2 && sFullText.includes(t.toLowerCase())) {
+          score += 4;
+        }
+      }
+
+      return { scheme: s, score };
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+    const topMatches = scored.filter((x) => x.score > 0).slice(0, 4).map((x) => x.scheme);
+    const fallbackMatches = topMatches.length > 0 ? topMatches : allPublished.slice(0, 3);
+
+    return {
+      query: question,
+      detectedDistrict: detectedDistrict || 'All MP Districts',
+      detectedNeed: detectedNeed || 'General Welfare',
+      rulesUsed: rulesUsed.length > 0 ? rulesUsed : ['मध्य प्रदेश महिला कल्याण एवं आजीविका योजना प्राथमिकता नियम'],
+      matches: fallbackMatches,
+      disclaimer: '⚠️ आवश्यक सूचना: यह खोज परिणाम केवल शासकीय नियमों के आधार पर संभावित पात्रता दर्शाते हैं। यह अंतिम स्वीकृति का वादा नहीं है। अंतिम स्वीकृति जिला प्रशासन/कार्यालय के सत्यापन पर निर्भर है।',
+      helplineOffer: 'निशुल्क सहायता हेतु हमारी हेल्पलाइन 1800-233-0000 पर संपर्क करें या कॉल-बैक का अनुरोध दर्ज करें।',
+    };
+  }
+
   private generateSlug(name: string, code: string): string {
     const cleanName = name
       .toLowerCase()

@@ -19,7 +19,7 @@ export class AIService {
     }
   }
 
-  async generateSchemeSummary(schemeId: string, adminUserId: string) {
+  async generateSchemeSummary(schemeId: string, adminUserId: string, officialNoticeText?: string) {
     const scheme = await prisma.scheme.findUnique({
       where: { id: schemeId },
     });
@@ -32,19 +32,19 @@ export class AIService {
 
     if (this.openai) {
       try {
-        summaryData = await this.callOpenAI(scheme);
+        summaryData = await this.callOpenAI(scheme, officialNoticeText);
       } catch (err: any) {
         logger.warn('OpenAI API call failed, falling back to structured template synthesis', {
           error: err.message,
           schemeCode: scheme.schemeCode,
         });
-        summaryData = this.generateFallbackSummary(scheme);
+        summaryData = this.generateFallbackSummary(scheme, officialNoticeText);
       }
     } else {
       logger.info('No OPENAI_API_KEY provided; generating high-fidelity local draft summary', {
         schemeCode: scheme.schemeCode,
       });
-      summaryData = this.generateFallbackSummary(scheme);
+      summaryData = this.generateFallbackSummary(scheme, officialNoticeText);
     }
 
     // Persist as a PENDING draft in AIReview table (Human review workflow)
@@ -196,7 +196,7 @@ export class AIService {
     return rejected;
   }
 
-  private async callOpenAI(scheme: Scheme): Promise<AISummaryResponse> {
+  private async callOpenAI(scheme: Scheme, officialNoticeText?: string): Promise<AISummaryResponse> {
     if (!this.openai) {
       throw new Error('OpenAI client not configured');
     }
@@ -213,6 +213,7 @@ export class AIService {
       applicationSteps: scheme.applicationSteps,
       applicableDistricts: scheme.applicableDistricts,
       officialSourceUrl: scheme.officialSourceUrl,
+      officialNoticeText: officialNoticeText || undefined,
     };
 
     const completion = await this.openai.chat.completions.create({
@@ -221,7 +222,7 @@ export class AIService {
         { role: 'system', content: HINDI_SUMMARY_SYSTEM_PROMPT },
         {
           role: 'user',
-          content: `Please synthesize the official scheme data into plain Hindi and English summaries:\n${JSON.stringify(
+          content: `Please synthesize the official scheme notice data into plain Hindi and English summaries:\n${JSON.stringify(
             promptPayload,
             null,
             2
@@ -241,14 +242,19 @@ export class AIService {
     return aiSummaryResponseSchema.parse(parsedJson);
   }
 
-  private generateFallbackSummary(scheme: Scheme): AISummaryResponse {
+  private generateFallbackSummary(scheme: Scheme, officialNoticeText?: string): AISummaryResponse {
     const docs = Array.isArray(scheme.requiredDocuments)
       ? (scheme.requiredDocuments as any[]).map((d) => d.nameHi || d.name).join(', ')
       : 'आधार कार्ड, समग्र आईडी, बैंक पासबुक';
 
-    const hindi = `यह योजना (${scheme.nameHi || scheme.name}) मध्य प्रदेश की पात्र महिलाओं के लिए है। इसका मुख्य उद्देश्य ${scheme.need} सहायता प्रदान करना है। इसके तहत लाभार्थियों को ${scheme.benefitHi || scheme.benefit} प्रदान किया जाता है। आवेदन हेतु आवश्यक दस्तावेज: ${docs}। आवेदन निकटतम ग्राम पंचायत, जनपद अथवा एमपी ऑनलाइन कियोस्क के माध्यम से किया जा सकता है। आधिकारिक पोर्टल: ${scheme.officialSourceUrl}`;
+    let noticeSnippet = '';
+    if (officialNoticeText && officialNoticeText.trim().length > 0) {
+      noticeSnippet = ` आधिकारिक राजपत्र सूचना अनुसार: ${officialNoticeText.trim().slice(0, 150)}...`;
+    }
 
-    const english = `The ${scheme.name} scheme provides ${scheme.benefit} to eligible women applicants residing in Madhya Pradesh. Key documentation includes Aadhaar, Samagra ID, and relevant category proof. Applications are processed through local Panchayat and state kiosks.`;
+    const hindi = `यह योजना (${scheme.nameHi || scheme.name}) मध्य प्रदेश की पात्र महिलाओं के लिए है। इसका मुख्य उद्देश्य ${scheme.need} सहायता प्रदान करना है। इसके तहत लाभार्थियों को ${scheme.benefitHi || scheme.benefit} प्रदान किया जाता है। आवेदन हेतु आवश्यक दस्तावेज: ${docs}। आवेदन निकटतम ग्राम पंचायत, जनपद अथवा एमपी ऑनलाइन कियोस्क के माध्यम से किया जा सकता है। आधिकारिक पोर्टल: ${scheme.officialSourceUrl}।${noticeSnippet}`;
+
+    const english = `The ${scheme.name} scheme provides ${scheme.benefit} to eligible women applicants residing in Madhya Pradesh. Key documentation includes Aadhaar, Samagra ID, and relevant category proof. Applications are processed through local Panchayat and state kiosks.${officialNoticeText ? ` Official notification extract: ${officialNoticeText.slice(0, 120)}...` : ''}`;
 
     return {
       hindiSummary: hindi,

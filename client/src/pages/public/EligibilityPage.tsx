@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { api } from '../../services/api';
@@ -22,6 +22,11 @@ import {
   FileText,
   Clock,
   Sparkles,
+  Mic,
+  MicOff,
+  Send,
+  AlertTriangle,
+  ExternalLink,
 } from 'lucide-react';
 
 const MP_DISTRICTS = [
@@ -71,6 +76,21 @@ export const EligibilityPage: React.FC = () => {
   const [result, setResult] = useState<EligibilityResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Natural Language Hindi Voice/Typed Finder State
+  const [finderMode, setFinderMode] = useState<'VOICE_TYPED' | 'GUIDED_SCREENER'>('VOICE_TYPED');
+  const [hindiQuestion, setHindiQuestion] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const [speechError, setSpeechError] = useState<string | null>(null);
+  const [isAskingAi, setIsAskingAi] = useState(false);
+  const [aiAnswerData, setAiAnswerData] = useState<{
+    query: string;
+    rulesUsed: string[];
+    disclaimer: string;
+    helplineOffer: string;
+  } | null>(null);
+  const [aiMatches, setAiMatches] = useState<any[]>([]);
+  const recognitionRef = useRef<any>(null);
+
   // Callback inline form
   const [callbackVillage, setCallbackVillage] = useState('');
   const [callbackPhone, setCallbackPhone] = useState('');
@@ -83,6 +103,98 @@ export const EligibilityPage: React.FC = () => {
     schemeCode?: string;
     schemeName?: string;
   }>({ isOpen: false });
+
+  // Web Speech API Hindi Voice Listening
+  const toggleListening = () => {
+    setSpeechError(null);
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setSpeechError(
+        language === 'HI'
+          ? 'आपके ब्राउज़र में बोलकर खोजने की सुविधा उपलब्ध नहीं है। कृपया लिखकर पूछें।'
+          : 'Voice speech recognition is not supported in this browser. Please type your question.'
+      );
+      return;
+    }
+
+    if (isListening) {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'hi-IN';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setHindiQuestion(transcript);
+        setIsListening(false);
+        handleAskHindiQuestion(transcript);
+      };
+
+      recognition.onerror = (event: any) => {
+        console.warn('Speech recognition error:', event.error);
+        setIsListening(false);
+        if (event.error === 'not-allowed') {
+          setSpeechError(
+            language === 'HI'
+              ? 'कृपया माइक्रोफ़ोन की अनुमति प्रदान करें।'
+              : 'Please allow microphone access to search by voice.'
+          );
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (err) {
+      console.error('Speech initialization error:', err);
+      setIsListening(false);
+    }
+  };
+
+  const handleAskHindiQuestion = async (queryText?: string) => {
+    const q = (queryText !== undefined ? queryText : hindiQuestion).trim();
+    if (!q) return;
+
+    setIsAskingAi(true);
+    setError(null);
+
+    try {
+      const res = await api.askSchemeQuestion({
+        question: q,
+        district: district !== 'All Districts' ? district : undefined,
+      });
+
+      setAiMatches(res.matches || []);
+      setAiAnswerData({
+        query: res.query,
+        rulesUsed: res.rulesUsed,
+        disclaimer: res.disclaimer,
+        helplineOffer: res.helplineOffer,
+      });
+    } catch (err: any) {
+      console.error('AI question error:', err);
+      setError(err.message || 'Failed to process question. Please try the guided screener.');
+    } finally {
+      setIsAskingAi(false);
+    }
+  };
 
   const handleNext = () => {
     if (step < totalSteps) {
@@ -232,24 +344,316 @@ export const EligibilityPage: React.FC = () => {
 
       {/* Main Questionnaire Container */}
       <div className="max-w-7xl mx-auto px-6 lg:px-12 py-10 space-y-10">
-        {/* Evaluating State */}
-        {isEvaluating && (
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center space-y-4 animate-fadeIn">
-            <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mx-auto text-[#EA3C36]">
-              <span className="material-symbols-outlined text-3xl animate-spin">refresh</span>
+        {/* Dual Mode Switcher: Voice/Typed Hindi Finder vs 6-Step Guided Screener */}
+        <div className="flex items-center justify-center">
+          <div className="inline-flex p-1.5 bg-gray-100 rounded-2xl border border-gray-200/90 shadow-2xs max-w-full flex-wrap gap-1">
+            <button
+              type="button"
+              onClick={() => {
+                setFinderMode('VOICE_TYPED');
+                setResult(null);
+              }}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                finderMode === 'VOICE_TYPED'
+                  ? 'bg-[#EA3C36] text-white shadow-xs'
+                  : 'text-gray-700 hover:text-[#EA3C36] hover:bg-white/60'
+              }`}
+            >
+              <Mic className="w-4 h-4" />
+              <span>बोलकर या लिखकर पूछें (Hindi Voice / Typed AI Finder)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setFinderMode('GUIDED_SCREENER');
+                setAiAnswerData(null);
+              }}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                finderMode === 'GUIDED_SCREENER'
+                  ? 'bg-[#EA3C36] text-white shadow-xs'
+                  : 'text-gray-700 hover:text-[#EA3C36] hover:bg-white/60'
+              }`}
+            >
+              <CheckCircle2 className="w-4 h-4" />
+              <span>6-चरण पात्रता प्रश्नावली (6-Step Guided Screener)</span>
+            </button>
+          </div>
+        </div>
+
+        {/* 1. HINDI VOICE / TYPED NATURAL LANGUAGE FINDER */}
+        {finderMode === 'VOICE_TYPED' && (
+          <div className="space-y-8 animate-fadeIn">
+            <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-200 shadow-xs space-y-5">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-[#EA3C36] text-xs font-bold uppercase tracking-wider">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>AI Natural Language Scheme Finder</span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-extrabold text-[#1A1A1A]">
+                  हिंदी में अपना सवाल बोलें या लिखें
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed max-w-3xl">
+                  माइक दबाकर बोलें या नीचे टाइप करें। हमारा AI इंजन मध्य प्रदेश शासन की योजनाओं के नियमों की जांच कर संभावित पात्रता प्रदर्शित करेगा।
+                </p>
+              </div>
+
+              {/* Voice and Typing Input Box */}
+              <div className="space-y-3">
+                <div className="relative flex items-center">
+                  <input
+                    type="text"
+                    value={hindiQuestion}
+                    onChange={(e) => setHindiQuestion(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAskHindiQuestion();
+                      }
+                    }}
+                    placeholder="उदा: मैं भोपाल से 42 वर्ष की विधवा महिला हूं, बीपीएल कार्ड है, मुझे कौन सी योजना मिलेगी?"
+                    className="w-full pl-4 pr-24 sm:pr-28 py-3.5 bg-gray-50 rounded-xl text-xs sm:text-sm text-gray-900 border border-gray-200 focus:outline-hidden focus:bg-white focus:border-[#EA3C36] transition-colors"
+                  />
+
+                  <div className="absolute right-2 flex items-center gap-1.5">
+                    {/* Mic Button */}
+                    <button
+                      type="button"
+                      onClick={toggleListening}
+                      title={isListening ? "Listening... Click to Stop" : "Click to Speak in Hindi"}
+                      className={`p-2 rounded-lg transition-all cursor-pointer ${
+                        isListening
+                          ? 'bg-red-600 text-white animate-pulse shadow-md ring-2 ring-red-400'
+                          : 'bg-gray-100 hover:bg-red-50 text-gray-600 hover:text-[#EA3C36]'
+                      }`}
+                    >
+                      {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                    </button>
+
+                    {/* Submit Button */}
+                    <button
+                      type="button"
+                      disabled={isAskingAi || !hindiQuestion.trim()}
+                      onClick={() => handleAskHindiQuestion()}
+                      className="px-3.5 py-2 rounded-lg bg-[#EA3C36] hover:bg-[#D32F2F] text-white text-xs font-bold transition-all shadow-xs cursor-pointer disabled:opacity-40 flex items-center gap-1"
+                    >
+                      <span>खोजें</span>
+                      <Send className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Speech Error Alert */}
+                {speechError && (
+                  <p className="text-xs text-red-600 font-semibold">{speechError}</p>
+                )}
+
+                {/* Quick Suggestion Chips */}
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <span className="text-[11px] text-gray-500 font-bold uppercase">सुझाए गए प्रश्न:</span>
+                  {[
+                    "विधवा कल्याणी पेंशन (Kalyani Pension)",
+                    "लाड़ली बहना सहायता ₹1,250",
+                    "सिलाई मशीन व स्वरोजगार ऋण",
+                    "गर्भवती महिला सहायता (PMMVY ₹5,000)",
+                  ].map((chip) => (
+                    <button
+                      key={chip}
+                      type="button"
+                      onClick={() => {
+                        setHindiQuestion(chip);
+                        handleAskHindiQuestion(chip);
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-gray-100 hover:bg-red-50 hover:text-[#EA3C36] text-[11px] font-semibold text-gray-700 transition-colors border border-gray-200 cursor-pointer"
+                    >
+                      {chip}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-            <h2 className="text-xl font-bold text-[#1A1A1A]">
-              Evaluating Rules Against Welfare Databases...
-            </h2>
-            <p className="text-xs text-gray-500 max-w-md mx-auto">
-              Matching your inputs with verified eligibility rules for Sehore, Bhopal, Raisen, and other districts.
-            </p>
+
+            {/* AI Loading State */}
+            {isAskingAi && (
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-xs p-10 text-center space-y-3">
+                <div className="w-10 h-10 border-3 border-gray-200 border-t-[#EA3C36] rounded-full animate-spin mx-auto"></div>
+                <h3 className="text-base font-bold text-gray-900">
+                  नियमों और आधिकारिक राजपत्र की जांच की जा रही है...
+                </h3>
+                <p className="text-xs text-gray-500">
+                  Evaluating eligibility rules against official schemes directory.
+                </p>
+              </div>
+            )}
+
+            {/* AI Results View */}
+            {!isAskingAi && aiAnswerData && (
+              <div className="space-y-6 animate-fadeIn">
+                {/* 1. Header & Rules Used Card */}
+                <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
+                    <div>
+                      <span className="text-xs uppercase font-bold text-[#EA3C36] tracking-wider">
+                        EVALUATION RESULTS (संभावित पात्रता)
+                      </span>
+                      <h3 className="text-xl font-bold text-[#1A1A1A]">
+                        {aiMatches.length} संभावित योजनाएं पाई गईं
+                      </h3>
+                    </div>
+                    <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200 self-start sm:self-auto">
+                      AI Rule Engine Active
+                    </span>
+                  </div>
+
+                  {/* Rules Used Breakdown */}
+                  {aiAnswerData.rulesUsed && aiAnswerData.rulesUsed.length > 0 && (
+                    <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 space-y-2">
+                      <p className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        जांच में प्रयुक्त नियम (Rules Used For Evaluation):
+                      </p>
+                      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-700">
+                        {aiAnswerData.rulesUsed.map((rule, idx) => (
+                          <li key={idx} className="flex items-center gap-2 font-medium">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                            <span>{rule}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Statutory Disclaimer: NEVER A PROMISE */}
+                  <div className="p-4 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-900 flex items-start gap-3">
+                    <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                    <div className="space-y-1 text-xs">
+                      <p className="font-bold">
+                        महत्वपूर्ण कानूनी अस्वीकरण (Never a Promise / कोई कानूनी वादा नहीं)
+                      </p>
+                      <p className="leading-relaxed text-amber-800">
+                        {aiAnswerData.disclaimer}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Helpline Offer Banner */}
+                  <div className="p-4 rounded-xl bg-red-50/70 border border-red-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-[#EA3C36] text-white flex items-center justify-center shrink-0">
+                        <Headphones className="w-4 h-4" />
+                      </div>
+                      <p className="text-xs font-semibold text-gray-800 leading-relaxed">
+                        {aiAnswerData.helplineOffer}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setCallbackModal({ isOpen: true, schemeName: 'Hindi Voice Finder Inquiry' })}
+                      className="px-4 py-2 rounded-lg bg-[#EA3C36] hover:bg-[#D32F2F] text-white text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer"
+                    >
+                      कॉल-बैक का अनुरोध करें
+                    </button>
+                  </div>
+                </div>
+
+                {/* Matched Schemes Cards */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {aiMatches.map((scheme: any) => (
+                    <article
+                      key={scheme.id || scheme.schemeCode}
+                      className="bg-white rounded-2xl border border-gray-200 shadow-xs p-6 space-y-4 flex flex-col justify-between hover:shadow-md transition-shadow"
+                    >
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="px-2.5 py-0.5 rounded-full bg-red-50 text-[#EA3C36] text-xs font-bold border border-red-100">
+                            {scheme.schemeCode}
+                          </span>
+                          <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                            संभावित पात्र (Possible Match)
+                          </span>
+                        </div>
+
+                        <div>
+                          <h4 className="text-base font-bold text-gray-900">{scheme.name}</h4>
+                          {scheme.nameHi && (
+                            <p className="text-xs font-bold text-[#EA3C36] font-hindi mt-0.5">
+                              {scheme.nameHi}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
+                          <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+                            प्रत्यक्ष लाभ (Sanctioned Benefit)
+                          </p>
+                          <p className="text-base font-extrabold text-[#1A1A1A] mt-0.5">
+                            {scheme.benefit}
+                          </p>
+                        </div>
+
+                        <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
+                          {scheme.descriptionHi || scheme.description}
+                        </p>
+
+                        <div className="flex items-center justify-between text-[11px] text-gray-500 pt-1 border-t border-gray-100">
+                          {scheme.officialSourceUrl && (
+                            <a
+                              href={scheme.officialSourceUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[#EA3C36] hover:underline font-bold inline-flex items-center gap-1"
+                            >
+                              <span>Official Notice ↗</span>
+                            </a>
+                          )}
+                          <span>
+                            Verified: {scheme.lastCheckedAt ? new Date(scheme.lastCheckedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "Active"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="pt-3 border-t border-gray-100 flex items-center gap-2">
+                        <Link
+                          to={`/schemes/${scheme.slug}`}
+                          className="flex-1 py-2 rounded-lg bg-gray-100 hover:bg-[#EA3C36] hover:text-white text-gray-800 text-xs font-bold text-center transition-colors shadow-2xs"
+                        >
+                          दिशा-निर्देश देखें (Guidelines)
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => setCallbackModal({ isOpen: true, schemeCode: scheme.schemeCode, schemeName: scheme.name })}
+                          className="px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-[#EA3C36] text-xs font-bold border border-red-200 transition-colors cursor-pointer flex items-center gap-1"
+                        >
+                          <Headphones className="w-3.5 h-3.5" />
+                          <span>कॉल-बैक</span>
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
-        {/* QUESTIONNAIRE INTERFACE */}
-        {!isEvaluating && !result && (
-          <section className="bg-white rounded-xl border border-gray-200 shadow-xs p-6 sm:p-8 lg:p-10 space-y-8">
+        {/* 2. GUIDED SCREENER QUESTIONNAIRE INTERFACE */}
+        {finderMode === 'GUIDED_SCREENER' && (
+          <>
+            {/* Evaluating State */}
+            {isEvaluating && (
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center space-y-4 animate-fadeIn">
+                <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mx-auto text-[#EA3C36]">
+                  <span className="material-symbols-outlined text-3xl animate-spin">refresh</span>
+                </div>
+                <h2 className="text-xl font-bold text-[#1A1A1A]">
+                  Evaluating Rules Against Welfare Databases...
+                </h2>
+                <p className="text-xs text-gray-500 max-w-md mx-auto">
+                  Matching your inputs with verified eligibility rules for Sehore, Bhopal, Raisen, and other districts.
+                </p>
+              </div>
+            )}
+
+            {!isEvaluating && !result && (
+              <section className="bg-white rounded-xl border border-gray-200 shadow-xs p-6 sm:p-8 lg:p-10 space-y-8 animate-fadeIn">
             {/* Stepper Header */}
             <div className="space-y-4">
               <div className="flex items-center justify-between flex-wrap gap-2 border-b border-gray-100 pb-4">
@@ -644,24 +1048,24 @@ export const EligibilityPage: React.FC = () => {
         )}
 
         {/* ========================================================= */}
-        {/* MATCHED RESULTS VIEW                                      */}
+        {/* MATCHED RESULTS VIEW (GUIDED SCREENER)                    */}
         {/* ========================================================= */}
         {!isEvaluating && result && (
-          <div className="space-y-10 animate-fadeIn">
+          <div className="space-y-8 animate-fadeIn">
             {/* Top Results Headline Bar */}
-            <section className="bg-white p-6 rounded-xl border border-gray-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <section className="bg-white p-6 rounded-2xl border border-gray-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#EA3C36] animate-pulse"></span>
                   <h2 className="text-2xl font-extrabold text-[#1A1A1A]">
-                    {result.eligibleSchemes.length} Programs Match Your Profile
+                    {result.eligibleSchemes.length} Programs Match Your Profile (संभावित पात्रता)
                   </h2>
-                  <span className="px-2.5 py-0.5 rounded-full bg-red-50 text-[#EA3C36] text-xs font-bold">
-                    95%+ Confidence
+                  <span className="px-2.5 py-0.5 rounded-full bg-red-50 text-[#EA3C36] text-xs font-bold border border-red-200/60">
+                    Rule Engine Verified
                   </span>
                 </div>
                 <p className="text-xs text-gray-600">
-                  Profile: District: {district} • Age: {ageRange} • Status: {maritalStatus} • SHG: {isSHGMember ? 'Yes' : 'No'} • Ration: {hasBPLCard ? 'BPL' : 'General'}
+                  Profile: District: <strong>{district}</strong> • Age: <strong>{ageRange}</strong> • Status: <strong>{maritalStatus}</strong> • SHG: <strong>{isSHGMember ? 'Yes' : 'No'}</strong> • Ration: <strong>{hasBPLCard ? 'BPL / Antyodaya' : 'General'}</strong>
                 </p>
               </div>
 
@@ -685,6 +1089,71 @@ export const EligibilityPage: React.FC = () => {
                 </button>
               </div>
             </section>
+
+            {/* Rules Used & Statutory Disclaimer (NEVER A PROMISE) */}
+            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs space-y-4">
+              {/* Rules Used Breakdown */}
+              <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 space-y-2">
+                <p className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  जांच में प्रयुक्त नियम (Rules Used For Evaluation):
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-xs text-gray-700">
+                  <span className="flex items-center gap-1.5 font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>District Jurisdiction: {district}</span>
+                  </span>
+                  <span className="flex items-center gap-1.5 font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Age Criteria: {ageRange}</span>
+                  </span>
+                  <span className="flex items-center gap-1.5 font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Marital Status: {maritalStatus}</span>
+                  </span>
+                  <span className="flex items-center gap-1.5 font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Income Tier: {hasBPLCard ? 'BPL / Antyodaya' : 'General'}</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Statutory Disclaimer: NEVER A PROMISE */}
+              <div className="p-4 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-900 flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                <div className="space-y-1 text-xs">
+                  <p className="font-bold">
+                    महत्वपूर्ण कानूनी अस्वीकरण (Never a Promise / कोई कानूनी वादा नहीं)
+                  </p>
+                  <p className="leading-relaxed text-amber-800">
+                    यह परिणाम आपके द्वारा प्रदान की गई जानकारी के आधार पर संभावित पात्रता (Possible Matches) प्रदर्शित करता है, यह कोई कानूनी या सरकारी वादा नहीं (Never a Promise) है। वास्तविक वित्तीय अथवा सामाजिक सुरक्षा स्वीकृति संबंधित सरकारी विभाग अथवा ग्राम पंचायत द्वारा मूल दस्तावेजों के भौतिक सत्यापन के उपरांत ही मान्य होगी।
+                  </p>
+                </div>
+              </div>
+
+              {/* Helpline Call-Back Offer */}
+              <div className="p-4 rounded-xl bg-red-50/70 border border-red-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-[#EA3C36] text-white flex items-center justify-center shrink-0">
+                    <Headphones className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-gray-900">
+                      आवेदन करने में सहायता चाहिए? निशुल्क हेल्पलाइन कॉल-बैक प्राप्त करें
+                    </p>
+                    <p className="text-[11px] text-gray-600">
+                      Our trained field facilitators help you compile your file for free.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setCallbackModal({ isOpen: true, schemeName: 'Guided Screener Matched Schemes' })}
+                  className="px-4 py-2 rounded-lg bg-[#EA3C36] hover:bg-[#D32F2F] text-white text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer"
+                >
+                  हेल्पलाइन कॉल-बैक का अनुरोध करें
+                </button>
+              </div>
+            </div>
 
             {/* Matched Schemes Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -855,7 +1324,9 @@ export const EligibilityPage: React.FC = () => {
             </section>
           </div>
         )}
-      </div>
+      </>
+    )}
+  </div>
 
       {/* Callback Modal Component */}
       <CallbackModal

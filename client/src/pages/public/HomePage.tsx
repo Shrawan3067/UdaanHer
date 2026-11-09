@@ -1,866 +1,1024 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
+import { api } from "../../services/api";
+import { Scheme } from "../../types";
+import { CallbackModal } from "../../components/common/CallbackModal";
+import { SchemeCardSkeleton } from "../../components/common/LoadingSkeleton";
 import {
-  ChevronLeft,
-  ChevronRight,
+  Search,
+  Mic,
+  MicOff,
+  RotateCcw,
+  Sparkles,
   Heart,
-  Phone,
   ShieldCheck,
-  CreditCard,
-  Building,
-  Smartphone,
   CheckCircle2,
-  Users,
-  Activity,
-  Ambulance,
+  FileText,
+  Building,
+  Phone,
+  Calendar,
+  ExternalLink,
   ArrowRight,
+  Headphones,
+  AlertCircle,
+  HelpCircle,
+  Filter,
+  Lock,
+  Zap,
 } from "lucide-react";
+
+const MP_DISTRICTS = [
+  "All Districts",
+  "Bhopal",
+  "Sehore",
+  "Raisen",
+  "Rajgarh",
+  "Vidisha",
+  "Hoshangabad",
+  "Harda",
+  "Betul",
+  "Guna",
+];
+
+const NEED_CATEGORIES = [
+  { id: "All", labelEn: "All Needs", labelHi: "सभी आवश्यकताएं", count: 38 },
+  {
+    id: "Pension",
+    labelEn: "Widow & Senior Pension",
+    labelHi: "पेंशन (विधवा / वृद्धा)",
+    count: 11,
+  },
+  {
+    id: "Livelihood",
+    labelEn: "SHG & Micro-Loans",
+    labelHi: "आजीविका एवं ऋण",
+    count: 9,
+  },
+  {
+    id: "Health",
+    labelEn: "Maternity & Nutrition",
+    labelHi: "मातृत्व एवं स्वास्थ्य",
+    count: 7,
+  },
+  {
+    id: "Education",
+    labelEn: "Girls Education",
+    labelHi: "शिक्षा एवं छात्रवृत्ति",
+    count: 6,
+  },
+];
 
 export const HomePage: React.FC = () => {
   const { language } = useLanguage();
 
-  // Hero Slider State
-  const heroSlides = [
-    {
-      titleEn: "You can make a difference",
-      titleHi: "आप एक बड़ा बदलाव ला सकते हैं",
-      descEn:
-        "Your financial gift empowers rural women and community welfare initiatives across Madhya Pradesh and India.",
-      descHi:
-        "आपका आर्थिक सहयोग मध्य प्रदेश और पूरे भारत में जरूरतमंद परिवारों और महिलाओं तक त्वरित मानवीय सहायता पहुंचाता है।",
-      ctaEn: "Donate Now",
-      ctaHi: "अभी दान करें",
-      ctaHref: "/donate",
-      image:
-        "https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=1920&q=80",
-    },
-    {
-      titleEn: "Emergency Relief & 24/7 First Aid",
-      titleHi: "आपातकालीन राहत एवं 24/7 प्राथमिक चिकित्सा",
-      descEn:
-        "Mobilizing 75,000+ grassroots volunteers and ambulance linkages across Indian operational districts.",
-      descHi:
-        "मानवीय आपदाओं व स्वास्थ्य आपात स्थितियों में 75,000+ स्वयंसेवकों व एम्बुलेंस नेटवर्क की त्वरित तैनाती।",
-      ctaEn: "Explore Programs",
-      ctaHi: "कार्यक्रम देखें",
-      ctaHref: "/schemes",
-      image:
-        "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=1920&q=80",
-    },
-    {
-      titleEn: "Rural Women Self-Help Enterprises",
-      titleHi: "ग्रामीण महिला स्व-सहायता उद्यम व आजीविका",
-      descEn:
-        "Unlocking catalytic seed funding, digital literacy, and zero-fee welfare entitlement access for 500+ SHGs.",
-      descHi:
-        "500 से अधिक स्व-सहायता समूहों के लिए बीज पूंजी, डिजिटल साक्षरता और सरकारी कल्याण योजनाओं की सीधी पहुंच।",
-      ctaEn: "Find My Scheme",
-      ctaHi: "पात्रता खोजें",
-      ctaHref: "/eligibility",
-      image:
-        "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=1920&q=80",
-    },
-  ];
+  // Filter States
+  const [selectedNeed, setSelectedNeed] = useState<string>("All");
+  const [selectedDistrict, setSelectedDistrict] =
+    useState<string>("All Districts");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const [currentSlide, setCurrentSlide] = useState(0);
+  // Data States
+  const [schemes, setSchemes] = useState<Scheme[]>([]);
+  const [totalSchemesCount, setTotalSchemesCount] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 6500);
-    return () => clearInterval(timer);
-  }, [heroSlides.length]);
+  // AI Question Search State
+  const [isAskingAi, setIsAskingAi] = useState<boolean>(false);
+  const [aiAnswerData, setAiAnswerData] = useState<{
+    query: string;
+    rulesUsed: string[];
+    disclaimer: string;
+    helplineOffer: string;
+  } | null>(null);
 
-  const prevHeroSlide = () => {
-    setCurrentSlide(
-      (prev) => (prev - 1 + heroSlides.length) % heroSlides.length,
-    );
-  };
+  // Voice Speech Recognition State
+  const [isListening, setIsListening] = useState<boolean>(false);
+  const [speechError, setSpeechError] = useState<string | null>(null);
+  const recognitionRef = useRef<any>(null);
 
-  const nextHeroSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-  };
+  // Callback Modal State
+  const [callbackModal, setCallbackModal] = useState<{
+    isOpen: boolean;
+    schemeCode?: string;
+    schemeName?: string;
+  }>({ isOpen: false });
 
-  // Donation Widget state matching Page 2 of PDF
-  const [selectedAmount, setSelectedAmount] = useState<number>(1000);
-  const [customAmount, setCustomAmount] = useState<string>("");
-  const [selectedCampaign, setSelectedCampaign] =
-    useState<string>("General Donation");
-  const [selectedPaymentType, setSelectedPaymentType] =
-    useState<string>("UPI / QR");
+  // 3-Step Donation State
+  const [donationFrequency, setDonationFrequency] = useState<
+    "ONE_TIME" | "MONTHLY"
+  >("ONE_TIME");
+  const [donationAmount, setDonationAmount] = useState<number>(1000);
+  const [customDonation, setCustomDonation] = useState<string>("");
 
-  // Tab state for "How you can help today"
-  const [activeTab, setActiveTab] = useState<
-    "individual" | "planned" | "corporate"
-  >("individual");
-
-  const quickAmounts = [100, 500, 1000, 5000];
-
-  const handleAmountClick = (amt: number) => {
-    setSelectedAmount(amt);
-    setCustomAmount("");
-  };
-
-  const handleCustomChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value.replace(/\D/g, "");
-    setCustomAmount(val);
-    if (val) {
-      setSelectedAmount(parseInt(val, 10));
+  // Load Schemes based on Need & District
+  const loadSchemes = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await api.getSchemes({
+        need: selectedNeed !== "All" ? selectedNeed : undefined,
+        district:
+          selectedDistrict !== "All Districts" ? selectedDistrict : undefined,
+        search: searchQuery.trim() || undefined,
+        limit: 6,
+      });
+      setSchemes(res.schemes);
+      if (
+        selectedNeed === "All" &&
+        selectedDistrict === "All Districts" &&
+        !searchQuery.trim() &&
+        res?.pagination?.total !== undefined
+      ) {
+        setTotalSchemesCount(res.pagination.total);
+      }
+    } catch (err: any) {
+      console.error("Failed to load schemes:", err);
+      setError("योजनाओं की सूची लोड नहीं हो सकी। कृपया पुनः प्रयास करें।");
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  // Fetch initial total published schemes count
+  useEffect(() => {
+    api
+      .getSchemes({ limit: 1 })
+      .then((res) => {
+        if (res?.pagination?.total !== undefined) {
+          setTotalSchemesCount(res.pagination.total);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    loadSchemes();
+  }, [selectedNeed, selectedDistrict]);
+
+  // Handle Natural Language / Spoken Question
+  const handleAskQuestion = async (textToSearch?: string) => {
+    const q = (textToSearch || searchQuery).trim();
+    if (!q || q.length < 2) return;
+
+    setIsAskingAi(true);
+    setError(null);
+    try {
+      const res = await api.askSchemeQuestion({
+        question: q,
+        district:
+          selectedDistrict !== "All Districts" ? selectedDistrict : undefined,
+      });
+
+      setSchemes(res.matches || []);
+      setAiAnswerData({
+        query: res.query,
+        rulesUsed: res.rulesUsed,
+        disclaimer: res.disclaimer,
+        helplineOffer: res.helplineOffer,
+      });
+    } catch (err: any) {
+      console.error("AI question error:", err);
+      loadSchemes();
+    } finally {
+      setIsAskingAi(false);
+    }
+  };
+
+  // Web Speech API Voice Toggle
+  const toggleListening = () => {
+    setSpeechError(null);
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setSpeechError(
+        language === "HI"
+          ? "आपके ब्राउज़र में बोलकर खोजने की सुविधा उपलब्ध नहीं है। कृपया टाइप करें।"
+          : "Voice speech recognition is not supported in this browser. Please type your query.",
+      );
+      return;
+    }
+
+    if (isListening) {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "hi-IN";
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setSearchQuery(transcript);
+        setIsListening(false);
+        handleAskQuestion(transcript);
+      };
+
+      recognition.onerror = (event: any) => {
+        console.warn("Speech recognition error:", event.error);
+        setIsListening(false);
+        if (event.error === "not-allowed") {
+          setSpeechError("कृपया माइक्रोफ़ोन की अनुमति प्रदान करें।");
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (err) {
+      console.error("Speech initialization error:", err);
+      setIsListening(false);
+    }
+  };
+
+  const handleResetFilters = () => {
+    setSelectedNeed("All");
+    setSelectedDistrict("All Districts");
+    setSearchQuery("");
+    setAiAnswerData(null);
+    setSpeechError(null);
+  };
+
+  const hasActiveFilters =
+    searchQuery.trim() !== "" ||
+    selectedNeed !== "All" ||
+    selectedDistrict !== "All Districts" ||
+    aiAnswerData !== null;
+
   return (
-    <div className="flex flex-col w-full bg-white text-[#1A1A1A]">
-      {/* ========================================================= */}
-      {/* SECTION 1: HERO SLIDER (PAGE 1 OF PDF)                   */}
-      {/* ========================================================= */}
-      <section className="relative w-full h-[520px] lg:h-[620px] overflow-hidden bg-gray-900 group font-poppins">
-        {/* Background Image with Dark Contrast Overlay */}
-        <img
-          key={heroSlides[currentSlide].image}
-          src={heroSlides[currentSlide].image}
-          alt={heroSlides[currentSlide].titleEn}
-          className="absolute inset-0 w-full h-full object-cover object-center opacity-70 transition-opacity duration-700 animate-fadeIn"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/30" />
+    <div className="w-full bg-[#FAF9F5] text-[#1A1A1A] font-poppins min-h-screen">
+      {/* ===================================================================== */}
+      {/* 1. HERO LEAD SECTION (Matching Schemes Directory Top Header)          */}
+      {/* ===================================================================== */}
+      <section className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-4">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div className="space-y-2 max-w-3xl">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs uppercase tracking-wider text-[#EA3C36] font-bold">
+                  {language === "HI"
+                    ? "उड़ानहर: महिला कल्याण एवं सामाजिक सुरक्षा"
+                    : "UDAANHER: WOMEN'S WELFARE DIRECTORY"}
+                </span>
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#00A3C4] bg-cyan-50 px-2.5 py-0.5 rounded-full">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#00A3C4]" />
+                  <span>
+                    {language === "HI"
+                      ? "मध्य प्रदेश शासन से सत्यापित"
+                      : "MP State Verified"}
+                  </span>
+                </span>
+              </div>
 
-        {/* Hero Content */}
-        <div className="relative z-10 max-w-7xl mx-auto h-full px-6 lg:px-12 flex flex-col justify-center font-poppins">
-          <div
-            className="max-w-2xl space-y-5 animate-fadeIn font-poppins"
-            key={currentSlide}
-          >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-600/80 backdrop-blur-xs text-white text-xs uppercase font-extrabold tracking-wider font-poppins">
-              <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-              <span>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1A1A1A] tracking-tight leading-tight">
+                {language === "HI" ? (
+                  <>
+                    <span className="text-[#000000]">
+                      महिलाओं को उड़ने के पंख
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-[#000000] font-bold">
+                      Giving Women Wings to Fly
+                    </span>
+                  </>
+                )}
+              </h1>
+
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed max-w-2xl">
                 {language === "HI"
-                  ? "मानवीय सहायता मिशन"
-                  : "Humanitarian Welfare Mission"}
-              </span>
+                  ? "मध्य प्रदेश के 9 जिलों (भोपाल, सीहोर, रायसेन, राजगढ़, विदिशा, होशंगाबाद, हरदा, बैतूल, गुना) की महिलाओं के लिए सरकारी योजनाओं, विधवा पेंशन, मातृत्व लाभ एवं स्व-सहायता ऋण सहायता का सीधा मंच।"
+                  : "Discover, filter, and access government welfare entitlements, widow pensions, maternal benefits, and SHG micro-loans across 9 operational districts of Madhya Pradesh."}
+              </p>
             </div>
 
-            <h1 className="font-poppins text-3xl sm:text-5xl lg:text-6xl text-white font-extrabold tracking-tight leading-tight">
-              {language === "HI"
-                ? heroSlides[currentSlide].titleHi
-                : heroSlides[currentSlide].titleEn}
-            </h1>
-
-            <p className="font-poppins text-gray-200 text-base sm:text-lg lg:text-xl font-normal leading-relaxed">
-              {language === "HI"
-                ? heroSlides[currentSlide].descHi
-                : heroSlides[currentSlide].descEn}
-            </p>
-
-            <div className="pt-2 flex flex-wrap items-center gap-4 font-poppins">
+            {/* Quick Actions Tray */}
+            <div className="flex flex-wrap items-center gap-3 shrink-0">
               <Link
-                to={heroSlides[currentSlide].ctaHref}
-                className="font-poppins inline-flex items-center justify-center bg-[#EA3C36] hover:bg-[#D32F2F] text-white font-bold text-base px-8 py-3.5 rounded-lg shadow-lg hover-lift transition-all cursor-pointer"
+                to="/eligibility"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#EA3C36] hover:bg-[#D32F2F] text-white text-xs font-bold rounded-lg shadow-xs hover-lift transition-all cursor-pointer"
               >
-                {language === "HI"
-                  ? heroSlides[currentSlide].ctaHi
-                  : heroSlides[currentSlide].ctaEn}
+                <Zap className="w-4 h-4" />
+                <span>
+                  {language === "HI"
+                    ? "२ मिनट में पात्रता जांचें"
+                    : "2-Min Screener"}
+                </span>
               </Link>
-              <Link
-                to="/schemes"
-                className="font-poppins inline-flex items-center justify-center bg-white/20 hover:bg-white/30 text-white font-bold text-base px-6 py-3.5 rounded-lg backdrop-blur-xs transition-all border border-white/30 hover:border-white/50"
+              <a
+                href="#donate-section"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold rounded-lg border border-gray-200 transition-all cursor-pointer"
               >
-                {language === "HI" ? "सभी सेवाएं देखें" : "All Services"}
-              </Link>
+                <Heart className="w-3.5 h-3.5 text-[#EA3C36] fill-[#EA3C36]" />
+                <span>
+                  {language === "HI" ? "दान करें (80G छूट)" : "Donate (80G)"}
+                </span>
+              </a>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Slider Navigation Chevrons */}
-        <button
-          type="button"
-          onClick={prevHeroSlide}
-          aria-label="Previous slide"
-          className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/30 hover:bg-[#EA3C36] text-white flex items-center justify-center transition-all backdrop-blur-sm cursor-pointer z-20 shadow-md border border-white/20"
-        >
-          <ChevronLeft className="w-6 h-6" />
-        </button>
-        <button
-          type="button"
-          onClick={nextHeroSlide}
-          aria-label="Next slide"
-          className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/30 hover:bg-[#EA3C36] text-white flex items-center justify-center transition-all backdrop-blur-sm cursor-pointer z-20 shadow-md border border-white/20"
-        >
-          <ChevronRight className="w-6 h-6" />
-        </button>
-
-        {/* Slide Indicator Dots */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
-          {heroSlides.map((_, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => setCurrentSlide(idx)}
-              className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
-                currentSlide === idx
-                  ? "w-8 bg-[#EA3C36]"
-                  : "w-2.5 bg-white/50 hover:bg-white/80"
-              }`}
-              aria-label={`Go to slide ${idx + 1}`}
+      {/* ===================================================================== */}
+      {/* 2. SCHEMES DISCOVERY & SEARCH SECTION (Direct Schemes Page Palette)   */}
+      {/* ===================================================================== */}
+      <section
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8"
+        id="schemes-section"
+      >
+        {/* Search Bar & Category Filter Strip */}
+        <div className="bg-white p-5 sm:p-7 rounded-xl shadow-xs border border-gray-200 space-y-5">
+          {/* Natural Language & Voice Search Bar */}
+          <div className="relative w-full">
+            <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleAskQuestion()}
+              placeholder={
+                language === "HI"
+                  ? "बोलकर या लिखकर सवाल पूछें (उदा. 'सीहोर में विधवा पेंशन' या 'स्वयं सहायता समूह लोन')..."
+                  : "Search or speak in Hindi/English (e.g. 'widow pension in Sehore', 'SHG loan support')..."
+              }
+              className="w-full pl-12 pr-32 sm:pr-40 py-3 bg-gray-50 rounded-lg text-sm text-[#1A1A1A] placeholder:text-gray-400 border border-gray-200 focus:bg-white focus:border-[#EA3C36] focus:outline-hidden transition-all shadow-xs"
             />
-          ))}
-        </div>
-      </section>
 
-      {/* ========================================================= */}
-      {/* SECTION 2: PROGRAMS & SERVICES (PAGE 1 OF PDF)           */}
-      {/* ========================================================= */}
-      <section className="w-full py-16 lg:py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          {/* Eyebrow & Title */}
-          <div className="text-center space-y-2 mb-12">
-            <span className="text-xs uppercase tracking-widest text-[#EA3C36] font-bold">
-              {language === "HI"
-                ? "हम किस क्षेत्र में सक्रिय हैं"
-                : "WHAT ARE WE ACTIVE ON"}
-            </span>
-            <div className="flex items-center justify-center gap-4">
-              <h2 className="text-3xl lg:text-4xl font-extrabold text-[#1A1A1A] tracking-tight">
-                {language === "HI"
-                  ? "कार्यक्रम एवं सेवाएं"
-                  : "Programs & Services"}
-              </h2>
-            </div>
-            {/* Slider arrows */}
-            <div className="flex justify-end gap-2 pt-2">
+            {/* Clear Button */}
+            {searchQuery && (
               <button
                 type="button"
-                className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:text-[#EA3C36] hover:border-[#EA3C36] transition-colors"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-24 sm:right-28 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 cursor-pointer"
+                aria-label="Clear search"
               >
-                <ChevronLeft className="w-4 h-4" />
+                ✕
               </button>
-              <button
-                type="button"
-                className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:text-[#EA3C36] hover:border-[#EA3C36] transition-colors"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
+            )}
 
-          {/* 3 Services Cards from PDF */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Card 1: First Aid Training (Cyan/Teal circular badge) */}
-            <div className="bg-white rounded-xl border border-gray-200 p-8 shadow-xs hover-lift transition-all flex flex-col justify-between">
-              <div>
-                <div className="w-14 h-14 rounded-full bg-[#00A3C4] flex items-center justify-center text-white mb-6 shadow-xs">
-                  <Activity className="w-7 h-7" />
-                </div>
-                <h3 className="text-xl font-bold text-[#1A1A1A] mb-3">
-                  First Aid Training
-                </h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  Your donation will enable us to train people on first aid in
-                  rural and urban setting, equipping them to take timely
-                  responses and adequate measures to safely carry out first aid
-                  response.
-                </p>
-              </div>
-              <div className="pt-6 mt-6 border-t border-gray-100">
-                <Link
-                  to="/schemes"
-                  className="text-xs font-bold text-[#00A3C4] hover:underline flex items-center gap-1"
-                >
-                  <span>Learn more</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Card 2: Junior and Youth Engagement (Deep Blue circular badge) */}
-            <div className="bg-white rounded-xl border border-gray-200 p-8 shadow-xs hover-lift transition-all flex flex-col justify-between">
-              <div>
-                <div className="w-14 h-14 rounded-full bg-[#1E3A8A] flex items-center justify-center text-white mb-6 shadow-xs">
-                  <Users className="w-7 h-7" />
-                </div>
-                <h3 className="text-xl font-bold text-[#1A1A1A] mb-3">
-                  Junior and Youth Engagement
-                </h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  Grassroots women volunteers and youth animators are the
-                  backbone of UdaanHer: Giving women wings to fly. They work directly in villages and Gram
-                  Panchayats across India, ensuring no eligible woman is left
-                  behind without entitlements.
-                </p>
-              </div>
-              <div className="pt-6 mt-6 border-t border-gray-100">
-                <Link
-                  to="/schemes"
-                  className="text-xs font-bold text-[#1E3A8A] hover:underline flex items-center gap-1"
-                >
-                  <span>Learn more</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Card 3: Emergency Response (Red circular badge) */}
-            <div className="bg-white rounded-xl border border-gray-200 p-8 shadow-xs hover-lift transition-all flex flex-col justify-between">
-              <div>
-                <div className="w-14 h-14 rounded-full bg-[#EA3C36] flex items-center justify-center text-white mb-6 shadow-xs">
-                  <Ambulance className="w-7 h-7" />
-                </div>
-                <h3 className="text-xl font-bold text-[#1A1A1A] mb-3">
-                  Emergency Response &amp; Healthcare
-                </h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  Safe transfer to medical facilities and emergency maternal
-                  care are vital for saving lives. UdaanHer coordinates with
-                  108/102 emergency ambulance networks and district hospitals
-                  across operational Indian districts.
-                </p>
-              </div>
-              <div className="pt-6 mt-6 border-t border-gray-100">
-                <Link
-                  to="/schemes"
-                  className="text-xs font-bold text-[#EA3C36] hover:underline flex items-center gap-1"
-                >
-                  <span>Learn more</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Centered "See More" Button */}
-          <div className="text-center mt-12">
-            <Link
-              to="/schemes"
-              className="inline-flex items-center justify-center bg-[#EA3C36] hover:bg-[#D32F2F] text-white font-bold text-sm px-8 py-2.5 rounded-lg shadow-sm hover-lift transition-all"
+            {/* Voice Microphone Button */}
+            <button
+              type="button"
+              onClick={toggleListening}
+              title="बोलकर सवाल पूछें (Hindi Voice Search)"
+              className={`absolute right-12 sm:right-14 top-1/2 -translate-y-1/2 p-1.5 rounded-md transition-all cursor-pointer flex items-center gap-1 ${
+                isListening
+                  ? "bg-[#EA3C36] text-white animate-pulse"
+                  : "bg-red-50 hover:bg-red-100 text-[#EA3C36]"
+              }`}
             >
-              See More
-            </Link>
+              {isListening ? (
+                <MicOff className="w-4 h-4" />
+              ) : (
+                <Mic className="w-4 h-4" />
+              )}
+            </button>
+
+            {/* Submit Button */}
+            <button
+              type="button"
+              onClick={() => handleAskQuestion()}
+              disabled={isAskingAi}
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-3.5 sm:px-4 py-1.5 bg-[#EA3C36] hover:bg-[#D32F2F] text-white text-xs font-bold rounded-md shadow-xs transition-colors cursor-pointer"
+            >
+              {isAskingAi ? "..." : language === "HI" ? "खोजें" : "Search"}
+            </button>
+          </div>
+
+          {/* Speech error notice if microphone blocked */}
+          {speechError && (
+            <p className="text-xs text-[#EA3C36] font-semibold">
+              {speechError}
+            </p>
+          )}
+
+          {/* Category Pills (Exact SchemesPage Styling) */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            {NEED_CATEGORIES.map((cat) => {
+              const isSelected = selectedNeed === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedNeed(cat.id);
+                    setAiAnswerData(null);
+                  }}
+                  className={`px-3.5 sm:px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${
+                    isSelected
+                      ? "bg-[#EA3C36] text-white shadow-xs"
+                      : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                  }`}
+                >
+                  <span>{language === "HI" ? cat.labelHi : cat.labelEn}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                      isSelected
+                        ? "bg-white/20 text-white"
+                        : "bg-gray-200/80 text-gray-600"
+                    }`}
+                  >
+                    {cat.id === "All" && totalSchemesCount !== null
+                      ? totalSchemesCount
+                      : cat.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Secondary District Filter Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-gray-100">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-xs text-gray-500 font-semibold flex items-center gap-1">
+                <Filter className="w-3.5 h-3.5 text-gray-400" />
+                <span>
+                  {language === "HI" ? "जिला फ़िल्टर:" : "District Filter:"}
+                </span>
+              </span>
+              <select
+                value={selectedDistrict}
+                onChange={(e) => {
+                  setSelectedDistrict(e.target.value);
+                  setAiAnswerData(null);
+                }}
+                className="px-3.5 py-1.5 bg-gray-50 text-[#1A1A1A] rounded-lg text-xs font-semibold border border-gray-200 focus:border-[#EA3C36] focus:outline-hidden cursor-pointer"
+              >
+                <option value="All Districts">
+                  {language === "HI"
+                    ? "सभी 9 जिले (मध्य प्रदेश)"
+                    : "All 9 MP Districts"}
+                </option>
+                {MP_DISTRICTS.slice(1).map((d) => (
+                  <option key={d} value={d}>
+                    {d} {language === "HI" ? "जिला" : "District"}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="text-[#EA3C36] hover:underline cursor-pointer text-xs font-bold flex items-center gap-1"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>
+                  {language === "HI" ? "फ़िल्टर रीसेट करें" : "Reset Filters"}
+                </span>
+              </button>
+            )}
           </div>
         </div>
-      </section>
 
-      {/* ========================================================= */}
-      {/* SECTION 3: WE ARE ALWAYS WHERE OTHER NEED HELP (PAGE 1-2) */}
-      {/* ========================================================= */}
-      <section className="w-full bg-[#EA3C36] text-white relative overflow-hidden">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 items-stretch">
-          {/* Left Red Content (7 cols) */}
-          <div className="lg:col-span-7 p-8 sm:p-12 lg:p-16 flex flex-col justify-center space-y-6">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
-              We are Always Where Other Need Help
-            </h2>
-            <p className="text-white/90 text-sm sm:text-base leading-relaxed max-w-xl">
-              The mission of UdaanHer is to give women wings to fly: empower Indian women, relieve human
-              suffering, and foster grassroots autonomy through women Self-Help
-              Groups (SHGs), direct government welfare scheme navigation, and
-              verified community support across India.
+        {/* AI Rule Evaluation Result Banner */}
+        {aiAnswerData && (
+          <div className="bg-red-50 border-l-4 border-[#EA3C36] p-5 rounded-xl space-y-3 animate-fadeIn text-[#1A1A1A]">
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-[#EA3C36]" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#EA3C36]">
+                    {language === "HI"
+                      ? "पात्रता नियम विश्लेषण"
+                      : "Eligibility Rule Evaluation"}
+                  </span>
+                </div>
+                <p className="text-sm font-bold text-[#1A1A1A]">
+                  "{aiAnswerData.query}"
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAiAnswerData(null)}
+                className="text-xs font-bold text-[#EA3C36] hover:underline cursor-pointer"
+              >
+                ✕ बंद करें
+              </button>
+            </div>
+
+            <div className="space-y-1 text-xs text-gray-800">
+              <span className="font-bold">पहचाने गए नियम एवं शर्तें:</span>
+              <ul className="list-disc list-inside space-y-0.5 text-gray-700">
+                {aiAnswerData.rulesUsed.map((rule, idx) => (
+                  <li key={idx}>{rule}</li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Statutory Disclaimer: NEVER A PROMISE */}
+            <div className="p-3 bg-amber-50 rounded-lg border border-amber-200/80 text-amber-900 space-y-1">
+              <span className="text-xs font-bold flex items-center gap-1.5 text-amber-900">
+                <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                महत्वपूर्ण कानूनी अस्वीकरण (Never a Promise / कोई कानूनी वादा नहीं)
+              </span>
+              <p className="text-[11px] text-amber-800 leading-relaxed">
+                {aiAnswerData.disclaimer}
+              </p>
+            </div>
+
+            <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-red-100">
+              <span className="text-xs font-semibold text-gray-800">
+                {aiAnswerData.helplineOffer}
+              </span>
+              <button
+                type="button"
+                onClick={() =>
+                  setCallbackModal({
+                    isOpen: true,
+                    schemeCode: "AI-SEARCH",
+                    schemeName: `सवाल: ${aiAnswerData.query}`,
+                  })
+                }
+                className="px-3.5 py-1.5 bg-[#EA3C36] hover:bg-[#D32F2F] text-white text-xs font-bold rounded-lg cursor-pointer"
+              >
+                📞 कॉल-बैक अनुरोध करें
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Screener Banner Matching SchemesPage Exactly */}
+        <div className="w-full bg-[#EA3C36] p-6 sm:p-8 rounded-xl text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-md relative overflow-hidden">
+          <div className="space-y-1.5 z-10 max-w-2xl">
+            <div className="inline-flex items-center gap-2 text-xs uppercase tracking-wider font-extrabold text-white/90">
+              <Zap className="w-4 h-4 text-white" />
+              {language === "HI"
+                ? "२ मिनट का सरल पात्रता जांचकर्ता"
+                : "2-Minute Eligibility Screener"}
+            </div>
+            <h3 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white">
+              {language === "HI"
+                ? "क्या आप निश्चित नहीं हैं कि आप किस योजना के पात्र हैं?"
+                : "Not sure which programs match your criteria?"}
+            </h3>
+            <p className="text-xs sm:text-sm text-white/90 leading-relaxed">
+              {language === "HI"
+                ? "सरल ६ सवालों के जवाब दें और अपनी पात्रता अनुसार सरकारी योजनाएं खोजें। पूर्णतः निःशुल्क एवं गोपनीय।"
+                : "Answer 6 simple anonymous questions regarding your household to immediately unlock tailored welfare benefits and documentation checklists."}
             </p>
           </div>
 
-          {/* Right White Overlapping Card with Counters (5 cols) */}
-          <div className="lg:col-span-5 bg-white text-[#1A1A1A] p-8 sm:p-12 flex flex-col justify-center relative border-r-8 border-[#EA3C36] shadow-xl">
-            {/* Subtle decorative dot pattern */}
-            <div className="absolute top-4 right-4 grid grid-cols-6 gap-1 opacity-20 pointer-events-none">
-              {[...Array(24)].map((_, i) => (
-                <div key={i} className="w-1.5 h-1.5 rounded-full bg-gray-500" />
+          <Link
+            to="/eligibility"
+            className="z-10 inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white text-[#EA3C36] text-xs font-bold hover:bg-gray-50 shrink-0 shadow-md transition-all cursor-pointer active:scale-98"
+          >
+            <span>
+              {language === "HI" ? "पात्रता जांच शुरू करें" : "Start Screener"}
+            </span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {/* Schemes Grid Section */}
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-bold text-gray-700">
+              {language === "HI"
+                ? `प्रदर्शित: ${schemes.length} योजनाएं`
+                : `Showing ${schemes.length} Programs`}
+            </span>
+            {selectedDistrict !== "All Districts" && (
+              <span className="text-xs text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">
+                {selectedDistrict} Region
+              </span>
+            )}
+          </div>
+
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <SchemeCardSkeleton key={i} />
               ))}
             </div>
-
-            <div className="space-y-6">
-              {/* Stat 1 */}
-              <div>
-                <p className="text-3xl sm:text-4xl font-extrabold text-[#1A1A1A]">
-                  1,105,528<span className="text-[#EA3C36]">+</span>
-                </p>
-                <p className="text-xs sm:text-sm text-gray-600 font-medium mt-1">
-                  Women &amp; rural families assisted across Indian districts
-                </p>
-              </div>
-
-              {/* Stat 2 */}
-              <div className="pt-4 border-t border-gray-100">
-                <p className="text-3xl sm:text-4xl font-extrabold text-[#1A1A1A]">
-                  75,000<span className="text-[#EA3C36]">+</span>
-                </p>
-                <p className="text-xs sm:text-sm text-gray-600 font-medium mt-1">
-                  Grassroots SHG volunteers ready to take action
-                </p>
-              </div>
-
-              {/* Stat 3 */}
-              <div className="pt-4 border-t border-gray-100">
-                <p className="text-3xl sm:text-4xl font-extrabold text-[#1A1A1A]">
-                  500<span className="text-[#EA3C36]">+</span>
-                </p>
-                <p className="text-xs sm:text-sm text-gray-600 font-medium mt-1">
-                  Women-led Self-Help Groups equipped with micro-capital
-                </p>
-              </div>
-
-              {/* Stat 4 */}
-              <div className="pt-4 border-t border-gray-100">
-                <p className="text-3xl sm:text-4xl font-extrabold text-[#1A1A1A]">
-                  18,500<span className="text-[#EA3C36]">+</span>
-                </p>
-                <p className="text-xs sm:text-sm text-gray-600 font-medium mt-1">
-                  Mothers supported with nutritional baskets &amp; DBT benefits
-                </p>
-              </div>
+          ) : error ? (
+            <div className="bg-red-50 border border-red-200 text-red-700 p-6 rounded-xl text-center space-y-2">
+              <AlertCircle className="w-6 h-6 mx-auto text-[#EA3C36]" />
+              <p className="text-sm font-bold">{error}</p>
+              <button
+                type="button"
+                onClick={loadSchemes}
+                className="px-4 py-2 bg-[#EA3C36] text-white text-xs font-bold rounded-lg"
+              >
+                पुनः लोड करें
+              </button>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ========================================================= */}
-      {/* SECTION 4: WHERE YOUR MONEY GOES (PAGE 2 OF PDF)          */}
-      {/* ========================================================= */}
-      <section className="w-full py-16 bg-white text-center">
-        <div className="max-w-4xl mx-auto px-6 space-y-4">
-          <span className="text-xs uppercase tracking-wider text-[#EA3C36] font-bold">
-            How your help matters
-          </span>
-          <h2 className="text-3xl lg:text-4xl font-extrabold text-[#1A1A1A]">
-            Where Your Money Goes
-          </h2>
-
-          {/* Cute Donation Jar Graphic */}
-          <div className="flex justify-center py-4">
-            <div className="relative w-20 h-24 bg-red-50 border-2 border-[#EA3C36] rounded-b-2xl rounded-t-lg flex flex-col items-center justify-center shadow-xs">
-              <div className="w-12 h-2 bg-[#EA3C36] rounded-t-sm -mt-1 mb-2" />
-              <Heart className="w-6 h-6 text-[#EA3C36] fill-[#EA3C36] animate-pulse" />
-              <span className="text-[10px] font-bold text-[#EA3C36] mt-1">
-                92%
-              </span>
-            </div>
-          </div>
-
-          <p className="text-base sm:text-lg text-gray-700 font-semibold max-w-xl mx-auto leading-relaxed">
-            <span className="text-[#EA3C36] font-bold">
-              92% of the donation
-            </span>{" "}
-            will go to core services, program and rest 8% will go the operation,
-            management, logistics.
-          </p>
-        </div>
-      </section>
-
-      {/* ========================================================= */}
-      {/* SECTION 5: YOUR GIFT COULD CHANGE SOMEONE'S LIFE & DONATION WIDGET */}
-      {/* (PAGE 2 OF PDF)                                           */}
-      {/* ========================================================= */}
-      <section className="w-full py-16 bg-gray-900 relative overflow-hidden">
-        {/* Background Dark Overlay */}
-        <img
-          src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1920&q=80"
-          alt="Children receiving support"
-          className="absolute inset-0 w-full h-full object-cover opacity-20"
-        />
-        <div className="absolute inset-0 bg-black/75" />
-
-        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            {/* Left Column: Your Gift Could Change Someone's Life */}
-            <div className="lg:col-span-6 space-y-6 text-white">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl text-white font-bold tracking-tight leading-tight">
-                Your Gift Could Change Someone's Life
-              </h2>
-              <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-                The mission of UdaanHer is to give women wings to fly: empower women, relieve distress,
-                and provide 100% transparent Section 80G tax-exempt support for
-                vulnerable rural families across India.
+          ) : schemes.length === 0 ? (
+            <div className="bg-white rounded-xl p-12 text-center space-y-3 border border-gray-200">
+              <HelpCircle className="w-8 h-8 text-gray-400 mx-auto" />
+              <h3 className="text-base text-[#1A1A1A] font-bold">
+                {language === "HI"
+                  ? "कोई योजना नहीं मिली"
+                  : "No programs match your search or filter"}
+              </h3>
+              <p className="text-xs text-gray-500">
+                {language === "HI"
+                  ? "कृपया अन्य कीवर्ड खोजें अथवा फ़िल्टर रीसेट करें।"
+                  : "Try searching with other terms or clearing the active filters."}
               </p>
-
-              {/* Ways to Help Divider & Methods */}
-              <div className="pt-4 border-t border-white/20 space-y-4">
-                <span className="text-xs uppercase tracking-widest text-[#EA3C36] font-bold">
-                  WAYS TO HELP
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-[#EA3C36] text-white text-xs font-bold hover:bg-[#D32F2F] transition-colors cursor-pointer"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>
+                  {language === "HI"
+                    ? "सभी योजनाएं देखें"
+                    : "Reset All Filters"}
                 </span>
-
-                <div className="space-y-4 text-sm text-gray-200">
-                  {/* Method 1 */}
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded bg-white/10 flex items-center justify-center text-white shrink-0">
-                      <CreditCard className="w-4 h-4 text-[#EA3C36]" />
-                    </div>
-                    <span>
-                      Instant UPI / QR Code transfers (GPay, PhonePe, Paytm)
-                    </span>
-                  </div>
-
-                  {/* Method 2 */}
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded bg-white/10 flex items-center justify-center text-white shrink-0">
-                      <Building className="w-4 h-4 text-[#EA3C36]" />
-                    </div>
-                    <span>Direct Bank to Bank NEFT / RTGS Transfer</span>
-                  </div>
-
-                  {/* Method 3 */}
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded bg-white/10 flex items-center justify-center text-white shrink-0">
-                      <Smartphone className="w-4 h-4 text-[#EA3C36]" />
-                    </div>
-                    <span>
-                      Domestic Debit / Credit Card with Instant 80G Receipt
-                    </span>
-                  </div>
-                </div>
-              </div>
+              </button>
             </div>
-
-            {/* Right Column: Donation Card from PDF */}
-            <div className="lg:col-span-6">
-              <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-2xl text-[#1A1A1A] space-y-5">
-                <h3 className="text-xl font-bold text-[#1A1A1A]">
-                  Donation Amount
-                </h3>
-
-                {/* Currency & Tax Status */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-600">
-                    Currency &amp; Tax Status
-                  </label>
-                  <div className="flex items-center justify-between p-2.5 rounded-lg border border-[#EA3C36] bg-red-50/60 text-xs">
-                    <span className="font-bold text-[#EA3C36] flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-[#EA3C36]" />₹
-                      Indian Rupee (INR)
-                    </span>
-                    <span className="font-semibold text-gray-600 text-[11px]">
-                      Section 80G Tax-Exempt
-                    </span>
-                  </div>
-                </div>
-
-                {/* Select Campaign */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-600">
-                    Select Campaign
-                  </label>
-                  <select
-                    value={selectedCampaign}
-                    onChange={(e) => setSelectedCampaign(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm focus:border-[#EA3C36] focus:outline-hidden"
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {schemes.map((scheme) => {
+                const docCount = Array.isArray(scheme.requiredDocuments)
+                  ? scheme.requiredDocuments.length
+                  : 3;
+                return (
+                  <article
+                    key={scheme.id}
+                    className="bg-white rounded-xl p-6 shadow-xs flex flex-col justify-between hover-lift border border-gray-200 transition-all duration-200 group"
                   >
-                    <option value="General Donation">General Donation</option>
-                    <option value="Disaster Relief Fund">
-                      Disaster Relief Fund
-                    </option>
-                    <option value="First Aid & Health Kiosks">
-                      First Aid & Health Kiosks
-                    </option>
-                    <option value="Women & Youth Livelihood">
-                      Women & Youth Livelihood
-                    </option>
-                  </select>
-                </div>
+                    <div className="space-y-4">
+                      {/* Code Badge & Verified Tag */}
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <span className="px-2.5 py-0.5 rounded-full bg-red-50 text-[#EA3C36] text-xs font-bold border border-red-100">
+                          {scheme.schemeCode}
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#00A3C4] bg-cyan-50 px-2 py-0.5 rounded-full">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>Verified Aid</span>
+                        </span>
+                      </div>
 
-                {/* Select or enter an amount */}
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold text-gray-600">
-                    Select or enter an amount
-                  </label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {quickAmounts.map((amt) => {
-                      const isSelected =
-                        selectedAmount === amt && !customAmount;
-                      return (
-                        <button
-                          key={amt}
-                          type="button"
-                          onClick={() => handleAmountClick(amt)}
-                          className={`py-2 rounded-lg text-xs sm:text-sm font-bold border transition-all cursor-pointer ${
-                            isSelected
-                              ? "border-[#EA3C36] bg-red-50 text-[#EA3C36]"
-                              : "border-gray-200 text-gray-700 hover:border-gray-300"
-                          }`}
-                        >
-                          ₹{amt}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Custom amount"
-                    value={customAmount}
-                    onChange={handleCustomChange}
-                    className="w-full mt-2 px-3.5 py-2 rounded-lg border border-gray-300 text-sm focus:border-[#EA3C36] focus:outline-hidden placeholder:text-gray-400"
-                  />
-                </div>
+                      {/* Title & Hindi Subtitle */}
+                      <div>
+                        <h3 className="text-base font-bold text-[#1A1A1A] mb-1 leading-snug group-hover:text-[#EA3C36] transition-colors">
+                          {scheme.name}
+                        </h3>
+                        {scheme.nameHi && (
+                          <p className="text-xs text-[#EA3C36] font-medium font-hindi mb-2">
+                            {scheme.nameHi}
+                          </p>
+                        )}
 
-                {/* Payment Type */}
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold text-gray-600">
-                    Payment Gateway
-                  </label>
-                  <div className="grid grid-cols-1 xs:grid-cols-3 gap-2">
-                    {[
-                      { id: "UPI / QR", label: "UPI / QR" },
-                      { id: "Card (Debit/Credit)", label: "Card (Debit/Credit)" },
-                      { id: "Net Banking", label: "Net Banking" },
-                    ].map((m) => {
-                      const isSelected = selectedPaymentType === m.id;
-                      return (
-                        <button
-                          key={m.id}
-                          type="button"
-                          onClick={() => setSelectedPaymentType(m.id)}
-                          className={`p-2 sm:p-2.5 rounded-lg border text-xs font-semibold flex items-center justify-center text-center transition-all cursor-pointer leading-tight ${
-                            isSelected
-                              ? "border-[#EA3C36] bg-red-50 text-[#EA3C36]"
-                              : "border-gray-200 text-gray-700 hover:border-gray-300"
-                          }`}
-                        >
-                          {m.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+                        {/* Benefit Highlight Box */}
+                        <div className="p-3.5 rounded-lg bg-[#F8F9FA] my-3 border border-gray-200/80">
+                          <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+                            {language === "HI"
+                              ? "योजना से मिलने वाला लाभ"
+                              : "Program Benefit"}
+                          </p>
+                          <p className="text-base sm:text-lg font-extrabold text-[#1A1A1A]">
+                            {language === "HI" && scheme.benefitHi
+                              ? scheme.benefitHi
+                              : scheme.benefit}
+                          </p>
+                        </div>
 
-                {/* Continue CTA Button */}
-                <Link
-                  to={`/donate?amount=${selectedAmount}`}
-                  className="w-full inline-flex items-center justify-center bg-[#EA3C36] hover:bg-[#D32F2F] text-white font-bold py-3.5 rounded-lg text-sm tracking-wide shadow-md hover-lift transition-all"
-                >
-                  CONTINUE
-                </Link>
-              </div>
+                        {/* Description */}
+                        <p className="text-xs text-gray-600 line-clamp-3 leading-relaxed mb-3">
+                          {language === "HI" && scheme.descriptionHi
+                            ? scheme.descriptionHi
+                            : scheme.description}
+                        </p>
+
+                        {/* Document Requirement Pill, Official Source Link & Last Checked Date */}
+                        <div className="flex items-center justify-between text-[11px] text-gray-500 pt-1">
+                          <span className="flex items-center gap-1.5">
+                            <FileText className="w-3.5 h-3.5 text-gray-400" />
+                            <span>{docCount} key documents</span>
+                          </span>
+                          <div className="flex items-center gap-2">
+                            {scheme.officialSourceUrl && (
+                              <a
+                                href={scheme.officialSourceUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[#EA3C36] hover:underline font-bold inline-flex items-center gap-0.5"
+                              >
+                                <span>Official Notice</span>
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            )}
+                            {scheme.lastCheckedAt && (
+                              <span className="text-[10px] text-gray-500">
+                                Verified:{" "}
+                                {new Date(
+                                  scheme.lastCheckedAt,
+                                ).toLocaleDateString("en-IN", {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                })}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Nearest Help Centre */}
+                        {scheme.nearestHelpCentre &&
+                          scheme.nearestHelpCentre.name && (
+                            <div className="pt-3 mt-3 border-t border-gray-100 text-xs text-gray-600 space-y-0.5">
+                              <span className="font-semibold text-gray-700 flex items-center gap-1">
+                                <Building className="w-3 h-3 text-[#EA3C36]" />
+                                <span>
+                                  {language === "HI"
+                                    ? "निकटतम सहायता केंद्र:"
+                                    : "Help Centre:"}
+                                </span>
+                              </span>
+                              <p className="line-clamp-1">
+                                {scheme.nearestHelpCentre.name}
+                              </p>
+                              {scheme.nearestHelpCentre.phone && (
+                                <p className="text-[11px] font-semibold text-[#EA3C36]">
+                                  📞 {scheme.nearestHelpCentre.phone}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                      </div>
+                    </div>
+
+                    {/* Bottom Actions matching SchemesPage */}
+                    <div className="pt-5 mt-4 border-t border-gray-100 flex items-center justify-between gap-2">
+                      <Link
+                        to={`/schemes/${scheme.slug}`}
+                        className="inline-flex items-center justify-center flex-1 py-2 rounded-lg bg-gray-100 text-gray-800 text-xs font-bold hover:bg-[#EA3C36] hover:text-white transition-all shadow-2xs"
+                      >
+                        <span>
+                          {language === "HI"
+                            ? "दिशानिर्देश देखें"
+                            : "View Guidelines"}
+                        </span>
+                        <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                      </Link>
+                      <button
+                        onClick={() =>
+                          setCallbackModal({
+                            isOpen: true,
+                            schemeCode: scheme.schemeCode,
+                            schemeName: scheme.name,
+                          })
+                        }
+                        title="सहायता हेतु कॉल का अनुरोध (Request Assistance)"
+                        className="p-2 rounded-lg bg-red-50 hover:bg-red-100 text-[#EA3C36] transition-colors cursor-pointer"
+                        aria-label="Request Assistance"
+                      >
+                        <Headphones className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
+          )}
+
+          {/* Bottom All Schemes Link */}
+          <div className="text-center pt-4">
+            <Link
+              to="/schemes"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[#EA3C36] hover:bg-[#D32F2F] text-white text-xs font-bold shadow-xs hover-lift transition-all"
+            >
+              <span>
+                {language === "HI"
+                  ? totalSchemesCount !== null
+                    ? `सभी ${totalSchemesCount} योजनाएं देखें`
+                    : "सभी योजनाएं एवं सेवाएं देखें"
+                  : totalSchemesCount !== null
+                    ? `Browse All ${totalSchemesCount} Programs & Services`
+                    : "Browse All Programs & Services"}
+              </span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ========================================================= */}
-      {/* SECTION 6: HOW YOU CAN HELP TODAY (PAGE 2 OF PDF)         */}
-      {/* ========================================================= */}
-      <section className="w-full py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 space-y-8">
+      {/* ===================================================================== */}
+      {/* 3. DONATION SECTION: 3 STEPS AT MOST (Matching Red & Clean White)     */}
+      {/* ===================================================================== */}
+      <section
+        className="bg-white border-t border-gray-200 py-14 px-4 sm:px-6 lg:px-8"
+        id="donate-section"
+      >
+        <div className="max-w-4xl mx-auto space-y-8">
+          {/* Header */}
           <div className="text-center space-y-2">
             <span className="text-xs uppercase tracking-wider text-[#EA3C36] font-bold">
-              Ways to Support UdaanHer India
+              {language === "HI"
+                ? "दान करें • २ मिनट में रसीद पाएं"
+                : "DONATE ONLINE • INSTANT 80G RECEIPT"}
             </span>
-            <h2 className="text-3xl lg:text-4xl font-extrabold text-[#1A1A1A]">
-              How you can help today
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1A1A1A] tracking-tight">
+              {language === "HI"
+                ? "महिलाओं को दें आत्मनिर्भरता के पंख"
+                : "Your Gift Could Change Someone's Life"}
             </h2>
+            <p className="text-xs sm:text-sm text-gray-600 max-w-xl mx-auto leading-relaxed">
+              {language === "HI"
+                ? "धारा 80G के तहत 50% आयकर छूट • तुरंत वैध 80G पीडीएफ रसीद व प्रमाण पत्र डाउनलोड"
+                : "100% transparent Section 80G tax-exempt charitable aid. Instant verified PDF certificate."}
+            </p>
           </div>
 
-          {/* Tab Navigation */}
-          <div className="border-b border-gray-200">
-            <div className="flex items-center gap-8 justify-center overflow-x-auto">
-              <button
-                type="button"
-                onClick={() => setActiveTab("individual")}
-                className={`pb-3 text-sm font-semibold transition-all cursor-pointer border-b-2 whitespace-nowrap ${
-                  activeTab === "individual"
-                    ? "border-[#EA3C36] text-[#EA3C36]"
-                    : "border-transparent text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                Individual Giving
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab("planned")}
-                className={`pb-3 text-sm font-semibold transition-all cursor-pointer border-b-2 whitespace-nowrap ${
-                  activeTab === "planned"
-                    ? "border-[#EA3C36] text-[#EA3C36]"
-                    : "border-transparent text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                Planned Giving and Major Gifts
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab("corporate")}
-                className={`pb-3 text-sm font-semibold transition-all cursor-pointer border-b-2 whitespace-nowrap ${
-                  activeTab === "corporate"
-                    ? "border-[#EA3C36] text-[#EA3C36]"
-                    : "border-transparent text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                Corporate &amp; Foundation Partnerships
-              </button>
-            </div>
-          </div>
-
-          {/* Action Buttons Box */}
-          <div className="p-8 rounded-xl border border-gray-200 bg-white flex flex-wrap items-center justify-center gap-4">
-            <Link
-              to="/donate"
-              className="bg-[#EA3C36] hover:bg-[#D32F2F] text-white font-bold px-8 py-3 rounded-lg text-sm shadow-xs transition-all hover-lift"
-            >
-              Donate Online
-            </Link>
-            <Link
-              to="/donate?method=bank"
-              className="bg-[#EA3C36] hover:bg-[#D32F2F] text-white font-bold px-8 py-3 rounded-lg text-sm shadow-xs transition-all hover-lift"
-            >
-              Bank Transfer
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ========================================================= */}
-      {/* SECTION 7: OUR PROGRAMS BLOGS (PAGE 3 OF PDF)             */}
-      {/* ========================================================= */}
-      <section className="w-full py-16 bg-[#F8F9FA]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 space-y-10">
-          <div className="text-center">
-            <h2 className="text-3xl lg:text-4xl font-extrabold text-[#1A1A1A]">
-              Our Programs Blogs
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Blog Card 1 */}
-            <div className="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-xs hover-lift transition-all">
-              <img
-                src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=600&q=80"
-                alt="Health training"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-6 space-y-3">
-                <span className="text-[11px] font-bold text-[#EA3C36] uppercase tracking-wider">
-                  HEALTH &amp; HYGIENE
+          {/* 3-Step Donation Card */}
+          <div className="bg-[#F8F9FA] rounded-2xl p-6 sm:p-8 border border-gray-200 shadow-xs space-y-6">
+            {/* Step 1: Frequency & Amount */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-gray-700 flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-[#EA3C36] text-white flex items-center justify-center text-xs">
+                    1
+                  </span>
+                  {language === "HI"
+                    ? "दान आवृत्ति एवं राशि चुनें"
+                    : "Select Frequency & Amount"}
                 </span>
-                <h3 className="text-lg font-bold text-[#1A1A1A]">
-                  Scaling Rural Health Clinics in Remote Districts
-                </h3>
-                <p className="text-xs text-gray-600 leading-relaxed">
-                  How mobile first aid teams reach vulnerable households across
-                  high altitude and flood-prone terrain.
-                </p>
-                <div className="pt-2">
-                  <Link
-                    to="/campaigns"
-                    className="text-xs font-bold text-[#EA3C36] hover:underline"
+
+                {/* Frequency Toggle */}
+                <div className="inline-flex rounded-lg border border-gray-200 p-1 bg-white">
+                  <button
+                    type="button"
+                    onClick={() => setDonationFrequency("ONE_TIME")}
+                    className={`px-3 py-1 rounded-md text-xs font-bold transition-all cursor-pointer ${
+                      donationFrequency === "ONE_TIME"
+                        ? "bg-[#EA3C36] text-white shadow-xs"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
                   >
-                    Read More →
-                  </Link>
+                    {language === "HI" ? "एक बार (One-Time)" : "One-Time"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDonationFrequency("MONTHLY")}
+                    className={`px-3 py-1 rounded-md text-xs font-bold transition-all cursor-pointer ${
+                      donationFrequency === "MONTHLY"
+                        ? "bg-[#EA3C36] text-white shadow-xs"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    {language === "HI" ? "मासिक (Monthly)" : "Monthly"}
+                  </button>
                 </div>
+              </div>
+
+              {/* Amount Buttons */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[500, 1000, 2500, 5000].map((amt) => {
+                  const isSelected = donationAmount === amt && !customDonation;
+                  return (
+                    <button
+                      key={amt}
+                      type="button"
+                      onClick={() => {
+                        setDonationAmount(amt);
+                        setCustomDonation("");
+                      }}
+                      className={`py-3 px-4 rounded-lg text-sm font-bold border transition-all cursor-pointer ${
+                        isSelected
+                          ? "border-[#EA3C36] bg-red-50 text-[#EA3C36] ring-1 ring-[#EA3C36]"
+                          : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
+                      }`}
+                    >
+                      ₹{amt.toLocaleString("en-IN")}
+                      {donationFrequency === "MONTHLY" && (
+                        <span className="text-[11px] block font-normal">
+                          /mo
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Custom Amount */}
+              <input
+                type="text"
+                placeholder={
+                  language === "HI"
+                    ? "अन्य राशि दर्ज करें (₹)"
+                    : "Custom amount in INR"
+                }
+                value={customDonation}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, "");
+                  setCustomDonation(val);
+                  if (val) setDonationAmount(parseInt(val, 10));
+                }}
+                className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-sm focus:border-[#EA3C36] focus:outline-hidden placeholder:text-gray-400"
+              />
+            </div>
+
+            {/* Step 2: 80G Tax Benefit Summary */}
+            <div className="p-4 bg-white rounded-xl border border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-700">
+              <div className="space-y-0.5">
+                <span className="font-bold text-[#EA3C36] block">
+                  {language === "HI"
+                    ? "आयकर छूट (धारा 80G):"
+                    : "Section 80G Tax Benefit:"}
+                </span>
+                <span>
+                  {language === "HI" ? (
+                    <>
+                      आपके{" "}
+                      <strong>₹{donationAmount.toLocaleString("en-IN")}</strong>{" "}
+                      के दान पर ₹
+                      {(donationAmount * 0.5).toLocaleString("en-IN")} (50%) की
+                      आयकर कटौती अनुमन्य है।
+                    </>
+                  ) : (
+                    <>
+                      50% tax deduction on your contribution of{" "}
+                      <strong>₹{donationAmount.toLocaleString("en-IN")}</strong>{" "}
+                      is ₹{(donationAmount * 0.5).toLocaleString("en-IN")}.
+                    </>
+                  )}
+                </span>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-[#EA3C36] rounded-lg font-bold border border-red-100 shrink-0">
+                <CheckCircle2 className="w-4 h-4 text-[#EA3C36]" />
+                <span>80G Certificate Instant</span>
               </div>
             </div>
 
-            {/* Blog Card 2 */}
-            <div className="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-xs hover-lift transition-all">
-              <img
-                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80"
-                alt="Youth engagement"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-6 space-y-3">
-                <span className="text-[11px] font-bold text-[#1E3A8A] uppercase tracking-wider">
-                  YOUTH VOLUNTEERING
+            {/* Step 3: Checkout Action */}
+            <div className="space-y-3">
+              <Link
+                to={`/donate?amount=${donationAmount}&type=${donationFrequency}`}
+                className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#EA3C36] hover:bg-[#D32F2F] text-white font-bold text-sm tracking-wide shadow-xs hover-lift transition-all cursor-pointer"
+              >
+                <span>
+                  {language === "HI"
+                    ? `₹${donationAmount.toLocaleString("en-IN")} दान करें एवं तुरंत 80G रसीद पाएं`
+                    : `Proceed with ₹${donationAmount.toLocaleString("en-IN")} & Get Instant 80G Receipt`}
                 </span>
-                <h3 className="text-lg font-bold text-[#1A1A1A]">
-                  Empowering 75,000+ Young Leaders for Emergency Action
-                </h3>
-                <p className="text-xs text-gray-600 leading-relaxed">
-                  Youth collectives undergoing nationwide disaster management
-                  and rapid blood donation mobilization.
-                </p>
-                <div className="pt-2">
-                  <Link
-                    to="/campaigns"
-                    className="text-xs font-bold text-[#EA3C36] hover:underline"
-                  >
-                    Read More →
-                  </Link>
-                </div>
-              </div>
-            </div>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
 
-            {/* Blog Card 3 */}
-            <div className="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-xs hover-lift transition-all">
-              <img
-                src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=600&q=80"
-                alt="Disaster relief"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-6 space-y-3">
-                <span className="text-[11px] font-bold text-[#00A3C4] uppercase tracking-wider">
-                  COMMUNITY RELIEF
+              <div className="flex items-center justify-center gap-2 text-center text-xs text-gray-500 pt-1">
+                <Lock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                <span>
+                  विदेशी कार्ड / मुद्रा Phase 1 में प्रतिबंधित हैं (FCRA
+                  compliance • Domestic INR only)
                 </span>
-                <h3 className="text-lg font-bold text-[#1A1A1A]">
-                  Bundelkhand &amp; Sehore Women Relief: Rebuilding Dignity
-                  &amp; Livelihood
-                </h3>
-                <p className="text-xs text-gray-600 leading-relaxed">
-                  Delivering non-food relief kits, clean water solutions, and
-                  micro-livelihood setups to 715+ rural women-led households.
-                </p>
-                <div className="pt-2">
-                  <Link
-                    to="/campaigns"
-                    className="text-xs font-bold text-[#EA3C36] hover:underline"
-                  >
-                    Read More →
-                  </Link>
-                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ========================================================= */}
-      {/* SECTION 8: SPONSORS / CORPORATE PARTNERS (PAGE 3 OF PDF)  */}
-      {/* ========================================================= */}
-      <section className="w-full py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 space-y-8">
-          <div className="text-center space-y-1">
-            <span className="text-xs uppercase tracking-wider text-[#EA3C36] font-bold">
-              Sponsors
+      {/* ===================================================================== */}
+      {/* 4. STATUTORY FOOTER BANNER                                            */}
+      {/* ===================================================================== */}
+      <footer className="w-full py-8 px-4 sm:px-6 lg:px-8 bg-white border-t border-gray-200 text-xs text-gray-600">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+          <div className="space-y-1">
+            <p className="font-bold text-gray-900">
+              उड़ानहर महिला कल्याण एवं सशक्तिकरण चैरिटेबल ट्रस्ट (भोपाल)
+            </p>
+            <p>
+              पंजीकृत कार्यालय: प्लॉट 14, अरेरा हिल्स, भोपाल, म.प्र. - 462011 •
+              ट्रस्ट पैन: AAATC1234D • 80G पंजीकरण:
+              CIT(E)/BPL/80G/2021-22/A-1089
+            </p>
+          </div>
+          <div className="flex items-center gap-4 shrink-0">
+            <span className="font-bold text-[#EA3C36] flex items-center gap-1.5">
+              <Phone className="w-4 h-4" />
+              <span>हेल्पलाइन: 1800-233-0000 (टोल-फ्री)</span>
             </span>
-            <h2 className="text-3xl lg:text-4xl font-extrabold text-[#1A1A1A]">
-              Corporate Partners
-            </h2>
-          </div>
-
-          {/* Carousel with Navigation Arrows */}
-          <div className="flex items-center justify-between gap-6 pt-4">
-            <button
-              type="button"
-              className="w-10 h-10 rounded-full bg-[#EA3C36] hover:bg-[#D32F2F] text-white flex items-center justify-center shadow-md transition-all shrink-0 cursor-pointer"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-
-            {/* Partner Logos */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 w-full max-w-4xl items-center">
-              <div className="h-16 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center p-4">
-                <span className="font-extrabold text-gray-500 tracking-wider">
-                  UNICEF
-                </span>
-              </div>
-              <div className="h-16 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center p-4">
-                <span className="font-extrabold text-gray-500 tracking-wider">
-                  WHO
-                </span>
-              </div>
-              <div className="h-16 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center p-4">
-                <span className="font-extrabold text-gray-500 tracking-wider">
-                  IFRC
-                </span>
-              </div>
-              <div className="h-16 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center p-4">
-                <span className="font-extrabold text-gray-500 tracking-wider">
-                  NABARD
-                </span>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              className="w-10 h-10 rounded-full bg-[#EA3C36] hover:bg-[#D32F2F] text-white flex items-center justify-center shadow-md transition-all shrink-0 cursor-pointer"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
           </div>
         </div>
-      </section>
+      </footer>
+
+      {/* Callback Modal Component */}
+      <CallbackModal
+        isOpen={callbackModal.isOpen}
+        onClose={() => setCallbackModal({ isOpen: false })}
+        schemeCode={callbackModal.schemeCode}
+        schemeName={callbackModal.schemeName}
+      />
     </div>
   );
 };

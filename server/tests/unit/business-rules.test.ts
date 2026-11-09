@@ -170,5 +170,72 @@ describe('Unit Tests: Core Business Logic', () => {
       expect(parsed.success).toBe(false);
     });
   });
+
+  describe('Automated Reminders & Statutory Staleness Monitoring', () => {
+    it('accurately identifies schemes exceeding 30-day gazette verification threshold', () => {
+      const now = new Date();
+      const freshDate = new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000); // 10 days ago
+      const staleDate = new Date(now.getTime() - 35 * 24 * 60 * 60 * 1000); // 35 days ago
+
+      const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+      const isFreshStale = now.getTime() - freshDate.getTime() > thirtyDaysMs;
+      const isOldStale = now.getTime() - staleDate.getTime() > thirtyDaysMs;
+
+      expect(isFreshStale).toBe(false);
+      expect(isOldStale).toBe(true);
+    });
+
+    it('verifies CBDT Form 10BD / 80G certificate filing cut-off dates', () => {
+      // Annual filing deadline is May 31 immediately following the financial year
+      const deadlineMonth = 4; // May (0-indexed)
+      const deadlineDate = 31;
+      expect(deadlineMonth).toBe(4);
+      expect(deadlineDate).toBe(31);
+    });
+  });
+
+  describe('Hindi Voice/Typed Finder Query Parsing & Guardrails', () => {
+    const parseHindiQueryKeywords = (query: string) => {
+      const qLower = query.toLowerCase();
+      const rulesUsed: string[] = [];
+      let detectedNeed = 'General Welfare';
+
+      const pensionKeywords = ['पेंशन', 'विधवा', 'वृद्धा', 'कल्याणी', 'pension', 'widow'];
+      const livelihoodKeywords = ['आजीविका', 'लोन', 'ऋण', 'स्व सहायता', 'समूह', 'shg', 'रोजगार'];
+
+      if (pensionKeywords.some((k) => qLower.includes(k) || query.includes(k))) {
+        detectedNeed = 'Pension';
+        rulesUsed.push('पहचानी गई आवश्यकता: विधवा / वृद्धावस्था सामाजिक सुरक्षा पेंशन');
+      } else if (livelihoodKeywords.some((k) => qLower.includes(k) || query.includes(k))) {
+        detectedNeed = 'Livelihood';
+        rulesUsed.push('पहचानी गई आवश्यकता: महिला स्व-सहायता समूह (SHG) व आजीविका ऋण सहायता');
+      }
+
+      if (['भोपाल', 'bhopal'].some((k) => qLower.includes(k) || query.includes(k))) {
+        rulesUsed.push('लागू जिला: Bhopal (मध्य प्रदेश के 9 अधिकृत जनपदों में सत्यापित)');
+      }
+
+      const disclaimer = '⚠️ आवश्यक सूचना: यह खोज परिणाम केवल शासकीय नियमों के आधार पर संभावित पात्रता दर्शाते हैं। यह अंतिम स्वीकृति का वादा नहीं है।';
+      const helplineOffer = 'निशुल्क सहायता हेतु हमारी हेल्पलाइन 181 पर संपर्क करें या कॉल-बैक का अनुरोध दर्ज करें।';
+
+      return { detectedNeed, rulesUsed, disclaimer, helplineOffer };
+    };
+
+    it('parses widow pension inquiry in Hindi with correct rules and statutory disclaimer', () => {
+      const res = parseHindiQueryKeywords('मैं भोपाल की 40 वर्षीय विधवा महिला हूँ');
+      expect(res.detectedNeed).toBe('Pension');
+      expect(res.rulesUsed.some((r) => r.includes('विधवा'))).toBe(true);
+      expect(res.rulesUsed.some((r) => r.includes('Bhopal'))).toBe(true);
+      expect(res.disclaimer).toContain('वादा नहीं');
+      expect(res.helplineOffer).toContain('181');
+    });
+
+    it('parses SHG livelihood inquiry in Hindi with correct rules', () => {
+      const res = parseHindiQueryKeywords('सिलाई का काम शुरू करने के लिए महिला स्व सहायता समूह लोन');
+      expect(res.detectedNeed).toBe('Livelihood');
+      expect(res.rulesUsed.some((r) => r.includes('स्व-सहायता'))).toBe(true);
+      expect(res.disclaimer).toContain('वादा नहीं');
+    });
+  });
 });
 

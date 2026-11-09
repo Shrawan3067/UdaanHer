@@ -108,6 +108,20 @@ export class SchemeController {
       next(error);
     }
   }
+
+  async askQuestion(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { question, district } = req.body;
+      const result = await schemeService.askQuestion(question, district);
+      res.status(200).json({
+        success: true,
+        data: result,
+        message: 'Scheme recommendations evaluated successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const schemeController = new SchemeController();

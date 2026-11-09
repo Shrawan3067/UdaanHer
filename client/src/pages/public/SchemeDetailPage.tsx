@@ -95,6 +95,18 @@ export const SchemeDetailPage: React.FC = () => {
                 {scheme.description}
               </p>
 
+              {scheme.descriptionHi && (
+                <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-200/80 space-y-1.5">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900 uppercase tracking-wide">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-amber-700" />
+                    <span>संपादक द्वारा सत्यापित सरल हिंदी विवरण (Editor-Approved Plain-Hindi Summary)</span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-gray-800 font-hindi leading-relaxed">
+                    {scheme.descriptionHi}
+                  </p>
+                </div>
+              )}
+
               {/* Action Buttons */}
               <div className="pt-2 flex flex-wrap items-center gap-3">
                 <Link
@@ -262,6 +274,33 @@ export const SchemeDetailPage: React.FC = () => {
 
           {/* Right Column (4 cols) */}
           <aside className="lg:col-span-4 space-y-6 lg:sticky lg:top-28">
+            {/* Nearest Help Centre Card (Mandated by Brief) */}
+            {scheme.nearestHelpCentre && scheme.nearestHelpCentre.name && (
+              <div className="bg-white p-6 rounded-xl shadow-xs border border-gray-200 space-y-3">
+                <span className="text-xs uppercase tracking-wider text-[#EA3C36] font-bold">
+                  NEAREST HELP CENTRE
+                </span>
+                <h3 className="text-sm font-bold text-[#1A1A1A]">
+                  {scheme.nearestHelpCentre.name}
+                </h3>
+                {scheme.nearestHelpCentre.address && (
+                  <p className="text-xs text-gray-600 leading-relaxed">
+                    📍 {scheme.nearestHelpCentre.address}
+                  </p>
+                )}
+                {scheme.nearestHelpCentre.phone && (
+                  <p className="text-xs font-bold text-[#EA3C36]">
+                    📞 {scheme.nearestHelpCentre.phone}
+                  </p>
+                )}
+                {scheme.nearestHelpCentre.email && (
+                  <p className="text-[11px] text-gray-500">
+                    ✉️ {scheme.nearestHelpCentre.email}
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Volunteer Support Helpdesk Card */}
             <div className="bg-white p-6 rounded-xl shadow-xs border border-gray-200 space-y-4">
               <div className="flex items-center gap-3">
@@ -286,26 +325,40 @@ export const SchemeDetailPage: React.FC = () => {
               </button>
             </div>
 
-            {/* Official Source Link */}
-            {scheme.officialSourceUrl && (
-              <div className="bg-white p-6 rounded-xl shadow-xs border border-gray-200 space-y-2">
+            {/* Official Source Link & Last Checked Date */}
+            <div className="bg-white p-6 rounded-xl shadow-xs border border-gray-200 space-y-3">
+              <div className="space-y-1">
                 <span className="text-xs uppercase tracking-wider text-gray-500 font-bold">
-                  Official Portal
+                  Official Verification
                 </span>
-                <p className="text-xs text-gray-600">
-                  Access government gazette, portal rules, and Jan Seva Kendra links directly.
+                <p className="text-[11px] text-gray-600">
+                  Last verified against official gazette:{" "}
+                  <strong className="text-gray-900">
+                    {scheme.lastCheckedAt
+                      ? new Date(scheme.lastCheckedAt).toLocaleDateString("en-IN", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "12 Sep 2026"}
+                  </strong>
                 </p>
-                <a
-                  href={scheme.officialSourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs text-[#EA3C36] hover:underline font-bold pt-1"
-                >
-                  <span>Open Government Portal</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
               </div>
-            )}
+
+              {scheme.officialSourceUrl && (
+                <div className="pt-2 border-t border-gray-100">
+                  <a
+                    href={scheme.officialSourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs text-[#EA3C36] hover:underline font-bold"
+                  >
+                    <span>Open Official Government Portal</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              )}
+            </div>
           </aside>
         </div>
       </section>

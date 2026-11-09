@@ -66,6 +66,15 @@ export const Navbar: React.FC = () => {
     },
   ];
 
+  // Desktop navigation items:
+  // When a user is logged in as a donor or admin, omit "Ways to Donate" from the desktop navbar
+  // to prevent overlapping/blocking the Dashboard button. The prominent red "Donate Now"
+  // button is already permanently visible right next to Dashboard.
+  // In the mobile drawer, all links remain fully accessible.
+  const desktopNavLinks = user
+    ? navLinks.filter((link) => link.href !== "/donate")
+    : navLinks;
+
   const isActive = (path: string) => {
     if (path === "/" && location.pathname === "/") return true;
     if (path !== "/" && location.pathname.startsWith(path)) return true;
@@ -137,7 +146,7 @@ export const Navbar: React.FC = () => {
         >
           <div className="max-w-7xl mx-auto h-16 md:h-[70px] px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4 font-poppins min-w-0">
             {/* Left: Brand Logo & Emblem */}
-            <div className="flex items-center gap-2 sm:gap-4 lg:gap-8 font-poppins min-w-0">
+            <div className="flex items-center gap-2 sm:gap-4 lg:gap-3 xl:gap-6 font-poppins min-w-0">
               <Link
                 to="/"
                 className="flex items-center gap-2 sm:gap-3 group shrink-0 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#EA3C36] rounded-lg p-0.5 font-poppins min-w-0"
@@ -164,16 +173,19 @@ export const Navbar: React.FC = () => {
 
               {/* Desktop Navigation Links */}
               <nav
-                className="hidden lg:flex items-center gap-1 xl:gap-1.5 ml-2 font-poppins"
+                className="hidden lg:flex items-center gap-0.5 xl:gap-1.5 ml-1 xl:ml-3 font-poppins shrink min-w-0"
                 aria-label="Main Navigation"
               >
-                {navLinks.map((link) => {
+                {desktopNavLinks.map((link) => {
                   const active = isActive(link.href);
+                  const isWaysToDonate = link.href === "/donate";
                   return (
                     <Link
                       key={link.href}
                       to={link.href}
-                      className={`relative px-3.5 py-2 rounded-lg text-sm transition-all duration-150 font-semibold whitespace-nowrap focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#EA3C36] font-poppins ${
+                      className={`relative px-2.5 xl:px-3.5 py-1.5 xl:py-2 rounded-lg text-xs xl:text-sm transition-all duration-150 font-semibold whitespace-nowrap focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#EA3C36] font-poppins shrink-0 ${
+                        isWaysToDonate ? "hidden xl:inline-flex" : "inline-flex items-center"
+                      } ${
                         active
                           ? "text-[#EA3C36] bg-red-50/90 font-bold shadow-2xs"
                           : "text-gray-700 hover:text-[#EA3C36] hover:bg-gray-50"
@@ -181,7 +193,7 @@ export const Navbar: React.FC = () => {
                     >
                       {link.label}
                       {active && (
-                        <span className="absolute bottom-1 left-3.5 right-3.5 h-0.5 bg-[#EA3C36] rounded-full" />
+                        <span className="absolute bottom-1 left-2.5 right-2.5 xl:left-3.5 xl:right-3.5 h-0.5 bg-[#EA3C36] rounded-full" />
                       )}
                     </Link>
                   );
@@ -190,7 +202,7 @@ export const Navbar: React.FC = () => {
             </div>
 
             {/* Right Actions: Session, CTA & Mobile Toggle */}
-            <div className="flex items-center gap-1.5 sm:gap-3 font-poppins shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-2.5 font-poppins shrink-0 relative z-20 ml-auto">
               {/* Mobile language switch */}
               <div className="md:hidden">
                 <LanguageSwitcher />
@@ -198,39 +210,39 @@ export const Navbar: React.FC = () => {
 
               {/* Authenticated Controls */}
               {user ? (
-                <div className="hidden sm:flex items-center gap-2 font-poppins">
+                <div className="hidden sm:flex items-center gap-1.5 sm:gap-2 font-poppins shrink-0">
                   {isAdmin ? (
                     <Link
                       to="/admin"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 text-[#EA3C36] text-xs font-bold hover:bg-red-100 transition-colors border border-red-200/60 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#EA3C36] font-poppins"
+                      className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-red-50 text-[#EA3C36] text-xs font-bold hover:bg-red-100 transition-colors border border-red-200/60 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#EA3C36] font-poppins shrink-0 whitespace-nowrap"
                     >
-                      <ShieldCheck className="w-3.5 h-3.5" />
-                      <span>Admin</span>
+                      <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                      <span>{language === "HI" ? "एडमिन" : "Admin"}</span>
                     </Link>
                   ) : (
                     <Link
                       to="/donor/dashboard"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#EA3C36] font-poppins"
+                      className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-[#EA3C36] text-xs font-bold transition-all border border-red-200/70 shrink-0 whitespace-nowrap shadow-2xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#EA3C36] font-poppins"
                     >
-                      <UserIcon className="w-3.5 h-3.5 text-[#EA3C36]" />
-                      <span>Dashboard</span>
+                      <UserIcon className="w-3.5 h-3.5 text-[#EA3C36] shrink-0" />
+                      <span>{language === "HI" ? "डैशबोर्ड" : "Dashboard"}</span>
                     </Link>
                   )}
 
                   <button
                     type="button"
                     onClick={logout}
-                    title="Log out"
-                    className="p-2 text-gray-500 hover:text-[#EA3C36] hover:bg-gray-100 rounded-lg transition-colors cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#EA3C36] font-poppins"
+                    title={language === "HI" ? "लॉग आउट" : "Log out"}
+                    className="p-1.5 sm:p-2 text-gray-500 hover:text-[#EA3C36] hover:bg-gray-100 rounded-lg transition-colors cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#EA3C36] font-poppins shrink-0"
                     aria-label="Log out"
                   >
-                    <LogOut className="w-4 h-4" />
+                    <LogOut className="w-4 h-4 shrink-0" />
                   </button>
                 </div>
               ) : (
                 <Link
                   to="/login"
-                  className="hidden sm:inline-flex items-center justify-center text-xs sm:text-sm font-semibold text-gray-700 hover:text-gray-900 px-3.5 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-all focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#EA3C36] font-poppins"
+                  className="hidden sm:inline-flex items-center justify-center text-xs sm:text-sm font-semibold text-gray-700 hover:text-gray-900 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-all focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#EA3C36] font-poppins shrink-0 whitespace-nowrap"
                 >
                   {language === "HI" ? "लॉग इन" : "Log In"}
                 </Link>

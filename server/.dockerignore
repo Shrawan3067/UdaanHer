@@ -1,0 +1,13 @@
+node_modules
+dist
+logs
+storage
+.env
+.env.*
+!.env.example
+tests
+vitest.config.ts
+*.log
+.git
+.DS_Store
+

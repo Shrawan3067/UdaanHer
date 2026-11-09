@@ -11,11 +11,45 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from 'recharts';
+import {
+  Sparkles,
+  Download,
+  PlusCircle,
+  TrendingUp,
+  Receipt,
+  BookOpen,
+  HeartHandshake,
+  ArrowUpRight,
+  ShieldCheck,
+  CheckCircle2,
+  ChevronRight,
+  Coins,
+  Layers,
+  FileSpreadsheet,
+  Bell,
+  RotateCw,
+} from 'lucide-react';
 
 export const AdminDashboardPage: React.FC = () => {
   const { language } = useLanguage();
   const [data, setData] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isTriggeringAutomation, setIsTriggeringAutomation] = useState(false);
+  const [automationToast, setAutomationToast] = useState<string | null>(null);
+
+  const handleTriggerAutomation = async () => {
+    setIsTriggeringAutomation(true);
+    try {
+      const res = await api.triggerAutomation();
+      setAutomationToast(
+        `Automated pipelines executed! Dispatched ${res.data.taxRemindersSent} tax statement reminders, ${res.data.recurringRemindersSent} recurring patron notices, and audited ${res.data.staleSchemesFlagged} gazette records.`
+      );
+    } catch (err: any) {
+      alert("Automation trigger failed: " + err.message);
+    } finally {
+      setIsTriggeringAutomation(false);
+    }
+  };
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -33,8 +67,13 @@ export const AdminDashboardPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center">
-        <span className="material-symbols-outlined text-4xl text-primary animate-spin">refresh</span>
+      <div className="min-h-[50vh] flex items-center justify-center font-poppins">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-9 h-9 border-3 border-gray-200 border-t-[#EA3C36] rounded-full animate-spin"></div>
+          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            Loading Operations Command Center...
+          </span>
+        </div>
       </div>
     );
   }
@@ -42,179 +81,200 @@ export const AdminDashboardPage: React.FC = () => {
   const metrics = data?.metrics || {};
 
   return (
-    <div className="flex flex-col gap-8 max-w-[1600px] mx-auto w-full animate-fadeIn">
-      {/* Sub-Header & Executive Controls */}
-      <div className="p-6 lg:p-8 rounded-2xl glass-card shadow-xs border border-[#E5E7EB] flex flex-col xl:flex-row xl:items-center justify-between gap-6 hover-lift-sm">
+    <div className="flex flex-col gap-6 max-w-[1600px] mx-auto w-full animate-fadeIn font-poppins text-[#1A1A1A]">
+      {/* Automation Toast Alert */}
+      {automationToast && (
+        <div className="p-4 rounded-xl bg-emerald-50 text-emerald-900 flex items-center justify-between border border-emerald-200 shadow-2xs">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+            <span className="text-xs sm:text-sm font-semibold">{automationToast}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setAutomationToast(null)}
+            className="text-emerald-700 hover:text-emerald-900 font-bold text-sm p-1 cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* 1. MISSION GOVERNANCE EXECUTIVE HEADER */}
+      <div className="p-6 lg:p-7 rounded-2xl bg-white border border-gray-200/90 shadow-2xs flex flex-col xl:flex-row xl:items-center justify-between gap-6">
         <div className="flex flex-col gap-1.5 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-label-caps text-label-caps uppercase text-secondary font-bold tracking-wider">
+            <span className="text-xs uppercase font-extrabold text-[#EA3C36] tracking-wider">
               Mission Governance
             </span>
-            <span className="text-outline-variant">•</span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary font-label-caps text-xs font-semibold">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+            <span className="text-gray-300">•</span>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-bold border border-emerald-200/60">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
               NITI Aayog Darpan Synced
             </span>
-            <span className="text-outline-variant">•</span>
-            <span className="font-label-sm text-xs text-on-surface-variant font-medium">CBDT 10BD Active</span>
+            <span className="text-gray-300">•</span>
+            <span className="text-xs text-gray-500 font-semibold">CBDT Form 10BD Live</span>
           </div>
-          <h1 className="font-headline-md text-headline-md text-primary tracking-tight font-extrabold">
-            Operations &amp; Impact Command Center
+
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1A1A1A] tracking-tight">
+            {language === 'HI' ? 'संचालन एवं प्रभाव कमांड केंद्र' : 'Operations & Impact Command Center'}
           </h1>
-          <p className="font-body-sm text-body-sm text-on-surface-variant max-w-3xl leading-relaxed">
-            Statutory oversight, Section 80G electronic generation, and grassroots scheme saturation across Madhya Pradesh.
+          <p className="text-xs sm:text-sm text-gray-600 max-w-3xl leading-relaxed">
+            Statutory oversight, Section 80G certificate issuance, and grassroots women welfare scheme saturation across Madhya Pradesh.
           </p>
         </div>
 
-        {/* High-Level Actions */}
-        <div className="flex items-center gap-3 flex-wrap">
+        {/* Executive Action Controls */}
+        <div className="flex items-center gap-2.5 flex-wrap shrink-0">
           {metrics.pendingAiReviewsCount > 0 && (
             <Link
               to="/admin/ai-reviews"
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl btn-secondary-gradient text-on-secondary font-label-md text-label-md font-bold shadow-xs hover-lift transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-xs hover:-translate-y-0.5 transition-all cursor-pointer"
             >
-              <span className="material-symbols-outlined text-[18px]">psychology_alt</span>
+              <Sparkles className="w-4 h-4 text-white" />
               <span>{metrics.pendingAiReviewsCount} AI Reviews Pending</span>
             </Link>
           )}
 
           <Link
             to="/admin/reports"
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-surface-container-high text-on-surface font-label-md text-label-md font-semibold hover:bg-surface-container-highest border border-[#E5E7EB] transition-all hover-lift-sm cursor-pointer shadow-xs"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-gray-50 text-gray-800 text-xs font-bold border border-gray-200 shadow-2xs hover:-translate-y-0.5 transition-all cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[18px] text-primary">download</span>
+            <Download className="w-4 h-4 text-[#EA3C36]" />
             <span>Form 10BD CSV</span>
           </Link>
 
           <Link
             to="/admin/schemes"
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl btn-primary-gradient text-on-primary font-label-md text-label-md font-bold shadow-xs hover-lift transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#EA3C36] hover:bg-[#D32F2F] text-white text-xs font-bold shadow-xs hover:-translate-y-0.5 transition-all cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[18px]">add_circle</span>
+            <PlusCircle className="w-4 h-4" />
             <span>+ Add Scheme</span>
           </Link>
         </div>
       </div>
 
-      {/* KPI Metrics Strip: 5 Columns */}
+      {/* 2. STATISTICAL KPI CARDS: 5 COLUMNS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-        {/* KPI 1 */}
-        <div className="bg-surface-container-lowest rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col justify-between border border-[#E5E7EB]">
-          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary"></div>
+        {/* KPI 1: Total Donated */}
+        <div className="bg-white rounded-2xl p-5 shadow-2xs relative overflow-hidden flex flex-col justify-between border border-gray-200/90 hover:shadow-md transition-shadow">
+          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#EA3C36]"></div>
           <div>
             <div className="flex items-center justify-between mb-1">
-              <span className="font-label-caps text-label-caps uppercase text-on-surface-variant font-semibold">
-                Total Donated
+              <span className="text-[11px] uppercase font-bold text-gray-500 tracking-wider">
+                Total Collections
               </span>
-              <span className="material-symbols-outlined text-primary text-[20px]">payments</span>
+              <Coins className="w-4 h-4 text-[#EA3C36]" />
             </div>
-            <div className="font-headline-md text-headline-md text-primary tracking-tight font-bold">
+            <div className="text-2xl font-black text-[#1A1A1A] tracking-tight">
               ₹{(metrics.totalAmountCollected || 0).toLocaleString('en-IN')}
             </div>
           </div>
-          <div className="mt-3 pt-2 border-t border-[#E5E7EB] flex items-center justify-between">
-            <span className="font-label-sm text-label-sm text-primary font-medium flex items-center gap-0.5">
-              <span className="material-symbols-outlined text-[16px]">trending_up</span> +14.2% MoM
+          <div className="mt-3 pt-2.5 border-t border-gray-100 flex items-center justify-between">
+            <span className="text-xs font-bold text-emerald-700 flex items-center gap-1">
+              <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
+              <span>+14.2% MoM</span>
             </span>
-            <span className="font-label-sm text-label-sm text-on-surface-variant">FY 2026-27</span>
+            <span className="text-[10px] text-gray-400 font-semibold">FY 2026-27</span>
           </div>
         </div>
 
-        {/* KPI 2 */}
-        <div className="bg-surface-container-lowest rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col justify-between border border-[#E5E7EB]">
-          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-secondary"></div>
+        {/* KPI 2: 80G Receipts Issued */}
+        <div className="bg-white rounded-2xl p-5 shadow-2xs relative overflow-hidden flex flex-col justify-between border border-gray-200/90 hover:shadow-md transition-shadow">
+          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-sky-500"></div>
           <div>
             <div className="flex items-center justify-between mb-1">
-              <span className="font-label-caps text-label-caps uppercase text-on-surface-variant font-semibold">
+              <span className="text-[11px] uppercase font-bold text-gray-500 tracking-wider">
                 80G Receipts Issued
               </span>
-              <span className="material-symbols-outlined text-secondary text-[20px]">receipt_long</span>
+              <Receipt className="w-4 h-4 text-sky-600" />
             </div>
-            <div className="font-headline-md text-headline-md text-secondary tracking-tight font-bold">
+            <div className="text-2xl font-black text-sky-900 tracking-tight">
               {metrics.totalReceiptsIssued || 0}
             </div>
           </div>
-          <div className="mt-3 pt-2 border-t border-[#E5E7EB] flex items-center justify-between">
-            <span className="font-label-sm text-label-sm text-primary font-medium">100% Atomic</span>
-            <span className="font-label-sm text-label-sm text-on-surface-variant">Safe Sequences</span>
+          <div className="mt-3 pt-2.5 border-t border-gray-100 flex items-center justify-between">
+            <span className="text-xs font-bold text-sky-700">100% Atomic</span>
+            <span className="text-[10px] text-gray-400 font-semibold">Safe Sequences</span>
           </div>
         </div>
 
-        {/* KPI 3 */}
-        <div className="bg-surface-container-lowest rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col justify-between border border-[#E5E7EB]">
-          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary-container"></div>
+        {/* KPI 3: Published Schemes */}
+        <div className="bg-white rounded-2xl p-5 shadow-2xs relative overflow-hidden flex flex-col justify-between border border-gray-200/90 hover:shadow-md transition-shadow">
+          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-indigo-500"></div>
           <div>
             <div className="flex items-center justify-between mb-1">
-              <span className="font-label-caps text-label-caps uppercase text-on-surface-variant font-semibold">
+              <span className="text-[11px] uppercase font-bold text-gray-500 tracking-wider">
                 Published Schemes
               </span>
-              <span className="material-symbols-outlined text-primary-container text-[20px]">account_balance</span>
+              <BookOpen className="w-4 h-4 text-indigo-600" />
             </div>
-            <div className="font-headline-md text-headline-md text-primary tracking-tight font-bold">
+            <div className="text-2xl font-black text-[#1A1A1A] tracking-tight">
               {metrics.publishedSchemesCount || 0}
             </div>
           </div>
-          <div className="mt-3 pt-2 border-t border-[#E5E7EB] flex items-center justify-between">
-            <span className="font-label-sm text-label-sm text-on-surface-variant">9 MP Districts</span>
-            <span className="font-label-sm text-label-sm text-primary font-medium">Live Ingested</span>
+          <div className="mt-3 pt-2.5 border-t border-gray-100 flex items-center justify-between">
+            <span className="text-xs font-semibold text-gray-500">9 MP Districts</span>
+            <span className="text-xs font-bold text-indigo-700">Live Ingested</span>
           </div>
         </div>
 
-        {/* KPI 4 */}
-        <div className="bg-surface-container-lowest rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col justify-between border border-[#E5E7EB]">
-          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary-fixed"></div>
+        {/* KPI 4: Active Campaigns */}
+        <div className="bg-white rounded-2xl p-5 shadow-2xs relative overflow-hidden flex flex-col justify-between border border-gray-200/90 hover:shadow-md transition-shadow">
+          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-emerald-500"></div>
           <div>
             <div className="flex items-center justify-between mb-1">
-              <span className="font-label-caps text-label-caps uppercase text-on-surface-variant font-semibold">
+              <span className="text-[11px] uppercase font-bold text-gray-500 tracking-wider">
                 Active Campaigns
               </span>
-              <span className="material-symbols-outlined text-primary text-[20px]">volunteer_activism</span>
+              <HeartHandshake className="w-4 h-4 text-emerald-600" />
             </div>
-            <div className="font-headline-md text-headline-md text-primary tracking-tight font-bold">
+            <div className="text-2xl font-black text-[#1A1A1A] tracking-tight">
               {metrics.activeCampaignsCount || 0}
             </div>
           </div>
-          <div className="mt-3 pt-2 border-t border-[#E5E7EB] flex items-center justify-between">
-            <span className="font-label-sm text-label-sm text-on-surface-variant">Health &amp; Livelihood</span>
-            <span className="font-label-sm text-label-sm text-secondary font-medium">100% Field Ops</span>
+          <div className="mt-3 pt-2.5 border-t border-gray-100 flex items-center justify-between">
+            <span className="text-xs font-semibold text-gray-500">Health &amp; Livelihood</span>
+            <span className="text-xs font-bold text-emerald-700">100% Field Ops</span>
           </div>
         </div>
 
-        {/* KPI 5 */}
-        <div className="bg-surface-container-lowest rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col justify-between border border-[#E5E7EB]">
-          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-secondary-fixed"></div>
+        {/* KPI 5: AI Reviews Queue */}
+        <div className="bg-white rounded-2xl p-5 shadow-2xs relative overflow-hidden flex flex-col justify-between border border-gray-200/90 hover:shadow-md transition-shadow">
+          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-amber-500"></div>
           <div>
             <div className="flex items-center justify-between mb-1">
-              <span className="font-label-caps text-label-caps uppercase text-on-surface-variant font-semibold">
+              <span className="text-[11px] uppercase font-bold text-gray-500 tracking-wider">
                 AI Reviews Queue
               </span>
-              <span className="material-symbols-outlined text-secondary text-[20px]">psychology_alt</span>
+              <Sparkles className="w-4 h-4 text-amber-500" />
             </div>
-            <div className="font-headline-md text-headline-md text-on-surface tracking-tight font-bold">
+            <div className="text-2xl font-black text-amber-900 tracking-tight">
               {metrics.pendingAiReviewsCount || 0}
             </div>
           </div>
-          <div className="mt-3 pt-2 border-t border-[#E5E7EB] flex items-center justify-between">
-            <span className="font-label-sm text-label-sm text-secondary font-medium">Human Review Desk</span>
-            <span className="font-label-sm text-label-sm text-on-surface-variant">Hindi Drafts</span>
+          <div className="mt-3 pt-2.5 border-t border-gray-100 flex items-center justify-between">
+            <span className="text-xs font-bold text-amber-700">Human Review Desk</span>
+            <span className="text-[10px] text-gray-400 font-semibold">Hindi Drafts</span>
           </div>
         </div>
       </div>
 
-      {/* Main Grid: Analytics & Realtime Stream */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Recent Activity & Campaigns */}
+      {/* 3. MAIN ANALYTICS & RECENT TRANSACTIONS GRID */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left Column: Chart & Ledger Table (8 Cols) */}
         <div className="lg:col-span-8 flex flex-col gap-6">
-          {/* Monthly Collection Chart */}
-          <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-[#E5E7EB] space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-[#E5E7EB]">
+          {/* Monthly Collection Velocity Chart */}
+          <div className="bg-white rounded-2xl p-6 shadow-2xs border border-gray-200/90 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-gray-100">
               <div>
-                <h3 className="font-title-md text-title-md text-primary font-bold">Monthly Donation Velocity</h3>
-                <p className="font-body-sm text-xs text-on-surface-variant">
+                <h3 className="text-base sm:text-lg font-bold text-[#1A1A1A]">
+                  Monthly Donation Velocity
+                </h3>
+                <p className="text-xs text-gray-500">
                   INR contributions collected across all active campaigns (FY 2026-27).
                 </p>
               </div>
-              <span className="px-3 py-1 rounded-full bg-surface-container-high text-primary font-label-sm text-xs font-semibold">
+              <span className="px-2.5 py-1 rounded-full bg-red-50 text-[#EA3C36] text-xs font-bold border border-red-200/60">
                 Live Data
               </span>
             </div>
@@ -231,148 +291,234 @@ export const AdminDashboardPage: React.FC = () => {
                     { name: 'Mar', amount: metrics.totalAmountCollected || 250000 },
                   ]}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                  <XAxis dataKey="name" stroke="#6B7280" fontSize={12} />
-                  <YAxis stroke="#6B7280" fontSize={12} />
-                  <Tooltip
-                    formatter={(val: any) => [`₹${Number(val).toLocaleString('en-IN')}`, 'Amount']}
-                    contentStyle={{ backgroundColor: '#FFFFFF', borderRadius: '8px', border: '1px solid #E5E7EB' }}
+                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F3F5" vertical={false} />
+                  <XAxis dataKey="name" stroke="#9CA3AF" fontSize={11} tickLine={false} />
+                  <YAxis
+                    stroke="#9CA3AF"
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(val) => `₹${val / 1000}k`}
                   />
-                  <Bar dataKey="amount" fill="#EA3C36" radius={[6, 6, 0, 0]} />
+                  <Tooltip
+                    formatter={(val: any) => [`₹${Number(val).toLocaleString('en-IN')}`, 'Collections']}
+                    contentStyle={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '12px',
+                      border: '1px solid #E5E7EB',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
+                      fontSize: '12px',
+                    }}
+                  />
+                  <Bar dataKey="amount" fill="#EA3C36" radius={[6, 6, 0, 0]} maxBarSize={48} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          {/* Recent Donations Table */}
-          <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-[#E5E7EB] overflow-hidden">
-            <div className="p-6 border-b border-[#E5E7EB] flex items-center justify-between">
+          {/* Latest Donor Transactions Ledger */}
+          <div className="bg-white rounded-2xl shadow-2xs border border-gray-200/90 overflow-hidden">
+            <div className="p-5 sm:p-6 border-b border-gray-100 flex items-center justify-between">
               <div>
-                <h3 className="font-title-md text-title-md text-primary font-bold">Latest Donor Transactions</h3>
-                <p className="font-body-sm text-xs text-on-surface-variant">
-                  Real-time ledger updates with instant 80G receipt linkage.
+                <h3 className="text-base sm:text-lg font-bold text-[#1A1A1A]">
+                  Latest Donor Transactions
+                </h3>
+                <p className="text-xs text-gray-500">
+                  Real-time statutory ledger updates with instant 80G receipt linkage.
                 </p>
               </div>
               <Link
                 to="/admin/donations"
-                className="font-label-sm text-label-sm text-secondary hover:underline font-semibold"
+                className="inline-flex items-center gap-1 text-xs font-bold text-[#EA3C36] hover:underline"
               >
-                View All →
+                <span>View All</span>
+                <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[600px] text-left border-collapse">
+              <table className="w-full min-w-[620px] text-left border-collapse">
                 <thead>
-                  <tr className="bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider border-b border-[#E5E7EB]">
-                    <th className="py-3 px-6 font-semibold">Donor</th>
-                    <th className="py-3 px-6 font-semibold">Amount</th>
-                    <th className="py-3 px-6 font-semibold">Campaign</th>
-                    <th className="py-3 px-6 font-semibold">Receipt Number</th>
-                    <th className="py-3 px-6 font-semibold">Status</th>
+                  <tr className="bg-gray-50/80 text-gray-500 text-[11px] uppercase tracking-wider border-b border-gray-200/80">
+                    <th className="py-3 px-6 font-bold">Donor</th>
+                    <th className="py-3 px-6 font-bold">Amount</th>
+                    <th className="py-3 px-6 font-bold">Campaign</th>
+                    <th className="py-3 px-6 font-bold">Receipt Number</th>
+                    <th className="py-3 px-6 font-bold">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#E5E7EB]">
+                <tbody className="divide-y divide-gray-100">
                   {(data?.recentDonations || []).slice(0, 5).map((d: any) => (
-                    <tr key={d.id} className="hover:bg-surface-container-low/40">
-                      <td className="py-3 px-6">
-                        <p className="font-label-md text-sm font-semibold text-on-surface">
+                    <tr key={d.id} className="hover:bg-gray-50/60 transition-colors">
+                      <td className="py-3.5 px-6">
+                        <p className="text-xs font-bold text-gray-900">
                           {d.donor?.fullName || 'Anonymous Patron'}
                         </p>
-                        <p className="font-body-sm text-xs text-on-surface-variant">{d.donor?.email}</p>
+                        <p className="text-[11px] text-gray-500">{d.donor?.email}</p>
                       </td>
-                      <td className="py-3 px-6">
-                        <p className="font-title-md text-sm font-bold text-primary">
+                      <td className="py-3.5 px-6">
+                        <p className="text-xs font-extrabold text-[#EA3C36]">
                           ₹{Number(d.amount).toLocaleString('en-IN')}
                         </p>
                       </td>
-                      <td className="py-3 px-6 font-body-sm text-xs text-on-surface-variant">
-                        {d.campaign?.title || 'General Fund'}
+                      <td className="py-3.5 px-6 text-xs text-gray-600 font-medium">
+                        {d.campaign?.title || 'General Welfare Fund'}
                       </td>
-                      <td className="py-3 px-6 font-mono text-xs font-semibold text-primary">
-                        {d.receipt?.receiptNumber || '—'}
+                      <td className="py-3.5 px-6 font-mono text-xs font-bold text-[#1A1A1A]">
+                        {d.receipt?.receiptNumber ? (
+                          <span className="px-2 py-0.5 rounded bg-gray-100 border border-gray-200 text-gray-800">
+                            {d.receipt.receiptNumber}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )}
                       </td>
-                      <td className="py-3 px-6">
-                        <span className="px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-xs font-semibold">
+                      <td className="py-3.5 px-6">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
                           {d.status}
                         </span>
                       </td>
                     </tr>
                   ))}
+                  {(!data?.recentDonations || data.recentDonations.length === 0) && (
+                    <tr>
+                      <td colSpan={5} className="py-8 text-center text-xs text-gray-500">
+                        No transactions recorded yet in this fiscal period.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
           </div>
         </div>
 
-        {/* Right Column: AI Reviews & Quick Links */}
+        {/* Right Column: AI Ingestion & Quick Admin Links (4 Cols) */}
         <div className="lg:col-span-4 flex flex-col gap-6">
-          {/* AI Reviews Callout */}
-          <div className="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-[#E5E7EB] space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-secondary text-[24px]">psychology_alt</span>
-              <h3 className="font-title-md text-title-md text-primary font-bold">
-                OpenAI Plain-Hindi Drafter
-              </h3>
+          {/* OpenAI Plain-Hindi Review Desk Callout */}
+          <div className="bg-white p-6 rounded-2xl shadow-2xs border border-gray-200/90 space-y-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 border border-amber-200">
+                <Sparkles className="w-5 h-5 text-amber-600" />
+              </div>
+              <div className="flex flex-col">
+                <h3 className="text-sm font-bold text-gray-900">
+                  OpenAI Plain-Hindi Drafter
+                </h3>
+                <span className="text-[10px] uppercase font-bold text-amber-700">
+                  Human-In-The-Loop Desk
+                </span>
+              </div>
             </div>
-            <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
-              Generate easy-to-read, plain-Hindi scheme summaries for rural beneficiaries with structured JSON output and human-in-the-loop review.
+
+            <p className="text-xs text-gray-600 leading-relaxed">
+              Synthesize complex official gazettes into easy-to-read, plain-Hindi scheme summaries for rural beneficiaries with structured JSON output and editorial verification.
             </p>
-            <div className="p-3.5 rounded-xl bg-surface-container-low border border-[#E5E7EB] space-y-1">
-              <div className="flex justify-between font-label-sm text-xs font-semibold">
-                <span className="text-on-surface-variant">Queue Status:</span>
-                <span className="text-secondary">{metrics.pendingAiReviewsCount || 0} Pending</span>
+
+            <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 space-y-2">
+              <div className="flex justify-between text-xs font-semibold">
+                <span className="text-gray-600">Pending Review Queue:</span>
+                <span className="text-amber-700 font-bold">{metrics.pendingAiReviewsCount || 0} Pending</span>
               </div>
-              <div className="flex justify-between font-label-sm text-xs font-semibold">
-                <span className="text-on-surface-variant">AI Model:</span>
-                <span className="text-primary">gpt-4o-mini (Configurable)</span>
+              <div className="flex justify-between text-xs font-semibold">
+                <span className="text-gray-600">AI Model Pipeline:</span>
+                <span className="text-[#EA3C36] font-mono text-[11px] font-bold">gpt-4o-mini</span>
               </div>
             </div>
+
             <Link
               to="/admin/ai-reviews"
-              className="inline-flex items-center justify-center w-full py-2.5 rounded-xl bg-primary text-on-primary font-label-md text-label-md font-semibold hover:bg-primary-container transition-colors shadow-sm"
+              className="inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-[#EA3C36] hover:bg-[#D32F2F] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
             >
-              Open AI Review Desk →
+              <Sparkles className="w-4 h-4" />
+              <span>Open AI Review Desk →</span>
             </Link>
           </div>
 
-          {/* Quick Admin Actions */}
-          <div className="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-[#E5E7EB] space-y-3">
-            <h3 className="font-title-md text-title-md text-primary font-bold">Quick Administrative Tools</h3>
+          {/* Quick Administrative Shortcuts */}
+          <div className="bg-white p-6 rounded-2xl shadow-2xs border border-gray-200/90 space-y-3">
+            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider text-[11px] text-gray-400">
+              Quick Administrative Tools
+            </h3>
+
             <div className="flex flex-col gap-2">
               <Link
                 to="/admin/schemes"
-                className="flex items-center justify-between p-3 rounded-xl bg-surface-container-low hover:bg-surface-container text-primary font-label-md text-sm font-semibold transition-colors"
+                className="flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-red-50/50 hover:border-red-200 text-gray-800 hover:text-[#EA3C36] text-xs font-bold border border-gray-200 transition-all"
               >
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[18px]">menu_book</span>
+                <div className="flex items-center gap-2.5">
+                  <BookOpen className="w-4 h-4 text-[#EA3C36]" />
                   <span>Manage Welfare Schemes</span>
                 </div>
-                <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
               </Link>
 
               <Link
                 to="/admin/campaigns"
-                className="flex items-center justify-between p-3 rounded-xl bg-surface-container-low hover:bg-surface-container text-primary font-label-md text-sm font-semibold transition-colors"
+                className="flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-red-50/50 hover:border-red-200 text-gray-800 hover:text-[#EA3C36] text-xs font-bold border border-gray-200 transition-all"
               >
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[18px]">layers</span>
+                <div className="flex items-center gap-2.5">
+                  <Layers className="w-4 h-4 text-[#EA3C36]" />
                   <span>Campaign Budgets &amp; Goals</span>
                 </div>
-                <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
               </Link>
 
               <Link
                 to="/admin/reports"
-                className="flex items-center justify-between p-3 rounded-xl bg-surface-container-low hover:bg-surface-container text-primary font-label-md text-sm font-semibold transition-colors"
+                className="flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-red-50/50 hover:border-red-200 text-gray-800 hover:text-[#EA3C36] text-xs font-bold border border-gray-200 transition-all"
               >
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[18px]">table_chart</span>
+                <div className="flex items-center gap-2.5">
+                  <FileSpreadsheet className="w-4 h-4 text-[#EA3C36]" />
                   <span>Form 10BD Annual Returns</span>
                 </div>
-                <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
               </Link>
             </div>
+          </div>
+
+          {/* Automated Pipelines & Reminders Card */}
+          <div className="bg-white p-6 rounded-2xl shadow-2xs border border-gray-200/90 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Bell className="w-4 h-4 text-[#EA3C36]" />
+                <h3 className="text-sm font-bold text-gray-900">
+                  Automated Pipelines &amp; Reminders
+                </h3>
+              </div>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200">
+                Live Active
+              </span>
+            </div>
+
+            <div className="space-y-2 text-xs">
+              <div className="p-2.5 rounded-lg bg-gray-50 flex items-center justify-between">
+                <span className="text-gray-600 font-medium">80G Receipts &amp; Certificates:</span>
+                <span className="font-bold text-emerald-700">100% Atomic</span>
+              </div>
+              <div className="p-2.5 rounded-lg bg-gray-50 flex items-center justify-between">
+                <span className="text-gray-600 font-medium">Form 10BD Tax Reminders:</span>
+                <span className="font-bold text-gray-800">Automated</span>
+              </div>
+              <div className="p-2.5 rounded-lg bg-gray-50 flex items-center justify-between">
+                <span className="text-gray-600 font-medium">Monthly Recurring Reminders:</span>
+                <span className="font-bold text-gray-800">Automated</span>
+              </div>
+              <div className="p-2.5 rounded-lg bg-gray-50 flex items-center justify-between">
+                <span className="text-gray-600 font-medium">30-Day Gazette Audit Monitor:</span>
+                <span className="font-bold text-[#EA3C36]">Active</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              disabled={isTriggeringAutomation}
+              onClick={handleTriggerAutomation}
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gray-100 hover:bg-red-50 hover:text-[#EA3C36] text-gray-700 text-xs font-bold transition-all border border-gray-200 hover:border-red-200 cursor-pointer disabled:opacity-50"
+            >
+              <RotateCw className={`w-3.5 h-3.5 ${isTriggeringAutomation ? "animate-spin text-[#EA3C36]" : ""}`} />
+              <span>{isTriggeringAutomation ? "Processing Automation Suite..." : "Run Automated Reminders & Audit Suite"}</span>
+            </button>
           </div>
         </div>
       </div>

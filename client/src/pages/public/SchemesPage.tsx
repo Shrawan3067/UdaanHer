@@ -15,6 +15,9 @@ import {
   FileText,
   X,
   Filter,
+  Mic,
+  MicOff,
+  ExternalLink,
 } from "lucide-react";
 
 const MP_DISTRICTS = [
@@ -67,6 +70,78 @@ export const SchemesPage: React.FC = () => {
     schemeCode?: string;
     schemeName?: string;
   }>({ isOpen: false });
+
+  // Hindi Voice Recognition State
+  const [isListening, setIsListening] = useState(false);
+  const [speechError, setSpeechError] = useState<string | null>(null);
+  const recognitionRef = React.useRef<any>(null);
+
+  const toggleListening = () => {
+    setSpeechError(null);
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setSpeechError(
+        language === "HI"
+          ? "ब्राउज़र में बोलकर खोजने की सुविधा उपलब्ध नहीं है।"
+          : "Voice speech recognition is not supported in this browser."
+      );
+      return;
+    }
+
+    if (isListening) {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "hi-IN";
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setSearch(transcript);
+        setIsListening(false);
+        // Instant search with speech query
+        setIsLoading(true);
+        api.getSchemes({
+          search: transcript.trim() || undefined,
+          category: category !== "All" ? category : undefined,
+          district: district !== "All Districts" ? district : undefined,
+          page: 1,
+          limit: 6,
+        }).then((res) => {
+          setSchemes(res.schemes);
+          setPagination(res.pagination);
+        }).finally(() => {
+          setIsLoading(false);
+        });
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch {
+      setIsListening(false);
+    }
+  };
 
   const fetchSchemes = async () => {
     setIsLoading(true);
@@ -141,26 +216,44 @@ export const SchemesPage: React.FC = () => {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by program name, keywords (e.g. 'first aid', 'maternity', 'loan', 'ambulance')..."
-            className="w-full pl-12 pr-28 sm:pr-32 py-3 bg-gray-50 rounded-lg text-sm text-[#1A1A1A] placeholder:text-gray-400 border border-gray-200 focus:bg-white focus:border-[#EA3C36] focus:outline-hidden transition-all shadow-xs"
+            placeholder="Search by program name, keywords or speak in Hindi (e.g. 'विधवा पेंशन', 'maternity', 'loan')..."
+            className="w-full pl-12 pr-36 sm:pr-40 py-3 bg-gray-50 rounded-lg text-sm text-[#1A1A1A] placeholder:text-gray-400 border border-gray-200 focus:bg-white focus:border-[#EA3C36] focus:outline-hidden transition-all shadow-xs"
           />
-          {search && (
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+            {search && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                className="text-gray-400 hover:text-gray-600 p-1 cursor-pointer"
+                aria-label="Clear search"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
             <button
               type="button"
-              onClick={clearSearch}
-              className="absolute right-20 sm:right-24 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 cursor-pointer"
-              aria-label="Clear search"
+              onClick={toggleListening}
+              title={isListening ? "Listening in Hindi... Click to Stop" : "Click to Speak in Hindi (बोलकर खोजें)"}
+              className={`p-1.5 rounded-md transition-all cursor-pointer ${
+                isListening
+                  ? "bg-[#EA3C36] text-white animate-pulse shadow-xs"
+                  : "bg-gray-100 hover:bg-red-50 text-gray-600 hover:text-[#EA3C36]"
+              }`}
+              aria-label="Speak search in Hindi"
             >
-              <X className="w-4 h-4" />
+              {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
             </button>
-          )}
-          <button
-            type="submit"
-            className="absolute right-2 top-1/2 -translate-y-1/2 px-4 sm:px-5 py-1.5 bg-[#EA3C36] hover:bg-[#D32F2F] text-white text-xs font-bold rounded-md shadow-xs transition-colors cursor-pointer"
-          >
-            Search
-          </button>
+            <button
+              type="submit"
+              className="px-4 sm:px-5 py-1.5 bg-[#EA3C36] hover:bg-[#D32F2F] text-white text-xs font-bold rounded-md shadow-xs transition-colors cursor-pointer"
+            >
+              Search
+            </button>
+          </div>
         </form>
+        {speechError && (
+          <p className="text-xs text-red-600 font-semibold">{speechError}</p>
+        )}
 
         {/* Category Pills */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
@@ -188,7 +281,9 @@ export const SchemesPage: React.FC = () => {
                       : "bg-gray-200/80 text-gray-600"
                   }`}
                 >
-                  {cat.count}
+                  {cat.id === "All" && pagination.total > 0
+                    ? pagination.total
+                    : cat.count}
                 </span>
               </button>
             );
@@ -340,11 +435,45 @@ export const SchemesPage: React.FC = () => {
                         {scheme.description}
                       </p>
 
-                      {/* Document Requirement Pill */}
-                      <div className="flex items-center gap-1.5 text-[11px] text-gray-500">
-                        <FileText className="w-3.5 h-3.5 text-gray-400" />
-                        <span>{docCount} key documents required</span>
+                      {/* Document Requirement Pill, Official Source Link & Last Checked Date */}
+                      <div className="flex items-center justify-between text-[11px] text-gray-500 pt-1">
+                        <span className="flex items-center gap-1.5">
+                          <FileText className="w-3.5 h-3.5 text-gray-400" />
+                          <span>{docCount} key documents</span>
+                        </span>
+                        <div className="flex items-center gap-2">
+                          {scheme.officialSourceUrl && (
+                            <a
+                              href={scheme.officialSourceUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[#EA3C36] hover:underline font-bold inline-flex items-center gap-0.5"
+                            >
+                              <span>Official Notice</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          )}
+                          {scheme.lastCheckedAt && (
+                            <span className="text-[10px] text-gray-500">
+                              Verified: {new Date(scheme.lastCheckedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                            </span>
+                          )}
+                        </div>
                       </div>
+
+                      {/* Nearest Help Centre (Mandated by Brief) */}
+                      {scheme.nearestHelpCentre && scheme.nearestHelpCentre.name && (
+                        <div className="pt-2 text-[11px] text-gray-600 space-y-0.5 border-t border-gray-100 mt-2">
+                          <span className="font-semibold text-gray-700 block line-clamp-1">
+                            📍 {scheme.nearestHelpCentre.name}
+                          </span>
+                          {scheme.nearestHelpCentre.phone && (
+                            <span className="text-[#EA3C36] font-bold block">
+                              📞 {scheme.nearestHelpCentre.phone}
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
 

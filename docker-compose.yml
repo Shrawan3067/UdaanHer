@@ -1,0 +1,71 @@
+version: "3.8"
+
+services:
+  # ============================================================================
+  # Backend API Service (Node.js + Express + MongoDB Atlas)
+  # ============================================================================
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: udaanher-backend
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    env_file:
+      - ./server/.env
+    environment:
+      - NODE_ENV=production
+      - PORT=5001
+    volumes:
+      - receipt_storage:/app/storage/receipts
+      - backend_logs:/app/logs
+    networks:
+      - udaanher-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # ============================================================================
+  # Frontend & Reverse Proxy (React Vite + Nginx)
+  # ============================================================================
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-/api/v1}
+    container_name: udaanher-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      backend:
+        condition: service_healthy
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+    networks:
+      - udaanher-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  receipt_storage:
+    name: udaanher_receipts
+  backend_logs:
+    name: udaanher_logs
+
+networks:
+  udaanher-network:
+    name: udaanher_network
+    driver: bridge
+

@@ -59,3 +59,10 @@ export const updateSchemeSchema = z.object({
   }),
 });
 
+export const askSchemeQuestionSchema = z.object({
+  body: z.object({
+    question: z.string().min(2, 'Question must be at least 2 characters'),
+    district: z.string().optional(),
+  }),
+});
+

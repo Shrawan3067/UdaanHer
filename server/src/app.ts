@@ -16,15 +16,30 @@ import paymentRoutes from './modules/payments/payment.routes.js';
 import receiptRoutes from './modules/receipts/receipt.routes.js';
 import aiRoutes from './modules/ai/ai.routes.js';
 import adminReportRoutes from './modules/reports/report.routes.js';
+import adminAutomationRouter from './modules/automation/automation.routes.js';
 
 export function createApp(): Express {
   const app = express();
 
+  // Support reverse proxies (AWS ALB, EC2 Nginx reverse proxy, CloudFront)
+  app.set('trust proxy', 1);
+
   // 1. Security & Headers
   app.use(helmet());
+
+  const configuredOrigins = env.CLIENT_URL.split(',').map((u) => u.trim()).filter(Boolean);
+  const allowedOrigins = Array.from(new Set([...configuredOrigins, 'http://localhost:5173', 'http://127.0.0.1:5173']));
+
   app.use(
     cors({
-      origin: [env.CLIENT_URL, 'http://localhost:5173', 'http://127.0.0.1:5173'],
+      origin: (origin, callback) => {
+        // Allow requests with no origin (e.g. curl, health checks, same-origin reverse proxy)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+          return callback(null, true);
+        }
+        return callback(null, false);
+      },
       credentials: true,
       methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
@@ -96,6 +111,7 @@ export function createApp(): Express {
   apiV1.use('/admin/campaigns', adminCampaignRouter);
   apiV1.use('/admin/donations', adminDonationRouter);
   apiV1.use('/admin/ai', aiRoutes);
+  apiV1.use('/admin/automation', adminAutomationRouter);
   apiV1.use('/admin', adminReportRoutes);
 
   app.use('/api/v1', apiV1);

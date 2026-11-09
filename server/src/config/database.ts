@@ -206,6 +206,13 @@ class MongoAtlasClient {
               valObj.mode === "insensitive" ? "i" : "",
             ),
           };
+        } else if ("startsWith" in valObj) {
+          query[key] = {
+            $regex: new RegExp(
+              `^${valObj.startsWith}`,
+              valObj.mode === "insensitive" ? "i" : "",
+            ),
+          };
         } else if ("equals" in valObj) {
           if (valObj.mode === "insensitive") {
             query[key] = { $regex: new RegExp(`^${valObj.equals}$`, "i") };
@@ -817,6 +824,11 @@ class MongoAtlasClient {
         await database.collection("receipts").insertOne(record, { session });
         return this.normalizeDoc(record);
       },
+      count: async (args?: { where?: any }) => {
+        const database = await this.getDb();
+        const query = this.buildMongoQuery(args?.where);
+        return database.collection("receipts").countDocuments(query, { session });
+      },
       deleteMany: async (args?: { where?: any }) => {
         const database = await this.getDb();
         const query = this.buildMongoQuery(args?.where);
@@ -989,6 +1001,26 @@ class MongoAtlasClient {
 
   private createAuditLogRepo(session?: ClientSession) {
     return {
+      findMany: async (args?: {
+        where?: any;
+        orderBy?: any;
+        take?: number;
+        skip?: number;
+      }) => {
+        const database = await this.getDb();
+        const query = this.buildMongoQuery(args?.where);
+        const cursor = database.collection("audit_logs").find(query, { session });
+        if (args?.orderBy) cursor.sort(this.buildSort(args.orderBy));
+        if (args?.skip) cursor.skip(args.skip);
+        if (args?.take) cursor.limit(args.take);
+        const docs = await cursor.toArray();
+        return docs.map((d) => this.normalizeDoc(d));
+      },
+      count: async (args?: { where?: any }) => {
+        const database = await this.getDb();
+        const query = this.buildMongoQuery(args?.where);
+        return database.collection("audit_logs").countDocuments(query, { session });
+      },
       create: async (args: { data: any }) => {
         const database = await this.getDb();
         const id = args.data.id || crypto.randomUUID();

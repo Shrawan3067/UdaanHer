@@ -11,6 +11,7 @@
     "start": "node dist/server.js",
     "db:seed": "tsx src/scripts/seed.ts",
     "seed": "tsx src/scripts/seed.ts",
+    "seed:prod": "node dist/scripts/seed.js",
     "test": "vitest run tests/unit",
     "test:all": "vitest run",
     "test:watch": "vitest",

@@ -1,0 +1,182 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'UdaanHer Full-Stack Platform - AWS EC2 Infrastructure (Giving women wings to fly)'
+
+Parameters:
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: Must be the name of an existing EC2 KeyPair.
+
+  InstanceType:
+    Description: EC2 instance type
+    Type: String
+    Default: t3.small
+    AllowedValues:
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t2.micro
+      - t2.small
+    ConstraintDescription: Must be a valid EC2 instance type.
+
+  SSHLocation:
+    Description: The IP address range that can be used to SSH to the EC2 instances
+    Type: String
+    MinLength: 9
+    MaxLength: 18
+    Default: 0.0.0.0/0
+    AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x.
+
+Mappings:
+  # Latest Ubuntu 22.04 LTS AMIs (HVM:ebs-ssd) by Region
+  RegionMap:
+    us-east-1:
+      AMI: ami-0c7217cdde317cfec
+    us-east-2:
+      AMI: ami-05fb0b8c1424f266b
+    us-west-2:
+      AMI: ami-008fe2fc65e71647b
+    ap-south-1: # Mumbai (Recommended for Indian NGOs)
+      AMI: ami-0f5ee92e2d63afc18
+    ap-southeast-1:
+      AMI: ami-01811d4912b4ccb26
+    eu-central-1:
+      AMI: ami-0faab6bdbac9486fb
+    eu-west-1:
+      AMI: ami-0694d931cee176e7d
+
+Resources:
+  # ----------------------------------------------------------------------------
+  # 1. EC2 Security Group
+  # ----------------------------------------------------------------------------
+  UdaanHerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable HTTP, HTTPS, and SSH access for UdaanHer
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref SSHLocation
+          Description: SSH access
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+          Description: HTTP web traffic
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+          Description: HTTPS secure traffic
+      Tags:
+        - Key: Name
+          Value: udaanher-security-group
+        - Key: Project
+          Value: UdaanHer
+
+  # ----------------------------------------------------------------------------
+  # 2. EC2 Virtual Machine Instance
+  # ----------------------------------------------------------------------------
+  UdaanHerEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', AMI]
+      SecurityGroupIds:
+        - !Ref UdaanHerSecurityGroup
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 20
+            VolumeType: gp3
+            DeleteOnTermination: true
+      Tags:
+        - Key: Name
+          Value: udaanher-production-server
+        - Key: Project
+          Value: UdaanHer
+      UserData:
+        Fn::Base64: !Sub |
+          #!/usr/bin/env bash
+          set -euo pipefail
+          exec > >(tee /var/log/udaanher-bootstrap.log | logger -t udaanher-init -s 2>/dev/console) 2>&1
+
+          # 1. Configure 2GB Swap Memory (ensures build stability on t2/t3.micro)
+          fallocate -l 2G /swapfile || dd if=/dev/zero of=/swapfile bs=1M count=2048
+          chmod 600 /swapfile
+          mkswap /swapfile
+          swapon /swapfile
+          echo '/swapfile none swap sw 0 0' >> /etc/fstab
+
+          # 2. Install base packages
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update -y
+          apt-get install -y curl wget git build-essential ufw software-properties-common ca-certificates gnupg
+
+          # 3. Install Node.js 20 LTS & PM2
+          curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+          apt-get install -y nodejs
+          npm install -g pm2
+
+          # 4. Install Docker & Docker Compose
+          install -m 0755 -d /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor --yes -o /etc/apt/keyrings/docker.gpg
+          chmod a+r /etc/apt/keyrings/docker.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+          apt-get update -y
+          apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+          systemctl enable --now docker
+          usermod -aG docker ubuntu || true
+
+          # 5. Install Nginx & Certbot
+          apt-get install -y nginx certbot python3-certbot-nginx
+          systemctl enable --now nginx
+
+          # 6. Configure Host Firewall
+          ufw allow OpenSSH || ufw allow 22/tcp
+          ufw allow 'Nginx Full' || (ufw allow 80/tcp && ufw allow 443/tcp)
+          echo "y" | ufw enable || true
+
+          mkdir -p /home/ubuntu/udaanher
+          chown -R ubuntu:ubuntu /home/ubuntu/udaanher
+          echo "UdaanHer CloudFormation Bootstrap Completed Successfully."
+
+  # ----------------------------------------------------------------------------
+  # 3. Static Elastic IP Address
+  # ----------------------------------------------------------------------------
+  UdaanHerElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: udaanher-elastic-ip
+        - Key: Project
+          Value: UdaanHer
+
+  UdaanHerEIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      InstanceId: !Ref UdaanHerEC2Instance
+      EIP: !Ref UdaanHerElasticIP
+
+Outputs:
+  ElasticIP:
+    Description: Static Public Elastic IP Address of the UdaanHer Server
+    Value: !Ref UdaanHerElasticIP
+
+  WebsiteURL:
+    Description: Public HTTP URL for UdaanHer Web Platform
+    Value: !Sub 'http://${UdaanHerElasticIP}/'
+
+  HealthCheckURL:
+    Description: Health Check Endpoint URL
+    Value: !Sub 'http://${UdaanHerElasticIP}/health'
+
+  SSHCommand:
+    Description: Command to SSH into the newly created instance
+    Value: !Sub 'ssh -i ${KeyName}.pem ubuntu@${UdaanHerElasticIP}'
+

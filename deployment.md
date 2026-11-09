@@ -1,6 +1,6 @@
 # UdaanHer: Giving women wings to fly — Deployment & Operations Guide
 
-This guide details local setup, database provisioning, environment configurations, and production deployment instructions for **UdaanHer** across Vercel (Frontend), Render / Railway (Backend), and **MongoDB Atlas** (Cloud Database).
+This guide details local setup, database provisioning, environment configurations, and production deployment instructions for **UdaanHer** across **AWS EC2 (Production Recommended)**, Vercel (Frontend), Render / Railway (Backend), and **MongoDB Atlas** (Cloud Database).
 
 ---
 
@@ -13,8 +13,8 @@ This guide details local setup, database provisioning, environment configuration
 
 ### Step 1: Clone Repository & Install Root Workspaces
 ```bash
-git clone <repo-url>
-cd SakhiSetu
+git clone https://github.com/Shrawan3067/UdaanHer.git
+cd UdaanHer
 
 # Install dependencies for both server and client workspaces
 npm install
@@ -50,37 +50,31 @@ Local connection string: `mongodb://127.0.0.1:27017/udaanher?replicaSet=rs0`
 
 ## 3. Environment Variables Configuration
 
-### 3.1 Backend Environment (`server/.env`)
-Create `server/.env` based on `server/.env.example`:
+### 3.1 Backend Environment Variables (`server/.env`)
+Create `server/.env` with the following required environment variable names (names and descriptions only, per submission rules):
 
-```bash
-cp server/.env.example server/.env
-```
-
-| Variable | Description | Example Value |
+| Variable Name | Description | Purpose |
 |---|---|---|
-| `NODE_ENV` | Runtime environment | `development` (or `production`) |
-| `PORT` | Backend port | `5001` |
-| `CLIENT_URL` | Frontend origin for CORS | `http://localhost:5173` |
-| `DATABASE_URL` | Primary MongoDB Atlas connection string | `mongodb+srv://user:pass@cluster0.abcde.mongodb.net/udaanher?retryWrites=true&w=majority` |
-| `DATABASE_URL_TEST` | Isolated MongoDB database for test suites | `mongodb+srv://user:pass@cluster0.abcde.mongodb.net/udaanher_test?retryWrites=true&w=majority` |
-| `JWT_SECRET` | 32+ character key for JWT signing | `udaanher-super-secure-production-jwt-secret-key-32chars` |
-| `JWT_ACCESS_EXPIRES_IN` | Token duration | `24h` |
-| `OPENAI_API_KEY` | Official OpenAI API Key for Hindi summaries | `sk-proj-...` (optional, has built-in safe synthesis fallback) |
-| `OPENAI_MODEL` | OpenAI Model | `gpt-4o-mini` |
-| `TRUST_NAME` | Client Trust Name (Statutory Registration) | `UdaanHer Women Welfare & Empowerment Charitable Trust (Bhopal)` |
-| `TRUST_ADDRESS` | Trust Registered Address | `Plot 14, Arera Hills, Bhopal, Madhya Pradesh - 462011` |
-| `TRUST_PAN` | Trust PAN | `AAATC1234D` |
-| `TRUST_80G_REGISTRATION` | Trust 80G Statutory Registration Number | `CIT(E)/BPL/80G/2021-22/A-1089` |
-| `PDF_STORAGE_PROVIDER` | Receipt storage provider | `local` |
-| `PDF_STORAGE_BUCKET` | Receipt storage directory | `storage/receipts` |
+| `NODE_ENV` | Runtime environment mode | Runtime configuration (`development` or `production`) |
+| `PORT` | Local HTTP port for Express REST API | Networking port |
+| `CLIENT_URL` | Allowed client origin for CORS | CORS origin whitelisting |
+| `DATABASE_URL` | MongoDB Atlas cluster connection string | Primary cloud database connection |
+| `DATABASE_URL_TEST` | Isolated MongoDB database for test suites | Concurrency and test isolation |
+| `JWT_SECRET` | 32+ character secret key for JWT signing | Authentication and token verification |
+| `JWT_ACCESS_EXPIRES_IN` | JWT session expiration window | Donor and admin session lifespan |
+| `OPENAI_API_KEY` | Official OpenAI API Key for Hindi summaries | AI plain-Hindi synthesis engine (optional fallback active) |
+| `OPENAI_MODEL` | Target OpenAI model name | Model selection (`gpt-4o-mini`) |
+| `TRUST_NAME` | Client Trust Name (Statutory Registration) | Header on official 80G PDF certificates |
+| `TRUST_ADDRESS` | Registered address of charitable trust | Address on official 80G PDF certificates |
+| `TRUST_PAN` | Trust Permanent Account Number (PAN) | Statutory PAN on 80G certificates & Form 10BD |
+| `TRUST_80G_REGISTRATION` | Statutory Section 80G Registration Number | Legal exemption number on receipts |
+| `PDF_STORAGE_PROVIDER` | Receipt storage provider | Storage engine selector |
+| `PDF_STORAGE_BUCKET` | Receipt storage directory | Destination path for receipts |
 
-### 3.2 Frontend Environment (`client/.env`)
-Create `client/.env`:
-```env
-VITE_API_URL=http://localhost:5001/api/v1
-```
-*(In production, set `VITE_API_URL` to your deployed backend URL, e.g. `https://udaanher-api.onrender.com/api/v1`)*
+### 3.2 Frontend Environment Variables (`client/.env`)
+| Variable Name | Description | Purpose |
+|---|---|---|
+| `VITE_API_URL` | Base API URL for backend requests | Client-to-server REST communication endpoint |
 
 ---
 
@@ -170,6 +164,33 @@ npm run test:client
 6. Environment Variables:
    - `VITE_API_URL`: `https://your-render-backend-url.onrender.com/api/v1`
 7. Click **Deploy**.
+
+### 7.4 Production Deployment on AWS EC2 (Single Server / High Reliability)
+
+For enterprise self-hosted deployment, UdaanHer is fully automated for **AWS EC2 (Ubuntu 22.04 / 24.04 LTS)** using Docker Compose or PM2 + Host Nginx.
+
+See full dedicated documentation in [AWS EC2 Deployment Guide](docs/aws-ec2-deployment-guide.md).
+
+#### Quick Deployment Steps on EC2:
+```bash
+# 1. Connect to EC2 instance
+ssh -i your-key.pem ubuntu@<EC2_ELASTIC_IP>
+
+# 2. Clone repository & run automated system setup
+git clone https://github.com/Shrawan3067/UdaanHer.git udaanher
+cd udaanher
+sudo ./scripts/ec2-setup.sh
+
+# 3. Configure production environment
+cp .env.production.example server/.env
+nano server/.env # Provide your MongoDB Atlas URI & JWT secret
+
+# 4. Deploy full stack with Docker Compose & seed database
+./scripts/deploy.sh --docker --seed
+
+# 5. (Optional) Setup Free SSL via Let's Encrypt
+sudo ./scripts/ssl-setup.sh yourdomain.com admin@yourdomain.com
+```
 
 ---
 

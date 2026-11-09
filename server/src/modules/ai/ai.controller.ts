@@ -4,7 +4,8 @@ import { aiService } from './ai.service.js';
 export class AIController {
   async generateSummary(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const result = await aiService.generateSchemeSummary(req.params.schemeId, req.user!.id);
+      const { officialNoticeText } = req.body || {};
+      const result = await aiService.generateSchemeSummary(req.params.schemeId, req.user!.id, officialNoticeText);
       res.status(201).json({
         success: true,
         data: result,

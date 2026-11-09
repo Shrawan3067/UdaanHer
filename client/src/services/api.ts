@@ -103,6 +103,21 @@ class ApiClient {
     );
   }
 
+  async askSchemeQuestion(payload: { question: string; district?: string }) {
+    return this.request<{
+      query: string;
+      detectedDistrict: string;
+      detectedNeed: string;
+      rulesUsed: string[];
+      matches: any[];
+      disclaimer: string;
+      helplineOffer: string;
+    }>('/schemes/ask', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
   // --- Eligibility ---
   async matchEligibility(answers: any) {
     return this.request<any>("/eligibility/match", {
@@ -276,14 +291,15 @@ class ApiClient {
   }
 
   // --- Admin AI Review ---
-  async generateAISchemeSummary(schemeId: string) {
+  async generateAISchemeSummary(schemeId: string, data?: { officialNoticeText?: string }) {
     return this.request<any>(`/admin/ai/scheme-summary/${schemeId}`, {
       method: "POST",
+      body: JSON.stringify(data || {}),
     });
   }
 
-  async generateAISummary(schemeId: string) {
-    return this.generateAISchemeSummary(schemeId);
+  async generateAISummary(schemeId: string, data?: { officialNoticeText?: string }) {
+    return this.generateAISchemeSummary(schemeId, data);
   }
 
   async listAIReviews(status?: string) {
@@ -316,6 +332,10 @@ class ApiClient {
   }
 
   // --- Admin Reports ---
+  async getCampaignsReport() {
+    return this.request<any[]>("/admin/reports/campaigns");
+  }
+
   async getForm10BDReport(financialYear?: string) {
     const url = financialYear
       ? `/admin/reports/form-10bd?financialYear=${financialYear}`
@@ -328,6 +348,21 @@ class ApiClient {
       ? `${API_BASE_URL}/admin/reports/form-10bd?format=csv&financialYear=${financialYear}`
       : `${API_BASE_URL}/admin/reports/form-10bd?format=csv`;
     return url;
+  }
+
+  // --- Automation & Reminders ---
+  async getAutomationStatus() {
+    return this.request<{ success: boolean; data: any }>("/admin/automation/status");
+  }
+
+  async triggerAutomation() {
+    return this.request<{ success: boolean; message: string; data: any }>("/admin/automation/trigger", {
+      method: "POST",
+    });
+  }
+
+  async triggerAutomationSuite() {
+    return this.triggerAutomation();
   }
 }
 

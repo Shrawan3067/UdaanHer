@@ -1,0 +1,57 @@
+name: Test & Deploy to AWS EC2
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test-and-build:
+    name: Run Unit Tests & Build Assets
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Server & Client Unit Tests
+        run: npm test
+
+      - name: Build Server and Client Workspaces
+        run: npm run build
+
+  deploy:
+    name: Deploy to AWS EC2 Instance
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Execute Remote Deployment via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        if: env.EC2_HOST != ''
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER || 'ubuntu' }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_PORT || 22 }}
+          script: |
+            set -e
+            cd /home/ubuntu/udaanher || cd ~/udaanher
+            git pull origin main
+            ./scripts/deploy.sh --docker
+

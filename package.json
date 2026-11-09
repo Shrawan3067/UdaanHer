@@ -18,7 +18,9 @@
     "test:client": "npm --prefix client run test",
     "test": "npm --prefix server run test && npm --prefix client run test",
     "db:seed": "npm --prefix server run db:seed",
-    "seed": "npm --prefix server run db:seed"
+    "seed": "npm --prefix server run db:seed",
+    "seed:prod": "npm --prefix server run seed:prod",
+    "start": "npm --prefix server start"
   },
   "keywords": [
     "udaanher",
