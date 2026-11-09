@@ -84,10 +84,11 @@ export const DonationSuccessPage: React.FC = () => {
     <div className="max-w-3xl mx-auto px-6 lg:px-12 py-12 space-y-8 animate-fadeIn text-[#1A1A1A]">
       {/* Success Hero Header */}
       <div className="text-center space-y-3">
-        <div className="w-16 h-16 rounded-full bg-red-50 text-[#EA3C36] flex items-center justify-center mx-auto shadow-xs">
+        <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto shadow-sm">
           <CheckCircle2 className="w-9 h-9" />
         </div>
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-[#EA3C36] text-xs uppercase font-bold tracking-wider">
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs uppercase font-bold tracking-wider">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
           <span>Donation Successfully Confirmed</span>
         </div>
         <h1 className="text-3xl font-extrabold text-[#1A1A1A] tracking-tight">
