@@ -14,7 +14,7 @@ ENV VITE_API_URL=$VITE_API_URL
 
 # Copy package manifests and install all dependencies
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 # Copy source and config files
 COPY tsconfig*.json ./

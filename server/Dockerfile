@@ -10,7 +10,7 @@ WORKDIR /app
 
 # Install build dependencies
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 # Copy source files and TypeScript configuration
 COPY tsconfig.json ./
@@ -32,7 +32,7 @@ ENV PORT=5001
 
 # Copy package manifests and install production-only dependencies
 COPY package*.json ./
-RUN npm ci --omit=dev && npm cache clean --force
+RUN npm install --omit=dev && npm cache clean --force
 
 # Copy compiled JavaScript from builder
 COPY --from=builder /app/dist ./dist
