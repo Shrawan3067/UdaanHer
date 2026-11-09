@@ -1,7 +1,7 @@
 # UdaanHer: Giving women wings to fly — Technical Design Document (TDD)
 
 **GitHub Repository**: `https://github.com/Shrawan3067/UdaanHer` (Public Repository)  
-**Live Deployed App**: `http://<EC2_PUBLIC_IP>/` | `https://udaanher.isocode.org` (AWS EC2 Production Instance)  
+**Live Deployed App**: `http://52.22.92.241` (AWS EC2 Production Instance)  
 **Client Problem Statement**: Problem #3 — *NGO's donation platform with a women's schemes finder on the home page*  
 **Date**: November 2026 | **Version**: 1.0.0 Final Production-Ready Submission  
 **Author**: Isocode Software Engineering Candidate

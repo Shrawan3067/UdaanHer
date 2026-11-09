@@ -173,8 +173,8 @@ See full dedicated documentation in [AWS EC2 Deployment Guide](docs/aws-ec2-depl
 
 #### Quick Deployment Steps on EC2:
 ```bash
-# 1. Connect to EC2 instance
-ssh -i your-key.pem ubuntu@<EC2_ELASTIC_IP>
+# 1. Connect to EC2 instance (Elastic IP: 52.22.92.241)
+ssh -i your-key.pem ubuntu@52.22.92.241
 
 # 2. Clone repository & run automated system setup
 git clone https://github.com/Shrawan3067/UdaanHer.git udaanher
