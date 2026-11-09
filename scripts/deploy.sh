@@ -146,6 +146,13 @@ if [ "$MODE" = "docker" ]; then
     fi
   fi
 
+  # Stop host nginx to free port 80/443 for Docker container
+  if systemctl is-active --quiet nginx 2>/dev/null; then
+    echo -e "${YELLOW}Stopping host Nginx to allow Docker frontend container to bind ports 80/443...${NC}"
+    sudo systemctl stop nginx || true
+    sudo systemctl disable nginx || true
+  fi
+
   # Build and start services
   $COMPOSE_CMD down --remove-orphans || true
   $COMPOSE_CMD up -d --build
