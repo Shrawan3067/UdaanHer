@@ -137,11 +137,11 @@ export const Footer: React.FC = () => {
           {/* Column 1 & 2: Brand Mission & Newsletter */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-[#EA3C36] flex items-center justify-center text-white shadow-xs">
-                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                  <path d="M19 10.5h-5.5V5c0-.55-.45-1-1-1h-1c-.55 0-1 .45-1 1v5.5H5c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h5.5V19c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-5.5H19c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1z" />
-                </svg>
-              </div>
+              <img
+                src="/assets/images/logo.png"
+                alt="UdaanHer Logo"
+                className="h-10 w-auto bg-white rounded-lg p-1 object-contain shrink-0"
+              />
               <div className="flex flex-col">
                 <span className="text-lg text-white font-bold leading-tight">
                   UdaanHer Charitable Foundation

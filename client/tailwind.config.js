@@ -4,6 +4,9 @@ export default {
   darkMode: "class",
   theme: {
     extend: {
+      screens: {
+        xs: '420px',
+      },
       colors: {
         // UdaanHer: Giving women wings to fly Design System Tokens (India)
         primary: "#EA3C36",

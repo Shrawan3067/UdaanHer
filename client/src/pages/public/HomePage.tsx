@@ -140,7 +140,7 @@ export const HomePage: React.FC = () => {
               </span>
             </div>
 
-            <h1 className="font-poppins text-4xl sm:text-5xl lg:text-6xl text-white font-extrabold tracking-tight leading-tight">
+            <h1 className="font-poppins text-3xl sm:text-5xl lg:text-6xl text-white font-extrabold tracking-tight leading-tight">
               {language === "HI"
                 ? heroSlides[currentSlide].titleHi
                 : heroSlides[currentSlide].titleEn}
@@ -593,26 +593,28 @@ export const HomePage: React.FC = () => {
                   <label className="text-xs font-semibold text-gray-600">
                     Payment Gateway
                   </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {["UPI / QR", "Card (Debit/Credit)", "Net Banking"].map(
-                      (method) => {
-                        const isSelected = selectedPaymentType === method;
-                        return (
-                          <button
-                            key={method}
-                            type="button"
-                            onClick={() => setSelectedPaymentType(method)}
-                            className={`p-2.5 rounded-lg border text-xs font-semibold flex items-center justify-center transition-all cursor-pointer ${
-                              isSelected
-                                ? "border-[#EA3C36] bg-red-50 text-[#EA3C36]"
-                                : "border-gray-200 text-gray-700 hover:border-gray-300"
-                            }`}
-                          >
-                            {method}
-                          </button>
-                        );
-                      },
-                    )}
+                  <div className="grid grid-cols-1 xs:grid-cols-3 gap-2">
+                    {[
+                      { id: "UPI / QR", label: "UPI / QR" },
+                      { id: "Card (Debit/Credit)", label: "Card (Debit/Credit)" },
+                      { id: "Net Banking", label: "Net Banking" },
+                    ].map((m) => {
+                      const isSelected = selectedPaymentType === m.id;
+                      return (
+                        <button
+                          key={m.id}
+                          type="button"
+                          onClick={() => setSelectedPaymentType(m.id)}
+                          className={`p-2 sm:p-2.5 rounded-lg border text-xs font-semibold flex items-center justify-center text-center transition-all cursor-pointer leading-tight ${
+                            isSelected
+                              ? "border-[#EA3C36] bg-red-50 text-[#EA3C36]"
+                              : "border-gray-200 text-gray-700 hover:border-gray-300"
+                          }`}
+                        >
+                          {m.label}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 

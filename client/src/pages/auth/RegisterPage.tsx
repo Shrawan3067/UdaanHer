@@ -38,12 +38,13 @@ export const RegisterPage: React.FC = () => {
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 bg-white text-[#1A1A1A]">
       <div className="w-full max-w-md bg-white rounded-xl border border-gray-200 shadow-xl p-8 space-y-6">
-        <div className="text-center space-y-2">
-          {/* Red Cross Emblem */}
-          <div className="w-12 h-12 rounded-lg bg-[#EA3C36] text-white flex items-center justify-center mx-auto shadow-sm">
-            <svg className="w-7 h-7 fill-current" viewBox="0 0 24 24">
-              <path d="M19 10.5h-5.5V5c0-.55-.45-1-1-1h-1c-.55 0-1 .45-1 1v5.5H5c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h5.5V19c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-5.5H19c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1z" />
-            </svg>
+        <div className="text-center space-y-3">
+          <div className="flex justify-center mb-1">
+            <img
+              src="/assets/images/logo.png"
+              alt="UdaanHer Logo"
+              className="h-14 sm:h-16 w-auto object-contain mix-blend-multiply"
+            />
           </div>
           <h1 className="text-2xl font-bold text-[#1A1A1A]">
             {language === 'HI' ? 'दाता खाता पंजीकरण' : 'Create Donor Account'}

@@ -71,9 +71,11 @@ export const AdminLayout: React.FC = () => {
           {/* Brand */}
           <div className="h-20 px-6 flex items-center justify-between border-b border-[#E5E7EB]">
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-container flex items-center justify-center text-on-primary shadow-xs ring-1 ring-primary/20 group-hover:scale-105 transition-transform">
-                <span className="material-symbols-outlined text-[22px]">diversity_1</span>
-              </div>
+              <img
+                src="/assets/images/logo.png"
+                alt="UdaanHer Logo"
+                className="h-10 w-auto object-contain mix-blend-multiply group-hover:scale-105 transition-transform"
+              />
               <div className="flex flex-col">
                 <span className="font-title-md text-title-md text-primary tracking-tight font-bold group-hover:text-primary-container transition-colors">UdaanHer</span>
                 <span className="font-label-caps text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">
@@ -155,36 +157,37 @@ export const AdminLayout: React.FC = () => {
 
       {/* Top Header Bar for Desktop */}
       <div className="lg:pl-72">
-        <header className="fixed top-0 left-0 lg:left-72 right-0 h-20 glass-header border-b border-[#E5E7EB] z-40 px-6 lg:px-8 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <header className="fixed top-0 left-0 lg:left-72 right-0 h-16 sm:h-20 glass-header border-b border-[#E5E7EB] z-40 px-3 sm:px-6 lg:px-8 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <button
               onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-              className="lg:hidden p-2 text-on-surface rounded-xl hover:bg-surface-container cursor-pointer"
+              className="lg:hidden p-2 text-on-surface rounded-xl hover:bg-surface-container cursor-pointer shrink-0"
+              aria-label="Open sidebar"
             >
-              <Menu className="w-6 h-6" />
+              <Menu className="w-5 sm:w-6 h-5 sm:h-6" />
             </button>
-            <span className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider glass-pill px-3 py-1 rounded-full font-bold shadow-xs">
+            <span className="hidden xs:inline-block font-label-caps text-[10px] sm:text-label-caps text-on-surface-variant uppercase tracking-wider glass-pill px-2.5 sm:px-3 py-1 rounded-full font-bold shadow-xs truncate">
               Govt &amp; Field Operations Portal
             </span>
-            <div className="hidden sm:flex items-center gap-1.5 text-on-surface-variant font-body-sm text-xs">
+            <div className="hidden sm:flex items-center gap-1.5 text-on-surface-variant font-body-sm text-xs shrink-0">
               <span className="material-symbols-outlined text-[16px] text-primary">cloud_done</span>
               <span>NIC Data Sync Active</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             <LanguageSwitcher />
 
-            <div className="h-7 w-[1px] bg-surface-container-high"></div>
+            <div className="h-6 sm:h-7 w-[1px] bg-surface-container-high"></div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <div className="hidden sm:flex flex-col text-right">
                 <span className="font-title-md text-[14px] text-on-surface font-semibold leading-tight">
                   {user.fullName}
                 </span>
                 <span className="font-label-sm text-xs text-on-surface-variant">Lead Operations Director</span>
               </div>
-              <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-on-primary">
+              <div className="w-8 sm:w-9 h-8 sm:h-9 rounded-full bg-primary flex items-center justify-center text-on-primary">
                 <span className="material-symbols-outlined text-[18px]">person</span>
               </div>
             </div>
@@ -192,7 +195,7 @@ export const AdminLayout: React.FC = () => {
         </header>
 
         {/* Main Content Area */}
-        <main className="w-full pt-20 p-6 lg:p-8 min-h-screen">
+        <main className="w-full pt-16 sm:pt-20 p-3 sm:p-6 lg:p-8 min-h-screen">
           <Outlet />
         </main>
       </div>
@@ -204,7 +207,14 @@ export const AdminLayout: React.FC = () => {
           <div className="relative w-72 bg-surface-container-lowest h-full shadow-2xl flex flex-col justify-between p-4 z-10">
             <div>
               <div className="flex items-center justify-between pb-4 border-b border-[#E5E7EB]">
-                <span className="font-title-md text-primary font-bold">UdaanHer Admin</span>
+                <div className="flex items-center gap-2">
+                  <img
+                    src="/assets/images/logo.png"
+                    alt="UdaanHer"
+                    className="h-8 w-auto object-contain mix-blend-multiply"
+                  />
+                  <span className="font-title-md text-primary font-bold">UdaanHer Admin</span>
+                </div>
                 <button onClick={() => setMobileSidebarOpen(false)}>
                   <X className="w-6 h-6 text-on-surface" />
                 </button>

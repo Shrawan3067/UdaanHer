@@ -123,7 +123,7 @@ export const AdminDonationsPage: React.FC = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full min-w-[700px] text-left border-collapse">
               <thead>
                 <tr className="bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider border-b border-[#E5E7EB]">
                   <th className="py-3 px-6 font-semibold">Receipt &amp; Date</th>

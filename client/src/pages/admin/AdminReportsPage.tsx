@@ -48,7 +48,7 @@ export const AdminReportsPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <select
             value={financialYear}
             onChange={(e) => setFinancialYear(e.target.value)}
@@ -70,9 +70,9 @@ export const AdminReportsPage: React.FC = () => {
       </div>
 
       {/* Summary Banner */}
-      <div className="bg-surface-container-lowest rounded-2xl border border-[#E5E7EB] p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-surface-container-lowest rounded-2xl border border-[#E5E7EB] p-4 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-primary-fixed flex items-center justify-center text-primary font-bold">
+          <div className="w-12 h-12 rounded-xl bg-primary-fixed flex items-center justify-center text-primary font-bold shrink-0">
             <span className="material-symbols-outlined text-[24px]">verified_user</span>
           </div>
           <div>
@@ -83,7 +83,7 @@ export const AdminReportsPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex gap-8 sm:text-right">
+        <div className="flex flex-wrap gap-4 sm:gap-8 sm:text-right">
           <div>
             <span className="font-label-caps text-label-caps text-on-surface-variant font-semibold uppercase block">
               Total Verified Donors
@@ -103,7 +103,7 @@ export const AdminReportsPage: React.FC = () => {
 
       {/* Form 10BD Table */}
       <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-[#E5E7EB] overflow-hidden">
-        <div className="p-6 border-b border-[#E5E7EB] flex items-center justify-between">
+        <div className="p-4 sm:p-6 border-b border-[#E5E7EB] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <h3 className="font-title-md text-title-md text-primary font-bold">
             Schedule of Donors (Form 10BD Electronic Specification)
           </h3>
@@ -122,7 +122,7 @@ export const AdminReportsPage: React.FC = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full min-w-[750px] text-left border-collapse">
               <thead>
                 <tr className="bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider border-b border-[#E5E7EB]">
                   <th className="py-3 px-6 font-semibold">Sl. No.</th>

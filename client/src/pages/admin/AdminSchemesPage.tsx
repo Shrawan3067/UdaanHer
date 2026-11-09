@@ -191,13 +191,13 @@ export const AdminSchemesPage: React.FC = () => {
           />
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-start sm:justify-end">
           {(['ALL', 'PUBLISHED', 'DRAFT', 'ARCHIVED'] as const).map((st) => (
             <button
               key={st}
               type="button"
               onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1.5 rounded-lg font-label-sm text-xs font-semibold transition-colors ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg font-label-sm text-xs font-semibold transition-colors ${
                 statusFilter === st
                   ? 'bg-primary text-on-primary shadow-xs'
                   : 'bg-surface-container text-on-surface-variant hover:text-on-surface'
@@ -221,7 +221,7 @@ export const AdminSchemesPage: React.FC = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full min-w-[750px] text-left border-collapse">
               <thead>
                 <tr className="bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider border-b border-[#E5E7EB]">
                   <th className="py-3 px-6 font-semibold">Code &amp; Title</th>

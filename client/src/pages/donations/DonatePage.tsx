@@ -172,7 +172,7 @@ export const DonatePage: React.FC = () => {
           <div className="flex flex-wrap items-center gap-3">
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-[#EA3C36] text-xs uppercase font-bold tracking-wider">
               <span className="w-2 h-2 rounded-full bg-[#EA3C36]"></span>
-              Ways to Donate • Red Cross Humanitarian Network
+              Ways to Donate • UdaanHer Humanitarian Network
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-xs font-semibold">
               <Shield className="w-3.5 h-3.5 text-[#EA3C36]" />

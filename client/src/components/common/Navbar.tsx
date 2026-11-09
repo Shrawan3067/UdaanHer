@@ -135,26 +135,26 @@ export const Navbar: React.FC = () => {
             isScrolled ? "shadow-sm bg-white/98" : "shadow-2xs"
           }`}
         >
-          <div className="max-w-7xl mx-auto h-16 md:h-[70px] px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 font-poppins">
+          <div className="max-w-7xl mx-auto h-16 md:h-[70px] px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4 font-poppins min-w-0">
             {/* Left: Brand Logo & Emblem */}
-            <div className="flex items-center gap-4 lg:gap-8 font-poppins">
+            <div className="flex items-center gap-2 sm:gap-4 lg:gap-8 font-poppins min-w-0">
               <Link
                 to="/"
-                className="flex items-center gap-3 group shrink-0 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#EA3C36] rounded-lg p-0.5 font-poppins"
+                className="flex items-center gap-2 sm:gap-3 group shrink-0 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#EA3C36] rounded-lg p-0.5 font-poppins min-w-0"
               >
                 {/* UdaanHer Official Brand Logo */}
                 <img
                   src="/assets/images/logo.png"
                   alt="UdaanHer Logo"
-                  className="h-10 sm:h-12 w-auto object-contain mix-blend-multiply group-hover:scale-[1.03] transition-transform duration-200"
+                  className="h-9 sm:h-12 w-auto object-contain mix-blend-multiply group-hover:scale-[1.03] transition-transform duration-200 shrink-0"
                 />
 
                 {/* Brand Typography */}
-                <div className="flex flex-col font-poppins">
-                  <span className="text-lg sm:text-[21px] font-extrabold text-[#1A1A1A] tracking-tight leading-none group-hover:text-[#EA3C36] transition-colors font-poppins">
+                <div className="flex flex-col font-poppins min-w-0">
+                  <span className="text-base sm:text-[21px] font-extrabold text-[#1A1A1A] tracking-tight leading-none group-hover:text-[#EA3C36] transition-colors font-poppins truncate">
                     {language === "HI" ? "उड़ानहर" : "UdaanHer"}
                   </span>
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-[#EA3C36] mt-0.5 leading-none font-poppins">
+                  <span className="hidden xs:inline-block text-[9px] sm:text-[10px] uppercase font-bold tracking-wider text-[#EA3C36] mt-0.5 leading-none font-poppins truncate max-w-[130px] sm:max-w-none">
                     {language === "HI"
                       ? "महिलाओं को उड़ने के पंख"
                       : "Giving women wings to fly"}
@@ -190,7 +190,7 @@ export const Navbar: React.FC = () => {
             </div>
 
             {/* Right Actions: Session, CTA & Mobile Toggle */}
-            <div className="flex items-center gap-2.5 sm:gap-3 font-poppins">
+            <div className="flex items-center gap-1.5 sm:gap-3 font-poppins shrink-0">
               {/* Mobile language switch */}
               <div className="md:hidden">
                 <LanguageSwitcher />
@@ -239,24 +239,25 @@ export const Navbar: React.FC = () => {
               {/* Red Cross "Donate Now" CTA Button */}
               <Link
                 to="/donate"
-                className="inline-flex items-center justify-center gap-1.5 bg-[#EA3C36] hover:bg-[#D32F2F] active:scale-[0.98] text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-bold text-xs sm:text-sm shadow-xs hover:shadow-md transition-all cursor-pointer shrink-0 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#EA3C36] focus-visible:ring-offset-2 font-poppins"
+                className="inline-flex items-center justify-center gap-1 sm:gap-1.5 bg-[#EA3C36] hover:bg-[#D32F2F] active:scale-[0.98] text-white px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-lg font-bold text-xs sm:text-sm shadow-xs hover:shadow-md transition-all cursor-pointer shrink-0 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#EA3C36] focus-visible:ring-offset-2 font-poppins"
               >
-                <Heart className="w-3.5 h-3.5 fill-current" />
-                <span>{language === "HI" ? "दान करें" : "Donate Now"}</span>
+                <Heart className="w-3.5 h-3.5 fill-current shrink-0" />
+                <span className="hidden xs:inline">{language === "HI" ? "दान करें" : "Donate Now"}</span>
+                <span className="xs:hidden">{language === "HI" ? "दान" : "Donate"}</span>
               </Link>
 
               {/* Mobile Hamburger Button */}
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 text-gray-700 hover:text-[#EA3C36] hover:bg-gray-100 rounded-lg transition-colors focus:outline-hidden cursor-pointer"
+                className="lg:hidden p-1.5 sm:p-2 text-gray-700 hover:text-[#EA3C36] hover:bg-gray-100 rounded-lg transition-colors focus:outline-hidden cursor-pointer"
                 aria-label="Toggle navigation menu"
                 aria-expanded={mobileMenuOpen}
               >
                 {mobileMenuOpen ? (
-                  <X className="w-6 h-6" />
+                  <X className="w-5 sm:w-6 h-5 sm:h-6" />
                 ) : (
-                  <Menu className="w-6 h-6" />
+                  <Menu className="w-5 sm:w-6 h-5 sm:h-6" />
                 )}
               </button>
             </div>
